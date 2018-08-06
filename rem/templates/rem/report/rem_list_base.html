@@ -1,0 +1,136 @@
+{% extends "rem/base.html" %}
+
+{% block js %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#selecctall_1').click(function(event) {
+        if (this.checked) {
+            $('.jqselect_1').each(function() { //loop through each checkbox
+                $(this).prop('checked', true); //check
+            });
+        } else {
+            $('.jqselect_1').each(function() { //loop through each checkbox
+                $(this).prop('checked', false); //uncheck
+            });
+        }
+    });
+    $('#selecctall_2').click(function(event) {
+        if (this.checked) {
+            $('.jqselect_2').each(function() { //loop through each checkbox
+                $(this).prop('checked', true); //check
+            });
+        } else {
+            $('.jqselect_2').each(function() { //loop through each checkbox
+                $(this).prop('checked', false); //uncheck
+            });
+        }
+    });
+    $('#selecctall_3').click(function(event) {
+        if (this.checked) {
+            $('.jqselect_3').each(function() { //loop through each checkbox
+                $(this).prop('checked', true); //check
+            });
+        } else {
+            $('.jqselect_3').each(function() { //loop through each checkbox
+                $(this).prop('checked', false); //uncheck
+            });
+        }
+    });
+    $('#selecctall_4').click(function(event) {
+        if (this.checked) {
+            $('.jqselect_4').each(function() { //loop through each checkbox
+                $(this).prop('checked', true); //check
+            });
+        } else {
+            $('.jqselect_4').each(function() { //loop through each checkbox
+                $(this).prop('checked', false); //uncheck
+            });
+        }
+    });
+    $('#selecctall_5').click(function(event) {
+        if (this.checked) {
+            $('.jqselect_5').each(function() { //loop through each checkbox
+                $(this).prop('checked', true); //check
+            });
+        } else {
+            $('.jqselect_5').each(function() { //loop through each checkbox
+                $(this).prop('checked', false); //uncheck
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
+{% block title %} Remmittance List {% endblock %}
+
+{% block content %}
+<br>
+<form method="post">
+  {% csrf_token %}
+  <div class='form-row'>
+    <div class="col-auto">
+      {{form.date_from.label_tag}}
+      {{form.date_from}}
+    </div>
+    <div class="col-auto">
+      {{form.date_to.label_tag}}
+      {{form.date_to}}
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary btn-sm mb-2">Search</button>
+    </div>
+  </div>
+</form>
+</br>
+{%if rem_list %}
+  {% regroup rem_list by exchange as remmittance_list %}
+
+  {% block form %} {% endblock %}
+    <fieldset id="group_1">
+    {% csrf_token %}
+    {% for rem in remmittance_list %}
+      </br><h4> {{ rem.grouper }} </h4>
+      <table id="table_{{forloop.counter}}" class='table table-hover table-sm'>
+        <thead>
+          <tr>
+            <th scope="col"><input type="checkbox" id="selecctall_{{forloop.counter}}"/></th>
+            <th scope="col">Branch</th>
+            <th scope="col">Country</th>
+            <th scope="col">Ref. No</th>
+            <th scope="col">Status</th>
+            <th scope="col">Sender</th>
+            <th scope="col">Benificiary</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Date Paid</th>
+            <th scope="col">Posting Date</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+          {% for entry in rem.list %}
+          <tbody>
+            <tr>
+              <td>
+                <div class="form-check">
+                  <input class="form-check-input jqselect_{{forloop.parentloop.counter}}" type="checkbox" name="checks" value="{{entry.pk}}" id="Check-{{entry.pk}}">
+                </div>
+              </td>
+              <td>{{entry.branch}}</td>
+              <td>{{entry.rem_country}}</td>
+              <td>{{entry.reference}}</td>
+              <td>{{entry.status_verbose}}</td>
+              <td>{{entry.sender.title}}</td>
+              <td>{{entry.reciever.title}}</td>
+              <td>{{entry.amount}}</td>
+              <td>{{entry.date}}</td>
+              <td>{{entry.date_create}}</td>
+              <td><a class="btn btn-success btn-sm" href="{% url 'remmit-update' entry.pk %}"><i class="fas fa-edit"></i></a></td>
+            </tr>
+          </tbody>
+          {% endfor %}
+          </table>
+    {% endfor %}
+  </fieldset>
+    <input type="submit" class="btn btn-primary" value="Submit" />
+    </form>
+  {%endif%}
+{% endblock %}

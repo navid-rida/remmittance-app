@@ -1,0 +1,146 @@
+{% extends "rem/base.html" %}
+{% load widget_tweaks %}
+
+{% block title %} Upload Remmittance Data {% endblock %}
+
+{% block content %}
+{% if messages %}
+    {% for message in messages %}
+      {{ message }}
+    {% endfor %}
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+<div class="row">
+  <div class=" offset-1">
+    <div class="row">
+      <div class="col">
+        <h3> Add remmittance Information </h3>
+      </div>
+    </div>
+    {% if user.employee.branch.code == '0100'%}
+    <div class="row">
+      <div class="col-md-8">
+        <div class="form-group row">
+          {% for error in form.branch.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.branch.label_tag}}
+          {{ form.branch|add_class:"form-control col-md-10"}}
+        </div>
+      </div>
+    </div>
+    {%endif%}
+    <div class="row">
+      <div class="col-md-8">
+        <div class="form-group row">
+          {% for error in form.exchange.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.exchange.label_tag}}
+          {{ form.exchange|add_class:"form-control col-md-10"}}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8">
+        <div class="form-group row">
+          {% for error in form.rem_country.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.rem_country.label_tag}}
+          {{ form.rem_country|add_class:"form-control col-md-10"}}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8">
+        <div class="form-group row">
+          {% for error in form.reference.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.reference.label_tag}}
+          {{ form.reference|add_class:"form-control col-md-10"}}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8">
+        <div class="form-group row">
+          {% for error in form.sender.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.sender.label_tag}}
+          {{ form.sender|add_class:"form-control col-md-10"}}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8">
+        <div class="form-group row">
+          {% for error in form.reciever.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.reciever.label_tag}}
+          {{ form.reciever|add_class:"form-control col-md-10"}}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8">
+        <div class="form-group row">
+          {% for error in form.amount.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.amount.label_tag}}
+          {{ form.amount|add_class:"form-control col-md-10"}}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8">
+        <div class="form-group row">
+          {% for error in form.mode.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.mode.label_tag}}
+          {{ form.mode|add_class:"form-control col-md-10"}}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8">
+        <div class="form-group row">
+          {% for error in form.date.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.date.label_tag}}
+          {{ form.date}}
+        </div>
+      </div>
+    </div>
+    <input type="submit" class="btn btn-primary" value="Submit" />
+  </div>
+</div>
+
+</form>
+{% endblock %}
