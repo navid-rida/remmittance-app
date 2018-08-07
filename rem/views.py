@@ -1,7 +1,6 @@
 from django.shortcuts import render,redirect#, render_to_response
 from django.http import HttpResponse
 from .forms import RemmitForm, CsvForm, SearchForm
-#from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required,user_passes_test
 from .models import Remmit
 from datetime import date
@@ -27,7 +26,6 @@ def check_headoffice(user):
 class RemmitCreate(CreateView):
     model = Remmit
     form_class = RemmitForm
-    #fields = ['name']
     template_name = 'rem/forms/remmit_create_form.html'
     success_url = reverse_lazy('remmit-create')
 
@@ -41,7 +39,6 @@ class RemmitCreate(CreateView):
 class RemmitUpdate(UpdateView):
     model = Remmit
     form_class = RemmitForm
-    #fields = ['name']
     template_name = 'rem/forms/remmit_update_form.html'
     success_url = '/'
 
@@ -101,23 +98,6 @@ def mark_rem_list(request):
         form = SearchForm()
         context = {'form':form}
     return render(request, 'rem/report/mark_settle.html', context)
-
-
-
-"""@login_required
-def show_rem(request):
-    if request.method == "POST":
-        form = SearchForm(request.POST)
-        if form.is_valid():
-            date_from = form.cleaned_data['date_from']
-            date_to = form.cleaned_data['date_to']
-            rem_list = Remmit.objects.filter(date__range=[date_from, date_to]).order_by('exchange', '-date')
-            context = {'rem_list': rem_list, 'form':form}
-            return render(request, 'rem/report/new_rem_list.html', context)
-    else:
-        form = SearchForm()
-        context = {'form':form}
-    return render(request, 'rem/report/new_rem_list.html', context)"""
 
 
 @login_required

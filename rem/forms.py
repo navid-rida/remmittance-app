@@ -6,18 +6,6 @@ from datetime import date
 
 class RemmitForm(ModelForm):
 
-    """def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['branch'].widget.attrs.update({'class': 'form-control'})
-        self.fields['exchange'].widget.attrs.update({'class': 'form-control'})
-        self.fields['rem_country'].widget.attrs.update({'class': 'form-control'})
-        self.fields['sender'].widget.attrs.update({'class': 'form-control'})
-        self.fields['reciever'].widget.attrs.update({'class': 'form-control'})
-        self.fields['amount'].widget.attrs.update({'class': 'form-control'})
-        self.fields['amount'].widget.attrs.update({'class': 'form-control'})
-        self.fields['date'].widget.attrs.update({'class': 'form-control'})
-        #self.fields['comment'].widget.attrs.update(size='40')"""
-
     class Meta:
         model = Remmit
         fields = ('branch','exchange','rem_country','reference','sender','reciever','amount','mode','date',)
