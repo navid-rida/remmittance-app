@@ -103,7 +103,8 @@ $(document).ready(function() {
             <th scope="col">Amount</th>
             <th scope="col">Date Paid</th>
             <th scope="col">Posting Date</th>
-            <th scope="col"></th>
+            <th scope="col">Date Edited</th>
+            <th scope="col">Edited by</th>
           </tr>
         </thead>
           {% for entry in rem.list %}
@@ -123,6 +124,8 @@ $(document).ready(function() {
               <td>{{entry.amount}}</td>
               <td>{{entry.date}}</td>
               <td>{{entry.date_create}}</td>
+              <td>{{entry.date_edited}}</td>
+              <td>{{entry.created_by}}</td>
               <td><a class="btn btn-success btn-sm" href="{% url 'remmit-update' entry.pk %}"><i class="fas fa-edit"></i></a></td>
             </tr>
           </tbody>
