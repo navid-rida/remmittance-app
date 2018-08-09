@@ -8,7 +8,7 @@ class RemmitForm(ModelForm):
 
     class Meta:
         model = Remmit
-        fields = ('branch','exchange','rem_country','reference','sender','reciever','amount','mode','date',)
+        fields = ('exchange','rem_country','reference','sender','reciever','amount','mode','date',)
         widgets = {
             'date': forms.SelectDateWidget,
         }

@@ -31,8 +31,7 @@ class RemmitCreate(CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
-        if self.request.user.employee.branch.code != '0100':
-            form.instance.branch = self.request.user.employee.branch
+        form.instance.branch = self.request.user.employee.branch
         return super().form_valid(form)
 
 @method_decorator(login_required, name='dispatch')
