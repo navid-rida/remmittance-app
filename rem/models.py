@@ -6,6 +6,7 @@ from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 # Create your models here.
 numeric = RegexValidator(r'^[0-9]*$', 'Only numeric characters are allowed.')
+alpha_num = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only Alphabet and numeric characters are allowed.')
 
 
 class Branch(models.Model):
@@ -77,7 +78,7 @@ class Remmit(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     date_create = models.DateField("Date of posting", auto_now_add=True)
     date_edited = models.DateField("Date of last modified", auto_now=True)
-    reference = models.CharField("Referene No.", max_length=16,  validators=[numeric])
+    reference = models.CharField("Referene No.", max_length=16,  validators=[alpha_num])
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def status_verbose(self):
