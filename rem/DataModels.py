@@ -35,7 +35,11 @@ def make_ac_df(list,category,columns):
         #i = i + 1
         dr_cr = 'C' if category=='gl' else 'D'
         tr_date.append(date.today().strftime('%d/%m/%Y'))
-        br_code.append(rem.branch.code)
+        #br_code.append(rem.branch.code)
+        if category=='gl':
+            br_code.append(rem.branch.code)
+        else:
+            br_code.append("0101")
         if category=='gl':
             ac_no.append(rem.exchange.gl_no)
         else:
@@ -43,10 +47,9 @@ def make_ac_df(list,category,columns):
         type.append(dr_cr)
         amount.append(rem.amount)
         if dr_cr == 'C':
-
-            narration = "Settlement agt payment made on "+rem.date.strftime('%d/%m/%Y')
+            narration = "Settlement agt "+ rem.reference +" made on "+rem.date.strftime('%d/%m/%Y')
         else:
-            narration = "Favoring "+rem.branch.name+" agt payment made on "+rem.date.strftime('%d/%m/%Y')
+            narration = "Favoring "+rem.branch.name+" agt "+ rem.reference +" made on "+rem.date.strftime('%d/%m/%Y')
         narrations.append(narration)
         if category=='br_ac' and dr_cr == 'D':
             flag=1
@@ -64,6 +67,7 @@ def make_ac_df(list,category,columns):
         'flags' : flags
         }
     df = pd.DataFrame(dict)
+    df = df.sort_values(by=['ac_no',])
     return df
 
 def rem_bb_summary(list):

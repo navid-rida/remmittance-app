@@ -4,6 +4,7 @@ from datetime import date
 from .validators import validate_neg, validate_post_date
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
+from django.utils import timezone
 # Create your models here.
 numeric = RegexValidator(r'^[0-9]*$', 'Only numeric characters are allowed.')
 alpha_num = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only Alphabet and numeric characters are allowed.')
@@ -73,7 +74,7 @@ class Remmit(models.Model):
         (NOT_SETTLED, 'Not Settled'),
         )
     status = models.CharField("Status",max_length=2, choices=STATUS_CHOICES, default=NOT_SETTLED)
-    date = models.DateField("Remmittance Distribution Date", default=date.today(), validators=[validate_post_date])
+    date = models.DateField("Remmittance Distribution Date", default=timezone.now, validators=[validate_post_date])
     date_settle = models.DateField("Remmittance Settement Date", null=True, validators=[validate_post_date])
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     date_create = models.DateField("Date of posting", auto_now_add=True)
