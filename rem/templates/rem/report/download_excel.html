@@ -4,3 +4,8 @@
 {% block form %}
 <form method="post" action="{% url 'download_exc'%}">
 {% endblock %}
+{% block error %}
+  {% if list %}
+    <div class="alert alert-danger" role="alert">{{ list }}</div>
+  {% endif %}
+{% endblock %}

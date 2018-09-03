@@ -1,7 +1,13 @@
 from .models import *
 import pandas as pd
-from datetime import datetime, date
+from datetime import datetime, date,timedelta
 import io
+
+
+############################# Variables and Lists ######################################
+gl = ['901130537010101','901130539010101','901130537010103','901130537010105','901130537010108']
+cd = ['33300000414','33300000616','33300000670','33300000741','33300000848']
+ac_list = gl + cd
 
 ####################### common functions#################################################
 
@@ -16,7 +22,34 @@ def excel_output(df):
     xlsx_data = output.getvalue()
     return xlsx_data
 
-####################### common functions#################################################
+def qset_to_df(qset):
+    """ accepts Django queryset and converts to pandas Dataframe """
+    df = pd.DataFrame(list(qset.values()))
+    return df
+
+def find_same_amount(df):
+    """This function takes remmittance details dataframe as input
+    and returns a modified dataframe marking the entries which has
+    same exchange house AND Branch AND same amount"""
+    ids = list(df['id'][df.duplicated(['amount','branch_id','exchange_id'],keep= False)==True].values)
+    return ids
+
+def search(date_from=None,date_to=None,exchange=None,branch=None,status=None):
+    if status==None:
+        rem_list = Remmit.objects.all()
+    else:
+        rem_list = Remmit.objects.filter(status=status)
+    if date_from != None and date_to != None:
+        rem_list = rem_list.filter(date_create__gte=date_from-timedelta(days=1),date_create__lte=date_to+timedelta(days=1))
+    if branch != None:
+        rem_list = rem_list.filter(branch=branch)
+    if exchange != None:
+        rem_list = rem_list.filter(exchange=exchange)
+    rem_list = rem_list.order_by('exchange', '-date')
+    return rem_list
+
+
+####################### Report Sepcific Functions #################################################
 def make_ac_df(list,category,columns):
     #day = date.strftime('%Y-%m-%d')
     dict = {}
@@ -49,7 +82,7 @@ def make_ac_df(list,category,columns):
         if dr_cr == 'C':
             narration = "Settlement agt "+ rem.reference +" made on "+rem.date.strftime('%d/%m/%Y')
         else:
-            narration = "Favoring "+rem.branch.name+" agt "+ rem.reference +" made on "+rem.date.strftime('%d/%m/%Y')
+            narration = "Favoring "+rem.branch.code+" agt "+ rem.reference +" made on "+rem.date.strftime('%d/%m/%Y')
         narrations.append(narration)
         if category=='br_ac' and dr_cr == 'D':
             flag=1
@@ -67,6 +100,7 @@ def make_ac_df(list,category,columns):
         'flags' : flags
         }
     df = pd.DataFrame(dict)
+    df['ac_no'] = pd.Categorical(df['ac_no'], ac_list)
     df = df.sort_values(by=['ac_no',])
     return df
 

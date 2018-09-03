@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from datetime import date
+#from datetime import date
+from django.utils import timezone
 
 
 def validate_neg(value):
@@ -19,7 +20,7 @@ def validate_even(value):
 
 
 def validate_post_date(day):
-    if day > date.today():
+    if day > timezone.localdate():
         raise ValidationError(
             _('%(value)s is a future date'),
             params={'value': day},

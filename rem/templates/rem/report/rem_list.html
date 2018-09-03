@@ -15,11 +15,16 @@
       {{form.date_to}}
     </div>
     <div class="col-auto">
+      {{form.exchange.label_tag}}
+      {{form.exchange}}
+    </div>
+    <div class="col-auto">
       <button type="submit" class="btn btn-primary btn-sm mb-2">Search</button>
     </div>
   </div>
 </form>
 </br>
+{{ date }}
 {%if rem_list %}
   {% regroup rem_list by exchange as remmittance_list %}
     {% for rem in remmittance_list %}

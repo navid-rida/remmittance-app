@@ -68,13 +68,14 @@ $(document).ready(function() {
 <form method="post">
   {% csrf_token %}
   <div class='form-row'>
+    {% block select_date%}{% endblock %}
     <div class="col-auto">
-      {{form.date_from.label_tag}}
-      {{form.date_from}}
+      {{form.exchange.label_tag}}
+      {{form.exchange}}
     </div>
     <div class="col-auto">
-      {{form.date_to.label_tag}}
-      {{form.date_to}}
+      {{form.branch.label_tag}}
+      {{form.branch}}
     </div>
     <div class="col-auto">
       <button type="submit" class="btn btn-primary btn-sm mb-2">Search</button>
@@ -107,9 +108,10 @@ $(document).ready(function() {
             <th scope="col">Edited by</th>
           </tr>
         </thead>
+        <tbody>
           {% for entry in rem.list %}
-          <tbody>
-            <tr>
+
+            <tr {% if entry.id in ids %} class="table-warning"{% endif %}>
               <td>
                 <div class="form-check">
                   <input class="form-check-input jqselect_{{forloop.parentloop.counter}}" type="checkbox" name="checks" value="{{entry.pk}}" id="Check-{{entry.pk}}">
@@ -128,12 +130,14 @@ $(document).ready(function() {
               <td>{{entry.created_by}}</td>
               <td><a class="btn btn-success btn-sm" href="{% url 'remmit-update' entry.pk %}"><i class="fas fa-edit"></i></a></td>
             </tr>
-          </tbody>
+
           {% endfor %}
+          </tbody>
           </table>
     {% endfor %}
   </fieldset>
     <input type="submit" class="btn btn-primary" value="Submit" />
     </form>
   {%endif%}
+  {% block error %}{% endblock %}
 {% endblock %}

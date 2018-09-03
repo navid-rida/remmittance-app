@@ -1,6 +1,16 @@
 {% extends "rem/report/rem_list_base.html" %}
 
 {% block title %} Mark Settled {% endblock %}
+{% block select_date%}
+  <div class="col-auto">
+    {{form.date_from.label_tag}}
+    {{form.date_from}}
+  </div>
+  <div class="col-auto">
+    {{form.date_to.label_tag}}
+    {{form.date_to}}
+  </div>
+{% endblock %}
 {% block form %}
 <form method="post" action="{% url 'mark_settle'%}">
 {% endblock %}

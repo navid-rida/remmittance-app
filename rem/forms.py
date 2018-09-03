@@ -1,7 +1,8 @@
-from .models import Remmit
+from .models import Remmit, ExchangeHouse, Branch
 from django.forms import ModelForm
 from django import forms
-from datetime import date
+#from datetime import date
+from django.utils import timezone
 #from django.contrib.admin.widgets import AdminDateWidget
 
 class RemmitForm(ModelForm):
@@ -14,8 +15,10 @@ class RemmitForm(ModelForm):
         }
 
 class CsvForm(forms.Form):
-    date = forms.DateField(label="Date for download", initial=date.today(), widget=forms.SelectDateWidget)
+    date = forms.DateField(label="Date for download", initial=timezone.now, widget=forms.SelectDateWidget)
 
 class SearchForm(forms.Form):
-    date_from = forms.DateField(label="Starting Date", initial=date.today(),widget=forms.SelectDateWidget)
-    date_to = forms.DateField(label="Ending Date", initial=date.today(),widget=forms.SelectDateWidget)
+    date_from = forms.DateField(label="Starting Date", initial=timezone.now, required=False)
+    date_to = forms.DateField(label="Ending Date", initial=timezone.now, required=False)
+    exchange = forms.ModelChoiceField(queryset=ExchangeHouse.objects.all(),required=False)
+    branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'),required=False)

@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from .forms import RemmitForm, CsvForm, SearchForm
 from django.contrib.auth.decorators import login_required,user_passes_test
 from .models import Remmit
-from datetime import date
+import datetime
 from .DataModels import *
 import io
 from django.contrib import messages
@@ -11,6 +11,7 @@ from django.views.generic.edit import CreateView,UpdateView
 from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
 from django.contrib.auth.models import Group
+from django.utils import timezone
 # Create your views here.
 
 ###############User tests############################
@@ -58,8 +59,12 @@ def show_rem(request):
         if form.is_valid():
             date_from = form.cleaned_data['date_from']
             date_to = form.cleaned_data['date_to']
-            rem_list = Remmit.objects.filter(date__range=[date_from, date_to]).filter(branch=request.user.employee.branch).order_by('exchange', '-date')
-            context = {'rem_list': rem_list, 'form':form}
+            exchange = form.cleaned_data['exchange']
+            if check_headoffice(request.user):
+                rem_list = search(date_from=date_from,date_to=date_to,exchange=exchange)
+            else:
+                rem_list = search(request,date_from=date_from,date_to=date_to,exchange=exchange, branch=request.user.employee.branch)
+            context = {'rem_list': rem_list, 'form':form, 'date': date_from}
             return render(request, 'rem/report/rem_list.html', context)
     else:
         form = SearchForm()
@@ -72,14 +77,23 @@ def select_rem_list(request):
     if request.method == "POST":
         form = SearchForm(request.POST)
         if form.is_valid():
-            date_from = form.cleaned_data['date_from']
-            date_to = form.cleaned_data['date_to']
-            rem_list = Remmit.objects.filter(date__range=[date_from, date_to]).filter(status='NS').order_by('exchange', '-date')
-            context = {'rem_list': rem_list, 'form':form}
-            return render(request, 'rem/report/download_excel.html', context)
+            #date_from = form.cleaned_data['date_from']
+            #date_to = form.cleaned_data['date_to']
+            exchange = form.cleaned_data['exchange']
+            branch = form.cleaned_data['branch']
+            rem_list = search(branch=branch,exchange=exchange,status='NS')
+            if rem_list:
+                df = qset_to_df(rem_list)
+                ids = list(df['id'][df.duplicated(['amount','branch_id','exchange_id'],keep=False)==True].values)
+                context = {'rem_list': rem_list, 'form':form, 'ids':ids}
+            else:
+                context = {'form':form}
+        else:
+            context = {'form':form}
     else:
         form = SearchForm()
         context = {'form':form}
+
     return render(request, 'rem/report/download_excel.html', context)
 
 @login_required
@@ -90,7 +104,9 @@ def mark_rem_list(request):
         if form.is_valid():
             date_from = form.cleaned_data['date_from']
             date_to = form.cleaned_data['date_to']
-            rem_list = Remmit.objects.filter(date__range=[date_from, date_to]).order_by('exchange', '-date')
+            exchange = form.cleaned_data['exchange']
+            branch = form.cleaned_data['branch']
+            rem_list = search(status='NS',date_from=date_from,date_to=date_to,exchange=exchange)
             context = {'rem_list': rem_list, 'form':form}
             return render(request, 'rem/report/mark_settle.html', context)
     else:
@@ -113,7 +129,7 @@ def download_bb_excel(request):
             df = rem_bb_summary(date)
             xlsx_data = excel_output(df)
             response = HttpResponse(xlsx_data,content_type='application/vnd.ms-excel')
-            time = str(date.today())
+            time = str(tomezone.now)
             #filename = "output "+time+".xls"
             response['Content-Disposition'] = 'attachment; filename="somefilename.xls"'
             #writer.save(re)
@@ -132,24 +148,22 @@ def download_bb_excel(request):
 @user_passes_test(check_headoffice)
 def download_selected_excel(request):
 
-    if request.method == 'POST':
+    if request.method == 'POST' and request.POST.getlist('checks'):
         list = request.POST.getlist('checks') # If the form has been submitted...
         #form = Remmit.objects.filter(id__in=selected_values)
         df = rem_bb_summary(list)
         xlsx_data = excel_output(df)
         response = HttpResponse(xlsx_data,content_type='application/vnd.ms-excel')
-        time = str(date.today())
+        time = str(timezone.now)
         #filename = "output "+time+".xls"
         response['Content-Disposition'] = 'attachment; filename="somefilename.xls"'
         #writer.save(re)
         return response
     else:
-        list = "no list " # An unbound form
+        form = SearchForm()
+        list = "Please select at least one entry " # An unbound form
 
-    return render(request, 'rem/report/ex_test.html', {
-        'list': list,
-
-    })
+    return redirect('select_rem_list')
 
 @login_required
 @user_passes_test(check_headoffice)
