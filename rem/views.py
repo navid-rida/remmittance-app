@@ -63,7 +63,7 @@ def show_rem(request):
             if check_headoffice(request.user):
                 rem_list = search(date_from=date_from,date_to=date_to,exchange=exchange)
             else:
-                rem_list = search(request,date_from=date_from,date_to=date_to,exchange=exchange, branch=request.user.employee.branch)
+                rem_list = search(date_from=date_from,date_to=date_to,exchange=exchange, branch=request.user.employee.branch)
             context = {'rem_list': rem_list, 'form':form, 'date': date_from}
             return render(request, 'rem/report/rem_list.html', context)
     else:
