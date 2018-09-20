@@ -10,6 +10,7 @@ from django.utils import timezone
 # Create your models here.
 numeric = RegexValidator(r'^[0-9]*$', 'Only numeric characters are allowed.')
 alpha_num = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only Alphabet and numeric characters are allowed.')
+western_union = RegexValidator(r'^[0-9]{10}$', 'Western union mtcn can contain only 10 digit numbers')
 
 
 class Branch(models.Model):
@@ -44,23 +45,11 @@ class ExchangeHouse(models.Model):
 
 class Remmit(models.Model):
     #branch = models.ForeignKey(Branch, on_delete = models.CASCADE)
-    WESTERN = 'WU'
-    MONEYGRAM = 'MG'
-    RIA = 'RI'
-    EXPRESSMONEY = 'EM'
-    PLACID = 'EM'
-    EXCHANGE_CHOICES = (
-        (WESTERN, 'Western Union'),
-        (MONEYGRAM, 'MoneyGram'),
-        (EXPRESSMONEY, 'Express Money'),
-        (RIA, 'Ria'),
-        (PLACID,'Placid'),
-        )
-    exchange = models.ForeignKey(ExchangeHouse,on_delete=models.CASCADE, verbose_name='Exchange House')
+    exchange = models.ForeignKey(ExchangeHouse,on_delete=models.CASCADE, verbose_name='Channel of Remittance')
     rem_country = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Name of Country')
-    sender = models.CharField("Name of Remmitter",max_length=30)
+    sender = models.CharField("Name of Remitter",max_length=30)
     reciever = models.CharField("Name of Benificiary",max_length=30)
-    amount = models.DecimalField(max_digits=20,decimal_places=2, default=Decimal('0.00'), validators=[validate_neg])
+    amount = models.DecimalField("Amount of Payment",max_digits=20,decimal_places=2, validators=[validate_neg])
     CASH= 'C'
     TRANSFER = 'T'
     MODE_CHOICES = (
@@ -81,7 +70,7 @@ class Remmit(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     date_create = models.DateTimeField("Date of posting", auto_now_add=True)
     date_edited = models.DateTimeField("Date of last modified", auto_now=True)
-    reference = models.CharField("Referene No.", max_length=16,  validators=[alpha_num])
+    reference = models.CharField("Referene No./PIN/MTCN", max_length=16, unique=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def status_verbose(self):

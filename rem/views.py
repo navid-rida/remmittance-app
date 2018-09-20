@@ -40,7 +40,7 @@ class RemmitUpdate(UpdateView):
     model = Remmit
     form_class = RemmitForm
     template_name = 'rem/forms/remmit_update_form.html'
-    success_url = '/'
+    success_url = reverse_lazy('show_rem')
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
