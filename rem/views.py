@@ -66,6 +66,9 @@ def show_rem(request):
                 rem_list = search(date_from=date_from,date_to=date_to,exchange=exchange, branch=request.user.employee.branch)
             context = {'rem_list': rem_list, 'form':form, 'date': date_from}
             return render(request, 'rem/report/rem_list.html', context)
+        else:
+            context = {'form':form}
+
     else:
         form = SearchForm()
         context = {'form':form}

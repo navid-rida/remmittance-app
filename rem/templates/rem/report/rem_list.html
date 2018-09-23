@@ -6,10 +6,16 @@
     {% csrf_token %}
     <div class='form-row'>
         <div class="col-auto">
+            {% for error in form.date_from.errors %}
+              {{ error}}
+            {% endfor %}
             {{form.date_from.label_tag}}
             {{form.date_from}}
         </div>
         <div class="col-auto">
+            {% for error in form.date_to.errors %}
+              {{ error}}
+            {% endfor %}
             {{form.date_to.label_tag}}
             {{form.date_to}}
         </div>
