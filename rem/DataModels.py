@@ -40,9 +40,6 @@ def search(date_from=None,date_to=None,exchange=None,branch=None,status=None):
     else:
         rem_list = Remmit.objects.filter(status=status)
     if date_from != None and date_to != None:
-        if date_from==date_to:
-            rem_list = rem_list.filter(date_create__date=date_to)
-        else:
             rem_list = rem_list.filter(date_create__date__range=(date_from,date_to))
     if branch != None:
         rem_list = rem_list.filter(branch=branch)
