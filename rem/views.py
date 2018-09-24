@@ -67,7 +67,7 @@ def show_rem(request):
             context = {'rem_list': rem_list, 'form':form, 'date': date_from}
             return render(request, 'rem/report/rem_list.html', context)
         else:
-            context = {'form':form}
+            context = {'form':form, 'valid':'Not valid'}
 
     else:
         form = SearchForm()

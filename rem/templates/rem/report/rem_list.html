@@ -2,6 +2,7 @@
 {% block title %} Remmittance List {% endblock %}
 {% block content %}
 <br>
+{{ valid }}
 <form method="post">
     {% csrf_token %}
     <div class='form-row'>
