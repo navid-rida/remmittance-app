@@ -43,7 +43,7 @@ def search(date_from=None,date_to=None,exchange=None,branch=None,status=None):
         if date_from==date_to:
             rem_list = rem_list.filter(date_create__date=date_to)
         else:
-            rem_list = rem_list.filter(date__range=(date_from,date_to))
+            rem_list = rem_list.filter(date_create__date__range=(date_from,date_to))
     if branch != None:
         rem_list = rem_list.filter(branch=branch)
     if exchange != None:
