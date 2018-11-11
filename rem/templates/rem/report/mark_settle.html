@@ -5,10 +5,12 @@
   <div class="col-auto">
     {{form.date_from.label_tag}}
     {{form.date_from}}
+    {{form.date_from.errors}}
   </div>
   <div class="col-auto">
     {{form.date_to.label_tag}}
     {{form.date_to}}
+    {{form.date_to.errors}}
   </div>
 {% endblock %}
 {% block form %}

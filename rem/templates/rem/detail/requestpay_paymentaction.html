@@ -1,0 +1,53 @@
+{% extends "rem/detail/requestpay_detail_base.html" %}
+{% load widget_tweaks %}
+{% block title %} Payment {% endblock %}
+{% block payment_action %}
+<form enctype="multipart/form-data" method="post" action="{% url 'payment-confirm' object.pk %}">
+  {% csrf_token %}
+  <div class="row">
+      <div class="col">
+          <ul>
+              {% for error in form.non_field_errors %}
+              <div class="alert alert-danger" role="alert">
+                  <li>{{error}}</li>
+              </div>
+              {% endfor %}
+          </ul>
+      </div>
+  </div>
+  <div class='form-row'>
+      <div class="col-auto">
+          {{form.comment.label_tag}}
+          {{form.comment|add_class:"form-control"}}
+          {% for error in form.comment.errors %}
+          <div class="alert alert-danger" role="alert">
+              {{error}}
+          </div>
+          {% endfor %}
+      </div>
+      <div class="col-auto">
+          {{form.confirmation.label_tag}}
+          {{form.confirmation}}
+          {% for error in form.confirmation.errors %}
+          <div class="alert alert-danger" role="alert">
+              {{error}}
+          </div>
+          {% endfor %}
+      </div>
+      <div class="col-auto">
+          {{form.screenshot.label_tag}}
+          {{form.screenshot}}
+          {% for error in form.screenshot.errors %}
+          <div class="alert alert-danger" role="alert">
+              {{error}}
+          </div>
+          {% endfor %}
+      </div>
+  </div>
+  <div class='form-row'>
+      <div class="col-auto">
+          <button type="submit" class="btn btn-primary btn-sm mb-2">Confirm</button>
+      </div>
+  </div>
+  </form>
+{% endblock %}

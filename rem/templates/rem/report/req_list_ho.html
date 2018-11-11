@@ -1,0 +1,21 @@
+{% extends "rem/report/req_list_base.html" %}
+
+{% block title %} Request List {% endblock %}
+{% block branch_dropdown %}
+  <div class="col-auto">
+    {% for error in form.branch.errors %}
+        {{ error}}
+    {% endfor %}
+    {{form.branch.label_tag}}
+    {{form.branch}}
+  </div>
+{% endblock %}
+{% block branch_column %}<th scope="col">Branch</th> {% endblock %}
+{% block branch_value %}<td>{{entry.remittance.branch}}</td>{% endblock %}
+{% block button %}
+{% if entry.status == "RV"%}
+  <td><a class="btn btn-success btn-sm" href="{% url 'payment-confirm' entry.pk %}"><i class="far fa-info-square"></i> Confirm payment</a></td>
+{% else %}
+  <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-detail' entry.pk %}"><i class="far fa-info-square"></i> Details</a></td>
+{% endif %}
+{% endblock %}

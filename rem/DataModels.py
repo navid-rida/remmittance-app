@@ -53,7 +53,7 @@ def search(date_from=None,date_to=None,exchange=None,branch=None,status=None):
 def make_ac_df(list,category,columns):
     #day = date.strftime('%Y-%m-%d')
     dict = {}
-    remmits = Remmit.objects.filter(id__in=list)
+    payments = Payment.objects.filter(id__in=list)
     #Sl= []
     tr_date = []
     br_code = []
@@ -63,26 +63,24 @@ def make_ac_df(list,category,columns):
     narrations = []
     flags = []
     i = 1
-    for rem in remmits:
+    for pay in payments:
         #Sl.append(i)
         #i = i + 1
         dr_cr = 'C' if category=='gl' else 'D'
         tr_date.append(date.today().strftime('%d/%m/%Y'))
         #br_code.append(rem.branch.code)
         if category=='gl':
-            br_code.append(rem.branch.code)
+            br_code.append(pay.requestpay.remittance.branch.code)
+            ac_no.append(pay.requestpay.remittance.exchange.gl_no)
         else:
             br_code.append("0101")
-        if category=='gl':
-            ac_no.append(rem.exchange.gl_no)
-        else:
-            ac_no.append(rem.exchange.ac_no)
+            ac_no.append(pay.requestpay.remittance.exchange.ac_no)
         type.append(dr_cr)
-        amount.append(rem.amount)
+        amount.append(pay.requestpay.remittance.amount)
         if dr_cr == 'C':
-            narration = "Settlement agt "+ rem.reference +" made on "+rem.date.strftime('%d/%m/%Y')
+            narration = "Settlement agt "+ pay.requestpay.remittance.reference +" made on "+pay.dateresolved.strftime('%d/%m/%Y')
         else:
-            narration = "Favoring "+rem.branch.code+" agt "+ rem.reference +" made on "+rem.date.strftime('%d/%m/%Y')
+            narration = "Favoring "+pay.requestpay.remittance.branch.code+" agt "+ pay.requestpay.remittance.reference +" made on "+pay.dateresolved.strftime('%d/%m/%Y')
         narrations.append(narration)
         if category=='br_ac' and dr_cr == 'D':
             flag=1

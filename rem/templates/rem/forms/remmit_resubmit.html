@@ -1,0 +1,182 @@
+{% extends "rem/base.html" %}
+{% load widget_tweaks %}
+{% block title %} Remittance Resubmit {% endblock %}
+{% block content %}
+  {% if messages %}
+    {% for message in messages %}
+      {{ message }}
+    {% endfor %}
+  {% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <div class='form-row'>
+        <div class="col-auto">
+            {{form.name.label_tag}}
+            {{form.name|add_class:"form-control"}}
+            {% for error in form.name.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{error}}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="col-auto">
+            {{form.cell.label_tag}}
+            {{form.cell|add_class:"form-control"}}
+            {% for error in form.cell.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{error}}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class='form-row'>
+      <div class="col-auto">
+          {{form.dob.label_tag}}
+          {{form.dob}}
+          {% for error in form.dob.errors %}
+          <div class="alert alert-danger" role="alert">
+              {{error}}
+          </div>
+          {% endfor %}
+      </div>
+    </div>
+    <div class='form-row'>
+      <div class="col-auto">
+          {{form.address.label_tag}}
+          {{form.address|add_class:"form-control"}}
+          {% for error in form.address.errors %}
+          <div class="alert alert-danger" role="alert">
+              {{error}}
+          </div>
+          {% endfor %}
+      </div>
+    </div>
+    <div class='form-row'>
+        <div class="col-auto">
+            {{form.idtype.label_tag}}
+            {{form.idtype|add_class:"form-control"}}
+            {{form.idtype.errors}}
+        </div>
+        <div class="col-auto">
+            {{form.idno.label_tag}}
+            {{form.idno|add_class:"form-control"}}
+            {{form.idno.errors}}
+        </div>
+      </div>
+      <div class='form-row'>
+        <div class="col-auto">
+            {{form.idissue.label_tag}}
+            {{form.idissue|add_class:"form-control"}}
+            {{form.idissue.errors}}
+        </div>
+        <div class="col-auto">
+            {{form.idexpire.label_tag}}
+            {{form.idexpire|add_class:"form-control"}}
+            {{form.idexpire.errors}}
+        </div>
+      </div>
+    <div class="row">
+        <div class=" offset-1">
+            <div class="row">
+                <div class="col">
+                    {% block form_title %}
+                    <br>
+                    <h3> Remittance Entry </h3>
+                    <br>
+                    {% endblock%}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <ul>
+                        {% for error in rform.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            <li>{{error}}</li>
+                        </div>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group row">
+                        {% for error in rform.exchange.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{error}}
+                        </div>
+                        {% endfor %}
+                        {{ rform.exchange.label_tag}}
+                        {{ rform.exchange|add_class:"form-control col-md-10"}}
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group row">
+                        {% for error in rform.rem_country.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{error}}
+                        </div>
+                        {% endfor %}
+                        {{ rform.rem_country.label_tag}}
+                        {{ rform.rem_country|add_class:"form-control col-md-10"}}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group row">
+                        {% for error in rform.reference.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{error}}
+                        </div>
+                        {% endfor %}
+                        {{ rform.reference.label_tag}}
+                        {{ rform.reference|add_class:"form-control col-md-10"}}
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group row">
+                        {% for error in rform.sender.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{error}}
+                        </div>
+                        {% endfor %}
+                        {{ rform.sender.label_tag}}
+                        {{ rform.sender|add_class:"form-control col-md-10"}}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group row">
+                        {% for error in rform.amount.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{error}}
+                        </div>
+                        {% endfor %}
+                        {{ rform.amount.label_tag}}
+                        {{ rform.amount|add_class:"form-control col-md-10"}}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {% comment %}
+                    <div class="form-group row">
+                        {% for error in rform.mode.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{error}}
+                        </div>
+                        {% endfor %}
+                        {{ rform.mode.label_tag}}
+                        {{ rform.mode|add_class:"form-control col-md-10"}}
+                    </div>
+                    {% endcomment %}
+                </div>
+            </div>
+            <input type="submit" class="btn btn-primary" value="Submit" />
+        </div>
+    </div>
+
+</form>
+{% endblock %}

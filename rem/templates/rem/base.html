@@ -24,21 +24,22 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Pending Reports</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Show & Download</a>
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Reports</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{% url 'show_rem'%}">Remmittance List</a>
+                        {% comment %}<a class="dropdown-item" href="{% url 'show_rem'%}">Remmittance List</a>{% endcomment %}
+                        <a class="dropdown-item" href="{% url 'show_req'%}">Request List</a>
                         {% for group in request.user.groups.all %}
                           {% if group.name == "Head office user" %}
                             <a class="dropdown-item" href="{% url 'select_rem_list'%}">Remmittance Excel Download</a>
                             <a class="dropdown-item" href="{% url 'mark_rem_list'%}">Mark Settled</a>
-                            <div class="dropdown-divider"></div>
-                              <a class="dropdown-item" href="#">Export Import Summary</a>
+                            {% comment %}<div class="dropdown-divider"></div>
+                              <a class="dropdown-item" href="#">Export Import Summary</a>{% endcomment %}
                           {% endif%}
                         {% endfor%}
                     </div>
@@ -48,10 +49,11 @@
       Upload Report
     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{% url 'remmit-create'%}">Remmittance Entry</a>
+                        <a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Request</a>
+                        {% comment %}<a class="dropdown-item" href="{% url 'remmit-create'%}">Remmittance Entry</a>
                         <a class="dropdown-item" href="#">Quarterly Meeting minutes</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Export Import Summary</a>
+                        <a class="dropdown-item" href="#">Export Import Summary</a> {% endcomment %}
                     </div>
                 </li>
             </ul>
@@ -68,8 +70,28 @@
             {% endcomment %}
         </div>
     </nav>
+
     <div id="content">
         <div class="container">
+          {% if messages %}
+            <ul class="messages">
+              {% for message in messages %}
+                  {% if message.level_tag == "info" %}
+                    <li class="alert alert-info"
+                  {% elif message.level_tag == "success" %}
+                    <li class="alert alert-success"
+                  {% elif message.level_tag == "warning" %}
+                    <li class="alert alert-warning"
+                  {% elif message.level_tag == "error" %}
+                    <li class="alert alert-danger"
+                  {% else %}
+                    <li class= "alert alert-primary"
+                  {% endif %}
+                  role="alert"
+                  >{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
             {% block content %}
             {% endblock %}
         </div>

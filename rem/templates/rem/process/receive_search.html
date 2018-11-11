@@ -1,0 +1,109 @@
+{% extends "rem/base.html" %}
+{% load widget_tweaks %}
+{% block title %} Add/ Select Receiver {% endblock %}
+{% block content %}
+<br>
+<form method="post">
+    {% csrf_token %}
+    <div class='form-row'>
+        <div class="col-auto">
+            {{form.identification.label_tag}}
+            {{form.identification}}
+            {{form.identification.errors}}
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary btn-sm mb-2">Find</button>
+        </div>
+    </div>
+</form>
+</br>
+
+{% if receiver %}
+<h4>Customer Found:</h4>
+<table class='table table-hover table-sm'>
+    <tbody>
+        <tr>
+            <td>Name:</td>
+            <td>{{receiver.name}}</td>
+        </tr>
+        <tr>
+            <td>Address:</td>
+            <td>{{receiver.address}}</td>
+        </tr>
+        <tr>
+            <td>Phone Number:</td>
+            <td>{{receiver.cell}}</td>
+        </tr>
+        <tr>
+            <td>Date of Birth:</td>
+            <td>{{receiver.dob}}</td>
+        </tr>
+    </tbody>
+</table>
+  <a class="btn btn-primary btn-sm mb-2" href = "{% url 'remmit-create' pk=receiver.id %}">proceed with this client</button>
+{% endif %}
+{% comment %}
+{% elif msg and msg == "Entry  Not Found" %}
+  <form method="post" action="{% url 'add_client'%}">
+    {% csrf_token %}
+    <div class='form-row'>
+        <div class="col-auto">
+            {{rform.name.label_tag}}
+            {{rform.name|add_class:"form-control"}}
+            {{rform.name.errors}}
+        </div>
+        <div class="col-auto">
+            {{rform.cell.label_tag}}
+            {{rform.cell|add_class:"form-control"}}
+            {{rform.cell.errors}}
+        </div>
+    </div>
+    <div class='form-row'>
+      <div class="col-auto">
+          {{rform.dob.label_tag}}
+          {{rform.dob}}
+          {{rform.dob.errors}}
+      </div>
+    </div>
+    <div class='form-row'>
+      <div class="col-auto">
+          {{rform.address.label_tag}}
+          {{rform.address|add_class:"form-control"}}
+          {{rform.adress.errors}}
+      </div>
+    </div>
+    <div class='form-row'>
+      <div class="col-auto">
+          {{rform.idtype.label_tag}}
+          {{rform.idtype|add_class:"form-control"}}
+          {{rform.idtype.errors}}
+      </div>
+      <div class="col-auto">
+          {{rform.idtno.label_tag}}
+          {{rform.idno|add_class:"form-control"}}
+          {{rform.idno.errors}}
+      </div>
+    </div>
+    <div class='form-row'>
+      <div class="col-auto">
+          {{rform.idissue.label_tag}}
+          {{rform.idissue|add_class:"form-control"}}
+          {{rform.idissue.errors}}
+      </div>
+      <div class="col-auto">
+          {{rform.idexpire.label_tag}}
+          {{rform.idexpire|add_class:"form-control"}}
+          {{rform.idexpire.errors}}
+      </div>
+    </div>
+    <div class='form-row'>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary btn-sm mb-2">Create</button>
+        </div>
+    </div>
+  </form>
+{% else %}
+ <br>
+{% endif %}
+{% endcomment %}
+{% endblock %}

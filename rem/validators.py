@@ -18,7 +18,7 @@ xpress_re = RegexValidator(
 )
 
 ria_re = RegexValidator(
-    _lazy_re_compile(r'^[0-9a-zA-Z]{8,10}$'),
+    _lazy_re_compile(r'^[0-9a-zA-Z]{2}[0-9]{6,10}$'),
     message=_('Please enter a valid Ria PIN'),
     code='invalid_ria',
 )
@@ -33,6 +33,36 @@ moneygram_re = RegexValidator(
     _lazy_re_compile(r'^[1-9][0-9]{7}$'),
     message=_('Please enter a valid MoneyGram Reference No.'),
     code='invalid_moneygram',
+)
+
+mobile_re = RegexValidator(
+    _lazy_re_compile(r'^(\+8801|8801|01)[56789][0-9]{8}$'),
+    message=_('Please enter a valid Mobile phone number'),
+    code='invalid_moneygram',
+)
+
+old_nid_re = RegexValidator(
+    _lazy_re_compile(r'^[0-9]{13,17}$'),
+    message=_('Please enter a valid NID number'),
+    code='invalid_old_nid',
+)
+
+smart_nid_re = RegexValidator(
+    _lazy_re_compile(r'^[0-9]{10}$'),
+    message=_('Please enter a valid NID/ Smart Card number'),
+    code='invalid_smart_nid',
+)
+
+bc_re = RegexValidator(
+    _lazy_re_compile(r'^[0-9]{1,10}$'),
+    message=_('Please enter a valid NID/ Smart Card number'),
+    code='invalid_bc',
+)
+
+passport_re = RegexValidator(
+    _lazy_re_compile(r'^[a-zA-Z]{2}[0-9]{7}$'),
+    message=_('Please enter a valid passport number'),
+    code='invalid_bc',
 )
 
 """swift_re = RegexValidator(
@@ -81,5 +111,20 @@ def validate_placid(value):
 def validate_moneygram(value):
     return moneygram_re(value)
 
+def validate_mobile(value):
+    return mobile_re(value)
+
 """def validate_swift(value):
     return swift_re(value)"""
+
+def validate_old_nid(value):
+    return old_nid_re(value)
+
+def validate_smart_nid(value):
+    return smart_nid_re(value)
+
+def validate_bc(value):
+    return bc_re(value)
+
+def validate_passport(value):
+    return passport_re(value)
