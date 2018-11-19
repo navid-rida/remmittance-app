@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{%static "css/bootstrap/bootstrap.min.css" %}">
     <link rel="stylesheet" href="{%static "css/fontawesome-free-5.2.0-web/css/all.min.css" %}">
     <link rel="stylesheet" href="{%static "css/login.css" %}">
+    <link rel="stylesheet" href="{%static "css/style.css" %}">
     <title>{% block title %}Welcome to NRBC Report Management{% endblock %}</title>
 </head>
 
@@ -46,7 +47,7 @@
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Upload Report
+      Upload Data
     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Request</a>
@@ -99,10 +100,23 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
-    <script src="{%static "js/jquery-3.3.1.slim.min.js" %}"></script>
-    <script src="{%static "js/bootstrap.bundle.min.js" %}"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+    <!--   <script src="{%static "js/jquery-3.3.1.slim.min.js" %}"></script>-->
+ <script src="{%static "js/bootstrap.bundle.min.js" %}"></script>
     {% block js %}{% endblock %}
+
+    <script>
+      $( function() {
+          $( ".date" ).datepicker({
+            dateFormat: "dd-mm-yy"
+          });
+        });
+    </script>
 </body>
 
 </html>

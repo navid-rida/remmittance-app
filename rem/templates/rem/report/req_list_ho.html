@@ -1,5 +1,5 @@
 {% extends "rem/report/req_list_base.html" %}
-
+{% load widget_tweaks %}
 {% block title %} Request List {% endblock %}
 {% block branch_dropdown %}
   <div class="col-auto">
@@ -7,15 +7,15 @@
         {{ error}}
     {% endfor %}
     {{form.branch.label_tag}}
-    {{form.branch}}
+    {{form.branch|add_class:"form-control"}}
   </div>
 {% endblock %}
 {% block branch_column %}<th scope="col">Branch</th> {% endblock %}
 {% block branch_value %}<td>{{entry.remittance.branch}}</td>{% endblock %}
 {% block button %}
 {% if entry.status == "RV"%}
-  <td><a class="btn btn-success btn-sm" href="{% url 'payment-confirm' entry.pk %}"><i class="far fa-info-square"></i> Confirm payment</a></td>
+  <td><a class="btn btn-success btn-sm" href="{% url 'payment-confirm' entry.pk %}"> <i class="fas fa-check-circle"></i> Make payment</a></td>
 {% else %}
-  <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-detail' entry.pk %}"><i class="far fa-info-square"></i> Details</a></td>
+  <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-detail' entry.pk %}"><i class="fas fa-info-square"></i> Details</a></td>
 {% endif %}
 {% endblock %}

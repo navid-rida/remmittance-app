@@ -1,7 +1,8 @@
 {% extends "rem/base.html" %}
 {% load widget_tweaks %}
-{% block title %} Payment {% endblock %}
+{% block title %} Payment Details {% endblock %}
 {% block content %}
+  <h4>Payment Request Details</h4>
   <h4>Confirm or Reject Payment: {{object.remittance.reference }} Value: BDT {{object.remittance.amount}}</h4>
   <p>Request date and time: {{ object.datecreate }}</p>
   <p>Requested Posted by: {{ object.created_by }} Branch: {{object.remittance.branch}}</p>
@@ -11,8 +12,13 @@
   <p>Benificiary Name: {{ object.remittance.receiver.name }}</p>
   <p>Date of Birth of Benificiary: {{ object.remittance.receiver.dob }}</p>
   <p>Benificiary's cell No.: {{ object.remittance.receiver.cell }}</p>
-  {% if object.payment.screenshot.url != '' %}
-    <p>Image: <br><img src='{{ object.payment.screenshot.url }}' height="500" width="500"><img></p>
+  {% if object.payment and object.payment.screenshot.url != '' %}
+  <p>Status: 'Payable to customer'</p>
+    <p>Image: <br><img src='{{ object.payment.screenshot.url }}' class ="img-fluid" ><img></p>
+  {% elif object.status == 'RJ'%}
+    <p> Status: "Rejected"</p>
+  {% else %}
+    <br>
   {% endif %}
   {% block payment_action %}{% endblock %}
 {% endblock %}

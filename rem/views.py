@@ -109,7 +109,11 @@ def show_req(request):
             else:
                 filt['datecreate__date__range'] = None
             filt['remittance__exchange'] = form.cleaned_data['exchange']
-            filt['status'] = form.cleaned_data['status']
+            status = form.cleaned_data['status']
+            if status == 'AL':
+                filt['status'] = None
+            else:
+                filt['status'] = status
             filt['remittance__branch'] = form.cleaned_data['branch']
             filt['resubmit_flag'] = False
             if check_headoffice(request.user):
@@ -199,17 +203,17 @@ def search_receiver(request):
             identification = form.cleaned_data['identification']
             try:
                 receiver = Receiver.objects.get(idno=identification)
-                #messages.info(request, '')
-                context = {'receiver': receiver, 'msg':'Entry Found', 'form': form}
+                context = {'receiver': receiver, 'form': form}
             except Receiver.DoesNotExist:
                 form = ReceiverForm()
-                context = {'form': form, 'msg':'Entry  Not Found'}
+                messages.info(request, 'No customer was found with this identification, Please add a new receiver')
+                context = {'form': form}
                 return redirect('add_client')
         else:
             context = {'form':form}
     else:
         form = ReceiverSearchForm()
-        context = {'form':form, 'msg':'Enter a phone number to search existing customer'}
+        context = {'form':form}
     return render(request, 'rem/process/receive_search.html', context)
 
 

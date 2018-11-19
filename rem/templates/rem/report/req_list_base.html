@@ -1,4 +1,5 @@
 {% extends "rem/base.html" %}
+{% load widget_tweaks %}
 {% block js %}
 
 {% endblock %}
@@ -13,33 +14,35 @@
               {{ error}}
             {% endfor %}
             {{form.date_from.label_tag}}
-            {{form.date_from}}
+            {{form.date_from|add_class:"form-control date"}}
         </div>
         <div class="col-auto">
             {% for error in form.date_to.errors %}
               {{ error}}
             {% endfor %}
             {{form.date_to.label_tag}}
-            {{form.date_to}}
+            {{form.date_to|add_class:"form-control date"}}
         </div>
         <div class="col-auto">
             {% for error in form.exchange.errors %}
               {{ error}}
             {% endfor %}
             {{form.exchange.label_tag}}
-            {{form.exchange}}
+            {{form.exchange|add_class:"form-control"}}
         </div>
         <div class="col-auto">
             {% for error in form.status.errors %}
               {{ error}}
             {% endfor %}
             {{form.status.label_tag}}
-            {{form.status}}
+            {{form.status|add_class:"form-control"}}
         </div>
         {% block branch_dropdown %} {% endblock %}
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary btn-sm mb-2">Search</button>
-        </div>
+    </div>
+    <div class='form-row'>
+      <div class="col-auto">
+          <button type="submit" class="btn btn-primary btn-sm mb-2 element_margin">Search</button>
+      </div>
     </div>
 </form>
 </br>

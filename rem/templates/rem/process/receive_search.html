@@ -3,16 +3,21 @@
 {% block title %} Add/ Select Receiver {% endblock %}
 {% block content %}
 <br>
-<form method="post">
+<h4>Search Receiver</h4>
+<p>Please enter your receiver's ID No.</p>
+<form method="post" class="form-inline">
     {% csrf_token %}
     <div class='form-row'>
         <div class="col-auto">
-            {{form.identification.label_tag}}
-            {{form.identification}}
+            <i class="fa fa-search" aria-hidden="true"></i>{{form.identification}}
             {{form.identification.errors}}
+            {% comment%}
+            <i class="fa fa-search" aria-hidden="true"></i>
+            <input class="form-control form-control-md ml-3 w-75" type="text" placeholder="Search" aria-label="Search">
+            {% endcomment %}
         </div>
         <div class="col-auto">
-            <button type="submit" class="btn btn-primary btn-sm mb-2">Find</button>
+            <button type="submit" class="btn btn-primary btn-md mb-2">Find</button>
         </div>
     </div>
 </form>

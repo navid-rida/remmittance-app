@@ -1,7 +1,7 @@
 from .models import Remmit, ExchangeHouse, Branch, Receiver, Requestpay
 from django.forms import ModelForm
 from django import forms
-#from datetime import date
+#from datetime import date,datetime
 from django.utils import timezone
 from .validators import *
 
@@ -36,13 +36,21 @@ class RemmitForm(ModelForm):
 
 
 class ReceiverForm(ModelForm):
+    dob = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="Date of Birth",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
+    idissue = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="ID Issue Date",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
+    idexpire = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}),label="ID Expiry date",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
 
     class Meta:
         model = Receiver
         fields = ('name','cell','address','dob','idtype','idno','idissue','idexpire')
         widgets = {
-            'dob': forms.SelectDateWidget,
+            #'dob': forms.SelectDateWidget,
+            'address': forms.Textarea(attrs={'rows':4, 'cols':45}),
+            #'dob': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+            #'idissue': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+            #'idexpire': forms.DateInput(format['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
         }
+
     def clean_idno(self):
         idno = self.cleaned_data['idno']
         idtype = self.cleaned_data['idtype']
@@ -59,6 +67,15 @@ class ReceiverForm(ModelForm):
         # this method didn't change it.
         return idno
 
+    def clean_idissue(self):
+        idissue = self.cleaned_data['idissue']
+        #idtype = self.cleaned_data['idtype']
+        if idissue > timezone.now().date():
+            raise ValidationError('ID Issue date cannot be a future date')
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return idissue
+
 
 class ReceiverSearchForm(forms.Form):
     #cell = forms.CharField(label="Enter Customer's Cell No.", validators=[validate_mobile])
@@ -68,19 +85,21 @@ class SearchForm(forms.Form):
     #date_from = forms.DateField(label="Starting Date", initial=timezone.now, required=False, input_formats=['%d/%m/%Y','%d/%m/%y','%d-%m-%Y','%d-%m-%y','%Y-%m-%d','%Y/%m/%d'])
     #date_to = forms.DateField(label="Ending Date", initial=timezone.now, required=False, input_formats=['%d/%m/%Y','%d/%m/%y','%d-%m-%Y','%d-%m-%y','%Y-%m-%d','%Y/%m/%d'])
     #date_from = forms.DateField(label="Starting Date", initial=timezone.now, required=False, widget=forms.SelectDateWidget)
-    date_from = forms.DateField(label="Starting Date", initial=timezone.now, required=False, input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
-    date_to = forms.DateField(label="Ending Date", initial=timezone.now, required=False, input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
+    date_from = forms.DateField(label="Starting Date", required=False, input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
+    date_to = forms.DateField(label="Ending Date",  required=False, input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
     exchange = forms.ModelChoiceField(queryset=ExchangeHouse.objects.all(),required=False)
     branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'),required=False)
     REVIEW= 'RV'
     REJECTED = 'RJ'
     PAID = 'PD'
+    ALL = 'AL'
     STATUS_CHOICES = (
-        (REVIEW,'Request staged for review'),
-        (REJECTED, 'Request rejected'),
-        (PAID, 'Amount paid to customer'),
+        (ALL,'All Request'),
+        (REVIEW,'Pending For Processing'),
+        (REJECTED, 'Rejected'),
+        (PAID, 'Paid'),
         )
-    status = forms.ChoiceField(choices=STATUS_CHOICES,required=False)
+    status = forms.ChoiceField(label='Request Status',choices=STATUS_CHOICES,required=False)
 
 class PaymentForm(forms.Form):
     comment = forms.CharField(label="Remarks", widget=forms.Textarea, required=False)
