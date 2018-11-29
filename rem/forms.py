@@ -4,14 +4,17 @@ from django import forms
 #from datetime import date,datetime
 from django.utils import timezone
 from .validators import *
+import floppyforms as floppy
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 class RemmitForm(ModelForm):
 
     class Meta:
         model = Remmit
-        fields = ('exchange','rem_country','reference','sender','amount',)
+        fields = ('exchange','rem_country','reference','sender','amount','relationship', 'purpose')
         """widgets = {
-            'date': forms.SelectDateWidget,
+            'relationship': floppy.widgets.Input(datalist=['a','b','c']),
         }"""
 
 
@@ -102,7 +105,7 @@ class SearchForm(forms.Form):
     status = forms.ChoiceField(label='Request Status',choices=STATUS_CHOICES,required=False)
 
 class PaymentForm(forms.Form):
-    comment = forms.CharField(label="Remarks", widget=forms.Textarea, required=False)
+    comment = forms.CharField(label="Remarks", widget=forms.Textarea(attrs={'rows':4, 'cols':45}), required=False)
     PAID = 'P'
     REJECTED = 'R'
     PAYMENT_CHOICES = (
@@ -112,22 +115,39 @@ class PaymentForm(forms.Form):
     confirmation = forms.ChoiceField(choices=PAYMENT_CHOICES, widget=forms.RadioSelect, required=True)
     req = forms.ModelChoiceField(queryset=Requestpay.objects.filter(status='RV'),required=False)
     screenshot = forms.ImageField(required=False)
+    agent_screenshot = forms.ImageField(required=False)
+    customer_screenshot = forms.ImageField(required=False)
+    western_trm_screenshot = forms.ImageField(required=False)
 
 
     def clean(self):
         cleaned_data = super().clean()
         confirmation = cleaned_data.get("confirmation")
         comment = cleaned_data.get("comment")
-        screenshot = cleaned_data.get('screenshot', False)
+        agent_screenshot = cleaned_data.get('agent_screenshot', False)
+        customer_screenshot = cleaned_data.get('customer_screenshot', False)
+        western_trm_screenshot = cleaned_data.get('western_trm_screenshot', False)
         if (confirmation=='R') and (not comment):
             raise forms.ValidationError(
                     "A remark must be entered if the payment is rejected"
                 )
-        elif (confirmation=='P') and (not screenshot):
+        elif (confirmation=='P') and (not agent_screenshot):
             raise forms.ValidationError(
-                    "Payment confirmationa screenshot not uploaded"
+                    "Agent copy screenshot not uploaded"
                 )
         """else:
             raise forms.ValidationError(
                     "Please confirm or reject the payment"
                 )"""
+
+class SignUpForm(UserCreationForm):
+    #first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
+    #last_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
+    #email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
+    branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'),required=False)
+    cell = forms.CharField(label="Mobile No.", validators=[validate_mobile])
+    email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name','branch', 'cell', 'email', 'password1', 'password2',)

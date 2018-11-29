@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect, get_object_or_404#, render_to_response
 from django.http import HttpResponse
-from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm
+from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm
 from django.contrib.auth.decorators import login_required,user_passes_test
 from .models import Remmit, Requestpay, Receiver
 import datetime
@@ -118,13 +118,13 @@ def show_req(request):
             filt['resubmit_flag'] = False
             if check_headoffice(request.user):
                 filter_args = {k:v for k,v in filt.items() if v is not None}
-                req_list = Requestpay.objects.filter(**filter_args)
+                req_list = Requestpay.objects.filter(**filter_args).order_by('remittance__exchange','-datecreate')
                 context = {'req_list': req_list, 'form':form}
                 return render(request, 'rem/report/req_list_ho.html', context)
             else:
                 filt['remittance__branch'] = request.user.employee.branch
                 filter_args = {k:v for k,v in filt.items() if v is not None}
-                req_list = Requestpay.objects.filter(**filter_args)
+                req_list = Requestpay.objects.filter(**filter_args).order_by('remittance__exchange','-datecreate')
                 context = {'req_list': req_list, 'form':form}
                 return render(request, 'rem/report/req_list_branch.html', context)
         else:
@@ -195,6 +195,7 @@ def mark_rem_list(request):
     return render(request, 'rem/report/mark_settle.html', context)
 
 @login_required
+@user_passes_test(check_branch)
 #@user_passes_test(check_headoffice)
 def search_receiver(request):
     if request.method == "POST":
@@ -275,10 +276,10 @@ def download_bb_excel(request):
             date = form.cleaned_data['date']
             df = rem_bb_summary(date)
             xlsx_data = excel_output(df)
-            response = HttpResponse(xlsx_data,content_type='application/vnd.ms-excel')
+            response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             time = str(tomezone.now)
             #filename = "output "+time+".xls"
-            response['Content-Disposition'] = 'attachment; filename="somefilename.xls"'
+            response['Content-Disposition'] = 'attachment; filename="somefilename.xlsx"'
             #writer.save(re)
             return response
 
@@ -299,10 +300,10 @@ def download_selected_excel(request):
         #form = Remmit.objects.filter(id__in=selected_values)
         df = rem_bb_summary(list)
         xlsx_data = excel_output(df)
-        response = HttpResponse(xlsx_data,content_type='application/vnd.ms-excel')
+        response = HttpResponse(xlsx_data,content_type='pplication/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         time = str(timezone.now)
         #filename = "output "+time+".xls"
-        response['Content-Disposition'] = 'attachment; filename="somefilename.xls"'
+        response['Content-Disposition'] = 'attachment; filename="somefilename.xlsx"'
         #writer.save(re)
         return response
     else:
@@ -325,6 +326,7 @@ def mark_settle(request):
     return redirect('mark_rem_list')
 
 @login_required
+@user_passes_test(check_branch)
 def RequestPayCreate(request):
     if request.method == 'POST':
         pass
@@ -364,7 +366,9 @@ def payment_confirm(request, pk):
                 payment = Payment()
                 payment.requestpay = req
                 payment.paid_by = request.user
-                payment.screenshot = request.FILES.get('screenshot',False) #REVIEW NEEDED"""
+                payment.agent_screenshot = request.FILES.get('agent_screenshot',False) # REVIEW NEEDED
+                payment.customer_screenshot = request.FILES.get('customer_screenshot',False) # REVIEW NEEDED
+                payment.western_trm_screenshot = request.FILES.get('western_trm_screenshot',False) # REVIEW NEEDED
                 payment.save()
                 req.status = 'PD'
                 req.save()
@@ -372,6 +376,7 @@ def payment_confirm(request, pk):
                 return redirect('show_req')
             else:
                 req.status = 'RJ'
+                req.comment = comment
                 req.save()
                 messages.info(request, 'Request Rejected')
                 return redirect('show_req')
@@ -388,11 +393,11 @@ def payment_confirm(request, pk):
 @transaction.atomic
 def request_resubmit(request, pk):
     req = Requestpay.objects.get(pk=pk)
+    if req.resubmit_flag==True or req.status != 'RJ':
+        messages.warning(request, 'This request has already been resubmitted or has not been rejected')
+        return redirect('requestpay-detail',pk)
     remit = req.remittance
     client = req.remittance.receiver
-    if req.resubmit_flag==True:
-        messages.warning(request, 'This request has already been resubmitted')
-        return redirect('requestpay-detail',pk)
     if request.method == 'POST':
         rem_form = RemmitForm(request.POST, instance=remit)
         receiver_form = ReceiverForm(request.POST, instance=client)
@@ -405,11 +410,31 @@ def request_resubmit(request, pk):
             new_req.save()
             req.resubmit_flag=True
             req.save()
+            messages.info(request, 'This request is successfully resubmitted')
             return redirect('show_req')
         else:
             context = {'form': receiver_form, 'rform': rem_form}
     else:
         rem_form = RemmitForm(instance=remit)
         receiver_form = ReceiverForm(instance=client)
-        context = {'form': receiver_form, 'rform': rem_form}
+        context = {'form': receiver_form, 'rform': rem_form, 'comment':req.comment}
     return render(request,'rem/forms/remmit_resubmit.html',context)
+
+
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.refresh_from_db()  # load the profile instance created by the signal
+            user.employee.branch = form.cleaned_data.get('branch')
+            user.employee.cell = form.cleaned_data.get('cell')
+            user.save()
+            #raw_password = form.cleaned_data.get('password1')
+            #user = authenticate(username=user.username, password=raw_password)
+            #login(request, user)
+            return redirect('login')
+    else:
+        form = SignUpForm()
+    return render(request, 'registration/signup.html', {'form': form})

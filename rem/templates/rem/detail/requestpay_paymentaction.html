@@ -5,49 +5,73 @@
 <form enctype="multipart/form-data" method="post" action="{% url 'payment-confirm' object.pk %}">
   {% csrf_token %}
   <div class="row">
-      <div class="col">
-          <ul>
-              {% for error in form.non_field_errors %}
-              <div class="alert alert-danger" role="alert">
-                  <li>{{error}}</li>
-              </div>
-              {% endfor %}
-          </ul>
-      </div>
+    <div class="col">
+      <ul>
+        {% for error in form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+          <li>{{error}}</li>
+        </div>
+        {% endfor %}
+      </ul>
+    </div>
   </div>
   <div class='form-row'>
-      <div class="col-auto">
-          {{form.comment.label_tag}}
-          {{form.comment|add_class:"form-control"}}
-          {% for error in form.comment.errors %}
-          <div class="alert alert-danger" role="alert">
-              {{error}}
-          </div>
-          {% endfor %}
+    <div class="col-auto">
+      {{form.comment.label_tag}}
+      {{form.comment|add_class:"form-control"}}
+      {% for error in form.comment.errors %}
+      <div class="alert alert-danger" role="alert">
+        {{error}}
       </div>
-      <div class="col-auto">
-          {{form.confirmation.label_tag}}
-          {{form.confirmation}}
-          {% for error in form.confirmation.errors %}
-          <div class="alert alert-danger" role="alert">
-              {{error}}
-          </div>
-          {% endfor %}
+      {% endfor %}
+    </div>
+    <div class="col-auto">
+      {{form.confirmation.label_tag}}
+      {{form.confirmation}}
+      {% for error in form.confirmation.errors %}
+      <div class="alert alert-danger" role="alert">
+        {{error}}
       </div>
-      <div class="col-auto">
-          {{form.screenshot.label_tag}}
-          {{form.screenshot}}
-          {% for error in form.screenshot.errors %}
-          <div class="alert alert-danger" role="alert">
-              {{error}}
-          </div>
-          {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+  {% if object.remittance.exchange.name == "WESTERN UNION" %}
+  <div class="col-auto">
+    {{form.western_trm_screenshot.label_tag}}
+    {{form.western_trm_screenshot|add_class:"form-control"}}
+    {% for error in form.western_trm_screenshot.errors %}
+    <div class="alert alert-danger" role="alert">
+      {{error}}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <div class='form-row'>
+    <div class="col-auto">
+      {{form.agent_screenshot.label_tag}}
+      {{form.agent_screenshot|add_class:"form-control"}}
+      {% for error in form.screenshot.errors %}
+      <div class="alert alert-danger" role="alert">
+        {{error}}
       </div>
+      {% endfor %}
+    </div>
+    {% if object.remittance.exchange.name == "WESTERN UNION" or object.remittance.exchange.name == "RIA MONEY TRANSFER" %}
+    <div class="col-auto">
+      {{form.customer_screenshot.label_tag}}
+      {{form.customer_screenshot|add_class:"form-control"}}
+      {% for error in form.customer_screenshot.errors %}
+      <div class="alert alert-danger" role="alert">
+        {{error}}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
   </div>
   <div class='form-row'>
-      <div class="col-auto">
-          <button type="submit" class="btn btn-primary btn-sm mb-2">Confirm</button>
-      </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary btn-sm mb-2 element_margin">Confirm</button>
+    </div>
   </div>
-  </form>
+</form>
 {% endblock %}

@@ -1,4 +1,6 @@
 {% extends "rem/base.html" %}
+{% load widget_tweaks %}
+{% load humanize %}
 {% block js %}
 <script type="text/javascript">
     $(document).ready(function() {
@@ -70,15 +72,23 @@
         {% block select_date%}{% endblock %}
         <div class="col-auto">
             {{form.exchange.label_tag}}
-            {{form.exchange}}
+            {{form.exchange|add_class:"form-control"}}
+            {% for error in form.exchange.errors %}
+              <div class="alert alert-danger" role="alert">{{ error}}</div>
+            {% endfor %}
         </div>
         <div class="col-auto">
             {{form.branch.label_tag}}
-            {{form.branch}}
+            {{form.branch|add_class:"form-control"}}
+            {% for error in form.branch.errors %}
+              <div class="alert alert-danger" role="alert">{{ error}}</div>
+            {% endfor %}
         </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary btn-sm mb-2">Search</button>
-        </div>
+    </div>
+    <div class="form-row">
+      <div class="col-auto">
+          <button type="submit" class="btn btn-primary element_margin">Search</button>
+      </div>
     </div>
 </form>
 </br>
@@ -125,13 +135,13 @@
                 <td>{{entry.get_status_display}}</td>
                 <td>{{entry.requestpay.remittance.sender.title}}</td>
                 <td>{{entry.requestpay.remittance.receiver.name.title}}</td>
-                <td>{{entry.requestpay.remittance.amount}}</td>
+                <td>{{entry.requestpay.remittance.amount|intcomma}}</td>
                 <td>{{entry.requestpay.remittance.date}}</td>
                 <td>{{entry.requestpay.datecreate}}</td>
                 <td>{{entry.requestpay.get_status_display}}</td>
                 <td>{{entry.requestpay.created_by}}</td>
                 <td>{{entry.requestpay.resubmit_flag}}</td>
-                <td><a class="btn btn-success btn-sm" href="{% url 'remmit-update' entry.pk %}"><i class="fas fa-edit"></i></a></td>
+                <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-detail' entry.pk %}"><i class="fas fa-info-square"></i> Details</a></td>
             </tr>
 
             {% endfor %}

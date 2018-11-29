@@ -20,4 +20,6 @@ urlpatterns = [
     ########################## Details #########################################
     path('detail/req/<int:pk>/', views.RequestpayDetailView.as_view(), name='requestpay-detail'),
     path('resubmit/req/<int:pk>/', views.request_resubmit, name='requestpay-resubmit'),
+    ############################## USer Regestration & Authentication #########################
+    path('signup', views.signup, name='signup'),
 ]

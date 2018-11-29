@@ -14,7 +14,7 @@
 {% block branch_value %}<td>{{entry.remittance.branch}}</td>{% endblock %}
 {% block button %}
 {% if entry.status == "RV"%}
-  <td><a class="btn btn-success btn-sm" href="{% url 'payment-confirm' entry.pk %}"> <i class="fas fa-check-circle"></i> Make payment</a></td>
+  <td><a class="btn btn-success btn-sm" href="{% url 'payment-confirm' entry.pk %}"> <i class="fas fa-check-circle"></i> Process Request</a></td>
 {% else %}
   <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-detail' entry.pk %}"><i class="fas fa-info-square"></i> Details</a></td>
 {% endif %}

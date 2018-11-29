@@ -38,7 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    ########################## Additional Apps###################################
     'widget_tweaks',
+    'floppyforms',
+    'django.contrib.humanize'
 ]
 
 MIDDLEWARE = [
@@ -130,3 +133,8 @@ MEDIA_URL = '/media/'
 
 LOGOUT_REDIRECT_URL='login'
 LOGIN_REDIRECT_URL='index'
+
+######################### Email Settings##############################
+
+EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")

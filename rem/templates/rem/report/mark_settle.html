@@ -1,16 +1,20 @@
 {% extends "rem/report/rem_list_base.html" %}
-
+{% load widget_tweaks %}
 {% block title %} Mark Settled {% endblock %}
 {% block select_date%}
   <div class="col-auto">
     {{form.date_from.label_tag}}
-    {{form.date_from}}
-    {{form.date_from.errors}}
+    {{form.date_from|add_class:"form-control date"}}
+    {% for error in form.date_from.errors %}
+      <div class="alert alert-danger" role="alert">{{ error}}</div>
+    {% endfor %}
   </div>
   <div class="col-auto">
     {{form.date_to.label_tag}}
-    {{form.date_to}}
-    {{form.date_to.errors}}
+    {{form.date_to|add_class:"form-control date"}}
+    {% for error in form.date_to.errors %}
+      <div class="alert alert-danger" role="alert">{{ error}}</div>
+    {% endfor %}
   </div>
 {% endblock %}
 {% block form %}

@@ -3,120 +3,144 @@
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="{%static "css/bootstrap/bootstrap.min.css" %}">
-    <link rel="stylesheet" href="{%static "css/fontawesome-free-5.2.0-web/css/all.min.css" %}">
-    <link rel="stylesheet" href="{%static "css/login.css" %}">
-    <link rel="stylesheet" href="{%static "css/style.css" %}">
-    <title>{% block title %}Welcome to NRBC Report Management{% endblock %}</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="{% static "css/bootstrap/bootstrap.min.css" %}">
+  <link rel="stylesheet" href="{% static "css/fontawesome-free-5.2.0-web/css/all.min.css" %}">
+  <link rel="stylesheet" href="{% static "css/login.css" %}">
+  <link rel="stylesheet" href="{% static "css/style.css" %}">
+  <link rel="stylesheet" href="{% static "css/jquery-ui.css" %}">
+  <title>{% block title %}Welcome to NRBC Report Management{% endblock %}</title>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">NRBCB Report Management</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">NRBCB Centralized Remittance Distribution System</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Pending Reports</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Reports</a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        {% comment %}<a class="dropdown-item" href="{% url 'show_rem'%}">Remmittance List</a>{% endcomment %}
-                        <a class="dropdown-item" href="{% url 'show_req'%}">Request List</a>
-                        {% for group in request.user.groups.all %}
-                          {% if group.name == "Head office user" %}
-                            <a class="dropdown-item" href="{% url 'select_rem_list'%}">Remmittance Excel Download</a>
-                            <a class="dropdown-item" href="{% url 'mark_rem_list'%}">Mark Settled</a>
-                            {% comment %}<div class="dropdown-divider"></div>
-                              <a class="dropdown-item" href="#">Export Import Summary</a>{% endcomment %}
-                          {% endif%}
-                        {% endfor%}
-                    </div>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Upload Data
-    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Request</a>
-                        {% comment %}<a class="dropdown-item" href="{% url 'remmit-create'%}">Remmittance Entry</a>
-                        <a class="dropdown-item" href="#">Quarterly Meeting minutes</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Export Import Summary</a> {% endcomment %}
-                    </div>
-                </li>
-            </ul>
-            <ul class="navbar-nav mr-auto">
-              <li class="nav-item justify-content-end">
-                  <a class="nav-link" href="{% url 'logout'%}"><i class="fas fa-sign-out-alt"></i> Sign out</a>
-              </li>
-            </ul>
-            {% comment %}
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
-            {% endcomment %}
-        </div>
-    </nav>
-
-    <div id="content">
-        <div class="container">
-          {% if messages %}
-            <ul class="messages">
-              {% for message in messages %}
-                  {% if message.level_tag == "info" %}
-                    <li class="alert alert-info"
-                  {% elif message.level_tag == "success" %}
-                    <li class="alert alert-success"
-                  {% elif message.level_tag == "warning" %}
-                    <li class="alert alert-warning"
-                  {% elif message.level_tag == "error" %}
-                    <li class="alert alert-danger"
-                  {% else %}
-                    <li class= "alert alert-primary"
-                  {% endif %}
-                  role="alert"
-                  >{{ message }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-            {% block content %}
-            {% endblock %}
-        </div>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Pending Reports</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Reports</a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            {% comment %}<a class="dropdown-item" href="{% url 'show_rem'%}">Remmittance List</a>{% endcomment %}
+            <a class="dropdown-item" href="{% url 'show_req'%}">Request List</a>
+            {% for group in request.user.groups.all %}
+            {% if group.name == "Head office user" %}
+            <a class="dropdown-item" href="{% url 'select_rem_list'%}">Remmittance Excel Download</a>
+            <a class="dropdown-item" href="{% url 'mark_rem_list'%}">Mark Settled</a>
+            {% comment %}<div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Export Import Summary</a>{% endcomment %}
+            {% endif%}
+            {% endfor%}
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Upload Data
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Request</a>
+            {% comment %}<a class="dropdown-item" href="{% url 'remmit-create'%}">Remmittance Entry</a>
+            <a class="dropdown-item" href="#">Quarterly Meeting minutes</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Export Import Summary</a> {% endcomment %}
+          </div>
+        </li>
+      </ul>
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item justify-content-end">
+          <a class="nav-link" href="{% url 'logout'%}"><i class="fas fa-sign-out-alt"></i> Sign out ({{ request.user }})</a>
+        </li>
+      </ul>
+      {% comment %}
+      <form class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      </form>
+      {% endcomment %}
     </div>
+  </nav>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <div id="content">
+    <div class="container">
+      {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+        {% if message.level_tag == "info" %}
+        <li class="alert alert-info" {% elif message.level_tag == "success" %} <li class="alert alert-success" {% elif message.level_tag == "warning" %} <li class="alert alert-warning" {% elif message.level_tag == "error" %} <li class="alert alert-danger"
+          {% else %} <li class="alert alert-primary" {% endif %} role="alert">{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% block content %}
+      {% endblock %}
+    </div>
+  </div>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
 
 
-    <!--   <script src="{%static "js/jquery-3.3.1.slim.min.js" %}"></script>-->
- <script src="{%static "js/bootstrap.bundle.min.js" %}"></script>
-    {% block js %}{% endblock %}
+  <!--  <script src="{%static "js/jquery-3.3.1.slim.min.js" %}"></script>-->
+  <script src="{%static "js/jquery-1.7.2.min.js" %}"></script>
+  <script src="{%static "js/jquery-ui.min.js" %}"></script>
+  <script src="{%static "js/bootstrap.bundle.min.js" %}"></script>
+  {% block js %}{% endblock %}
 
-    <script>
-      $( function() {
-          $( ".date" ).datepicker({
-            dateFormat: "dd-mm-yy"
-          });
-        });
-    </script>
+  <script>
+    $(function() {
+      $(".date").datepicker({
+        dateFormat: "dd/mm/yy"
+      });
+      var relationship = [
+        "Family",
+        "Friend",
+        "Business Associate",
+        "Client",
+        "Employee",
+        "Employer",
+        "Acquaintance",
+      ];
+      var purpose = [
+        "Family Support",
+        "Savings",
+        "Loan Repayment",
+        "Gift",
+        "Freelancing Charges",
+        "Investment",
+        "Business Proceeds",
+        "Donation",
+        "Purchase of Goods",
+        "Travel Expenses",
+        "Education/Training",
+        "Legal Obligation",
+      ];
+      $( "#id_relationship" ).autocomplete({
+        source: relationship,
+        minLength: 0,
+      });
+      $( "#id_purpose" ).autocomplete({
+        source: purpose,
+        minLength: 0,
+      });
+    });
+  </script>
 </body>
 
 </html>

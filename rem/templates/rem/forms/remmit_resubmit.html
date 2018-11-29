@@ -11,10 +11,18 @@
 {% endfor %}
 {% endif %}
 
+
+
 <div class="row">
   <div class="col">
+    <h4 class="element_margin"> Resubmit Request </h4>
     <ul>
       {% for error in rform.non_field_errors %}
+      <div class="alert alert-danger" role="alert">
+        <li>{{error}}</li>
+      </div>
+      {% endfor %}
+      {% for error in form.non_field_errors %}
       <div class="alert alert-danger" role="alert">
         <li>{{error}}</li>
       </div>
@@ -23,147 +31,163 @@
   </div>
 </div>
 
-<form method="post">
-  {% csrf_token %}
-  <div class='form-row'>
-    <div class="col-auto">
-      {{form.name.label_tag}}
-      {{form.name|add_class:"form-control"}}
-      {% for error in form.name.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{error}}
+<div class="row">
+  <div class="col-auto">
+    <form method="post">
+      {% csrf_token %}
+      <div class='form-row'>
+        <div class="col-auto">
+          {{form.name.label_tag}}
+          {{form.name|add_class:"form-control"}}
+          {% for error in form.name.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="col-auto">
+          {{form.cell.label_tag}}
+          {{form.cell|add_class:"form-control"}}
+          {% for error in form.cell.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
       </div>
-      {% endfor %}
-    </div>
-    <div class="col-auto">
-      {{form.cell.label_tag}}
-      {{form.cell|add_class:"form-control"}}
-      {% for error in form.cell.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{error}}
+      <div class='form-row'>
+        <div class="col-auto">
+          {{form.dob.label_tag}}
+          {{form.dob|add_class:"form-control date"}}
+          {% for error in form.dob.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="col-auto">
+          {{ rform.amount.label_tag}}
+          {{ rform.amount|add_class:"form-control"}}
+          {% for error in rform.amount.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
       </div>
-      {% endfor %}
-    </div>
-  </div>
-  <div class='form-row'>
-    <div class="col-auto">
-      {{form.dob.label_tag}}
-      {{form.dob|add_class:"form-control date"}}
-      {% for error in form.dob.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{error}}
+      <div class='form-row'>
+        <div class="col-auto">
+          {{form.idtype.label_tag}}
+          {{form.idtype|add_class:"form-control"}}
+          {% for error in form.idtype.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="col-auto">
+          {{form.idno.label_tag}}
+          {{form.idno|add_class:"form-control"}}
+          {% for error in form.idno.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
       </div>
-      {% endfor %}
-    </div>
-    <div class="col-auto">
-      {{ rform.amount.label_tag}}
-      {{ rform.amount|add_class:"form-control"}}
-      {% for error in rform.amount.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{error}}
+      <div class='form-row'>
+        <div class="col-auto">
+          {{form.idissue.label_tag}}
+          {{form.idissue|add_class:"form-control date"}}
+          {% for error in form.idissue.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="col-auto">
+          {{form.idexpire.label_tag}}
+          {{form.idexpire|add_class:"form-control date"}}
+          {% for error in form.idexpire.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
       </div>
-      {% endfor %}
-    </div>
-  </div>
-  <div class='form-row'>
-    <div class="col-auto">
-      {{form.idtype.label_tag}}
-      {{form.idtype|add_class:"form-control"}}
-      {% for error in form.idtype.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{error}}
+      <div class='form-row'>
+        <div class="col-auto">
+          {{ rform.exchange.label_tag}}
+          {{ rform.exchange|add_class:"form-control"}}
+          {% for error in rform.exchange.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="col-auto">
+          {{ rform.rem_country.label_tag}}
+          {{ rform.rem_country|add_class:"form-control"}}
+          {% for error in rform.rem_country.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
       </div>
-      {% endfor %}
-    </div>
-    <div class="col-auto">
-      {{form.idno.label_tag}}
-      {{form.idno|add_class:"form-control"}}
-      {% for error in form.idno.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{error}}
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-  <div class='form-row'>
-    <div class="col-auto">
-      {{form.idissue.label_tag}}
-      {{form.idissue|add_class:"form-control date"}}
-      {% for error in form.idissue.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{error}}
-      </div>
-      {% endfor %}
-    </div>
-    <div class="col-auto">
-      {{form.idexpire.label_tag}}
-      {{form.idexpire|add_class:"form-control date"}}
-      {% for error in form.idexpire.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{error}}
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-  <div class='form-row'>
-    <div class="col-auto">
-      {{ rform.exchange.label_tag}}
-      {{ rform.exchange|add_class:"form-control"}}
-      {% for error in rform.exchange.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{error}}
-      </div>
-      {% endfor %}
-    </div>
-    <div class="col-auto">
-      {{ rform.rem_country.label_tag}}
-      {{ rform.rem_country|add_class:"form-control"}}
-      {% for error in rform.rem_country.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{error}}
-      </div>
-      {% endfor %}
-    </div>
-  </div>
 
-  <div class='form-row'>
-    <div class="col-auto">
-      {{ rform.reference.label_tag}}
-      {{ rform.reference|add_class:"form-control"}}
-      {% for error in rform.reference.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{error}}
+      <div class='form-row'>
+        <div class="col-auto">
+          {{ rform.reference.label_tag}}
+          {{ rform.reference|add_class:"form-control"}}
+          {% for error in rform.reference.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="col-auto">
+          {{ rform.sender.label_tag}}
+          {{ rform.sender|add_class:"form-control"}}
+          {% for error in rform.sender.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
       </div>
-      {% endfor %}
-    </div>
-    <div class="col-auto">
-      {{ rform.sender.label_tag}}
-      {{ rform.sender|add_class:"form-control"}}
-      {% for error in rform.sender.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{error}}
+      <div class='form-row'>
+        <div class="col-auto">
+          {{form.address.label_tag}}
+          {{form.address|add_class:"form-control"}}
+          {% for error in form.address.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="col-auto">
+          {{rform.relationship.label_tag}}
+          {{rform.relationship|add_class:"form-control"}}
+          {% for error in rform.relationship.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
       </div>
-      {% endfor %}
+      <div class="form-row">
+        <div class="col-auto">
+          <input type="submit" class="btn btn-primary element_margin" value="Submit" />
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="col-auto">
+    <div class="alert alert-danger" role="alert">
+      <b> Reaseon(s) for Rejection:</b><br>
+      {{ comment }}
     </div>
   </div>
-  <div class='form-row'>
-    <div class="col-auto">
-      {{form.address.label_tag}}
-      {{form.address|add_class:"form-control"}}
-      {% for error in form.address.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{error}}
-      </div>
-      {% endfor %}
-    </div>
-
-  </div>
-  <div class="form-row">
-    <div class="col-auto">
-      <input type="submit" class="btn btn-primary element_margin" value="Submit" />
-    </div>
-  </div>
-
-
-</form>
-{% endblock %}
+</div>
+  {% endblock %}

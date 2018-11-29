@@ -3,100 +3,100 @@
 {% block title %} Add/ Select Receiver {% endblock %}
 {% block content %}
 <div class="row">
-<div class="col-md-6 offset-3">
-  <h4>Add New Receiver</h4>
-<form method="post" action="{% url 'add_client'%}">
-  {% csrf_token %}
+  <div class="col-md-6 offset-3">
+    <h4>Add New Receiver</h4>
+    <form method="post" action="{% url 'add_client'%}">
+      {% csrf_token %}
 
 
-  <div class='form-row'>
-      <div class="col-auto ">
+      <div class='form-row'>
+        <div class="col-auto ">
           {{form.name.label_tag}}
           {{form.name|add_class:"form-control element_margin"}}
           {% for error in form.name.errors %}
           <div class="alert alert-danger" role="alert">
-              {{error}}
+            {{error}}
           </div>
           {% endfor %}
-      </div>
-      <div class="col-auto">
+        </div>
+        <div class="col-auto">
           {{form.cell.label_tag}}
           {{form.cell|add_class:"form-control element_margin"}}
           {% for error in form.cell.errors %}
           <div class="alert alert-danger" role="alert">
-              {{error}}
+            {{error}}
           </div>
           {% endfor %}
+        </div>
       </div>
-  </div>
-  <div class='form-row'>
-    <div class="col-auto">
-        {{form.dob.label_tag}}
-        {{form.dob|add_class:"form-control date"}}
-        {% for error in form.dob.errors %}
-        <div class="alert alert-danger" role="alert">
+      <div class='form-row'>
+        <div class="col-auto">
+          {{form.dob.label_tag}}
+          {{form.dob|add_class:"form-control date"}}
+          {% for error in form.dob.errors %}
+          <div class="alert alert-danger" role="alert">
             {{error}}
+          </div>
+          {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-  </div>
-  <div class='form-row'>
-    <div class="col-auto">
-        {{form.address.label_tag}}
-        {{form.address|add_class:"form-control element_margin"}}
-        {% for error in form.address.errors %}
-        <div class="alert alert-danger" role="alert">
+      </div>
+      <div class='form-row'>
+        <div class="col-auto">
+          {{form.address.label_tag}}
+          {{form.address|add_class:"form-control element_margin"}}
+          {% for error in form.address.errors %}
+          <div class="alert alert-danger" role="alert">
             {{error}}
+          </div>
+          {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-  </div>
-  <div class='form-row'>
-      <div class="col-auto">
+      </div>
+      <div class='form-row'>
+        <div class="col-auto">
           {{form.idtype.label_tag}}
           {{form.idtype|add_class:"form-control element_margin"}}
           {% for error in form.idtype.errors %}
           <div class="alert alert-danger" role="alert">
-              {{error}}
+            {{error}}
           </div>
           {% endfor %}
-      </div>
-      <div class="col-auto">
+        </div>
+        <div class="col-auto">
           {{form.idno.label_tag}}
           {{form.idno|add_class:"form-control element_margin"}}
           {% for error in form.idno.errors %}
           <div class="alert alert-danger" role="alert">
-              {{error}}
+            {{error}}
           </div>
           {% endfor %}
+        </div>
       </div>
-    </div>
-    <div class='form-row'>
-      <div class="col-auto">
+      <div class='form-row'>
+        <div class="col-auto">
           {{form.idissue.label_tag}}
           {{form.idissue|add_class:"form-control date element_margin"}}
           {% for error in form.idissue.errors %}
           <div class="alert alert-danger" role="alert">
-              {{error}}
+            {{error}}
           </div>
           {% endfor %}
-      </div>
-      <div class="col-auto">
+        </div>
+        <div class="col-auto">
           {{form.idexpire.label_tag}}
           {{form.idexpire|add_class:"form-control date element_margin"}}
           {% for error in form.idexpire.errors %}
           <div class="alert alert-danger" role="alert">
-              {{error}}
+            {{error}}
           </div>
           {% endfor %}
+        </div>
       </div>
-    </div>
-  <div class='form-row'>
-      <div class="col-auto">
+      <div class='form-row'>
+        <div class="col-auto">
           <button type="submit" class="btn btn-primary btn-sm mb-2">Create</button>
+        </div>
       </div>
+    </form>
   </div>
-  </form>
-</div>
 </div>
 {% endblock %}

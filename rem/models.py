@@ -5,6 +5,8 @@ from .validators import validate_neg, validate_post_date, validate_mobile
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 # Create your models here.
@@ -22,7 +24,7 @@ class Branch(models.Model):
         return self.name
 
 class Country(models.Model):
-    name = models.CharField("Name of The Country", max_length=50)
+    name = models.CharField("Remitting Country", max_length=50)
     code = models.CharField("Country code", max_length=20)
 
     def __str__(self):
@@ -32,8 +34,15 @@ class Country(models.Model):
 class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     branch = models.ForeignKey(Branch,on_delete=models.CASCADE, verbose_name='Branch of the Employee')
+    cell = models.CharField("Cell number of Receiver", validators=[validate_mobile], max_length=14, unique=True)
     def __str__(self):
         return self.user.get_full_name()
+
+@receiver(post_save, sender=User)
+def update_user_employee(sender, instance, created, **kwargs):
+    if created:
+        Employee.objects.create(user=instance)
+    instance.employee.save()
 
 class Receiver(models.Model):
     name = models.CharField("Name of Receiver", max_length=100)
@@ -65,8 +74,10 @@ class ExchangeHouse(models.Model):
 
 class Remmit(models.Model):
     exchange = models.ForeignKey(ExchangeHouse,on_delete=models.CASCADE, verbose_name='Channel of Remittance')
-    rem_country = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Name of Country')
+    rem_country = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Remitting Country')
     sender = models.CharField("Name of Remitter",max_length=50)
+    relationship = models.CharField("Relationship to Sender",max_length=50, null=True)
+    purpose = models.CharField("Purpose of Transaction",max_length=50, null=True)
     receiver = models.ForeignKey(Receiver, on_delete=models.PROTECT, verbose_name="Receiver")
     amount = models.DecimalField("Amount of Payment",max_digits=20,decimal_places=2, validators=[validate_neg])
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
@@ -75,6 +86,15 @@ class Remmit(models.Model):
     reference = models.CharField("Referene No./PIN/MTCN", max_length=16, unique=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
     edited_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, related_name='editors')
+    REVIEW= 'RV'
+    REJECTED = 'RJ'
+    PAID = 'PD'
+    """STATUS_CHOICES = (
+        (REVIEW,'Request to be Processed'),
+        (REJECTED, 'Request Rejected'),
+        (PAID, 'Amount Payable to Customer'),
+        )
+    status=models.CharField("Request Status",max_length=2, choices=STATUS_CHOICES, default=REVIEW)"""
 
 
 class Requestpay(models.Model):
@@ -85,9 +105,9 @@ class Requestpay(models.Model):
     REJECTED = 'RJ'
     PAID = 'PD'
     STATUS_CHOICES = (
-        (REVIEW,'Request staged for review'),
-        (REJECTED, 'Request rejected'),
-        (PAID, 'Amount paid to customer'),
+        (REVIEW,'Request to be Processed'),
+        (REJECTED, 'Request Rejected'),
+        (PAID, 'Amount Payable to Customer'),
         )
     status=models.CharField("Request Status",max_length=2, choices=STATUS_CHOICES, default=REVIEW)
     comment = models.TextField("Reason for rejection or any other remarks",null=True)
@@ -107,4 +127,6 @@ class Payment(models.Model):
     paid_by = models.ForeignKey(User, on_delete=models.PROTECT)
     settled_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, related_name='settlements')
     date_settle = models.DateTimeField("Date of settlement", null=True, validators=[validate_post_date])
-    screenshot = models.ImageField(upload_to = 'images/%Y/%m/%d/', default = 'images/None/no-img.jpg')
+    agent_screenshot = models.ImageField("Agent Copy",upload_to = 'images/%Y/%m/%d/', default = 'images/None/no-img.jpg')
+    western_trm_screenshot = models.ImageField("Pre Transaction Receipt",upload_to = 'western_trm/%Y/%m/%d/', default = 'images/None/no-img.jpg')
+    customer_screenshot = models.ImageField("Customer Copy",upload_to = 'western_trm/%Y/%m/%d/', default = 'images/None/no-img.jpg')

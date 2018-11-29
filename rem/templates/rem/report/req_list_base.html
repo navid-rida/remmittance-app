@@ -1,5 +1,6 @@
 {% extends "rem/base.html" %}
 {% load widget_tweaks %}
+{% load humanize %}
 {% block js %}
 
 {% endblock %}
@@ -11,28 +12,28 @@
     <div class='form-row'>
         <div class="col-auto">
             {% for error in form.date_from.errors %}
-              {{ error}}
+              <div class="alert alert-danger" role="alert">{{ error}}</div>
             {% endfor %}
             {{form.date_from.label_tag}}
             {{form.date_from|add_class:"form-control date"}}
         </div>
         <div class="col-auto">
             {% for error in form.date_to.errors %}
-              {{ error}}
+              <div class="alert alert-danger" role="alert">{{ error}}</div>
             {% endfor %}
             {{form.date_to.label_tag}}
             {{form.date_to|add_class:"form-control date"}}
         </div>
         <div class="col-auto">
             {% for error in form.exchange.errors %}
-              {{ error}}
+              <div class="alert alert-danger" role="alert">{{ error}}</div>
             {% endfor %}
             {{form.exchange.label_tag}}
             {{form.exchange|add_class:"form-control"}}
         </div>
         <div class="col-auto">
             {% for error in form.status.errors %}
-              {{ error}}
+              <div class="alert alert-danger" role="alert">{{ error}}</div>
             {% endfor %}
             {{form.status.label_tag}}
             {{form.status|add_class:"form-control"}}
@@ -46,7 +47,9 @@
     </div>
 </form>
 </br>
+
 {%if req_list %}
+
 {% regroup req_list by remittance.exchange as request_list %}
 
 <fieldset id="group_1">
@@ -58,14 +61,14 @@
         <thead>
             <tr>
                 {% block branch_column %}{% endblock %}
-                <th scope="col">Country</th>
+                <th scope="col">Sender's Country</th>
                 <th scope="col">Ref. No</th>
                 <th scope="col">Sender</th>
                 <th scope="col">Benificiary</th>
                 <th scope="col">Amount</th>
                 <th scope="col">Request Posted By</th>
                 <th scope="col">Status</th>
-                <th scope="col">Resubmit?</th>
+                <th scope="col">Dealing Official's Phone</th>
                 <th scope="col"></th>
             </tr>
         </thead>
@@ -78,10 +81,10 @@
                 <td>{{entry.remittance.reference}}</td>
                 <td>{{entry.remittance.sender.title}}</td>
                 <td>{{entry.remittance.receiver}}</td>
-                <td>{{entry.remittance.amount}}</td>
+                <td>{{entry.remittance.amount|intcomma}}</td>
                 <td>{{entry.created_by}}</td>
                 <td>{{entry.get_status_display}}</td>
-                <td>{{entry.resubmit_flag}}</td>
+                <td>01XXXXXXXXX</td>
                 {% block button %}{% endblock %}
             </tr>
 
