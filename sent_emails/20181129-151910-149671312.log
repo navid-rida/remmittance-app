@@ -1,0 +1,25 @@
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Password reset on 127.0.0.1:8000
+From: webmaster@localhost
+To: nazmussaqib@nrbcommercialbank.com
+Date: Thu, 29 Nov 2018 09:19:10 -0000
+Message-ID: <154348315005.5500.7047645554272254551@HO-ID7.NRBCB.COM>
+
+
+You're receiving this email because you requested a password reset for your user account at 127.0.0.1:8000.
+
+Please go to the following page and choose a new password:
+
+http://127.0.0.1:8000/accounts/reset/NA/51p-9cb46678bd5c8f8bdc90/
+
+Your username, in case you've forgotten: saqib
+
+Thanks for using our site!
+
+The 127.0.0.1:8000 team
+
+
+
+-------------------------------------------------------------------------------
