@@ -21,6 +21,8 @@ from django.conf import settings
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('accounts/register/$', views.UserRegistrationView.as_view(), name='register'),
+    path('accounts/', include('django_registration.backends.activation.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('rem/', include('rem.urls')),
     path('admin/', admin.site.urls),

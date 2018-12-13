@@ -109,3 +109,14 @@ def rem_bb_summary(list):
     frames = [gl_df, ac_df]
     complete_df = pd.concat(frames)
     return complete_df
+
+
+############################ helper functions #########################################
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip

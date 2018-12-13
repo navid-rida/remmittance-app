@@ -7,6 +7,11 @@ from .validators import *
 import floppyforms as floppy
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.conf import settings
+from django.db import transaction
+############### imports for django-registration #############################
+from django_registration.forms import RegistrationForm
+
 
 class RemmitForm(ModelForm):
 
@@ -140,14 +145,38 @@ class PaymentForm(forms.Form):
                     "Please confirm or reject the payment"
                 )"""
 
-class SignUpForm(UserCreationForm):
+class SignUpForm(RegistrationForm):
     #first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
     #last_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
     #email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
-    branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'),required=False)
+    branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'))
     cell = forms.CharField(label="Mobile No.", validators=[validate_mobile])
     email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name','branch', 'cell', 'email', 'password1', 'password2',)
+        fields=('username', 'first_name', 'last_name','branch', 'cell', 'email', 'password1', 'password2',)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        branch = cleaned_data.get("branch")
+        user_number = branch.employee_set.filter(user__is_active=True).count()
+        MAXIMUM_AllOWWED_USER_PER_BRANCH = settings.MAXIMUM_USER_PER_BRANCH
+        if user_number >= MAXIMUM_AllOWWED_USER_PER_BRANCH:
+            raise forms.ValidationError(
+                    "maximum user limit for the branch exceeded"
+                )
+        else:
+            cleaned_data["branch"] = branch
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        with transaction.atomic():
+            user = super(SignUpForm, self).save()
+            user.refresh_from_db()  # very important! this will load the profile instance created by the signal
+            user.employee.branch = self.cleaned_data.get('branch')
+            user.employee.cell = self.cleaned_data.get('cell')
+            # set here all other values
+            user.save()
+            return user

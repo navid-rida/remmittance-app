@@ -137,5 +137,16 @@ LOGIN_REDIRECT_URL='index'
 
 ######################### Email Settings##############################
 
-EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+#EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+#EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+EMAIL_HOST = '192.168.50.51'
+#EMAIL_HOST_USER = 'kazinavidanzum@nrbcommercialbank.com'
+#EMAIL_HOST_PASSWORD = 'rC#u1bD$1t1y'
+EMAIL_PORT = 25
+######################### Rem app sepcific settings##############################
+
+MAXIMUM_USER_PER_BRANCH=2
+
+############################ django-registration settings ##############################
+
+ACCOUNT_ACTIVATION_DAYS = 2

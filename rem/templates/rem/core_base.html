@@ -1,0 +1,52 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="{% static "css/bootstrap/bootstrap.min.css" %}">
+  <link rel="stylesheet" href="{% static "css/fontawesome-free-5.2.0-web/css/all.min.css" %}">
+  <link rel="stylesheet" href="{% static "css/login.css" %}">
+  <link rel="stylesheet" href="{% static "css/style.css" %}">
+  <link rel="stylesheet" href="{% static "css/jquery-ui.css" %}">
+  <title>{% block title %}Welcome to NRBC Report Management{% endblock %}</title>
+</head>
+
+<body>
+
+  <div id="content">
+    <div class="container">
+      {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+        {% if message.level_tag == "info" %}
+        <li class="alert alert-info" {% elif message.level_tag == "success" %} <li class="alert alert-success" {% elif message.level_tag == "warning" %} <li class="alert alert-warning" {% elif message.level_tag == "error" %} <li class="alert alert-danger"
+          {% else %} <li class="alert alert-primary" {% endif %} role="alert">{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% block content %}
+      {% endblock %}
+    </div>
+  </div>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
+
+
+  <!--  <script src="{%static "js/jquery-3.3.1.slim.min.js" %}"></script>-->
+  <script src="{%static "js/jquery-1.7.2.min.js" %}"></script>
+  <script src="{%static "js/jquery-ui.min.js" %}"></script>
+  <script src="{%static "js/bootstrap.bundle.min.js" %}"></script>
+  {% block js %}{% endblock %}
+</body>
+
+</html>

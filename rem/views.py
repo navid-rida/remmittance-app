@@ -15,7 +15,13 @@ from django.contrib.auth.models import Group
 from django.utils import timezone
 from django.db import transaction
 from django.contrib.messages.views import SuccessMessageMixin
+from django.conf import settings
+############################### djang-registration imports ##########################
+from django_registration.backends.activation.views import RegistrationView
+from django_registration import signals
 # Create your views here.
+
+MAXIMUM_AllOWWED_USER_PER_BRANCH = settings.MAXIMUM_USER_PER_BRANCH
 
 ###############User tests############################
 def check_headoffice(user):
@@ -31,6 +37,13 @@ def check_branch(user):
         return True
     else:
         return False
+
+"""def check_user_available(branch, MAXIMUM_AllOWWED_USER_PER_BRANCH):
+    number = branch.employee_set.all().count()
+    if number >= MAXIMUM_AllOWWED_USER_PER_BRANCH:
+        return False
+    else:
+        return True"""
 
 @method_decorator([login_required,transaction.atomic], name='dispatch')
 class RemmitCreate(SuccessMessageMixin, CreateView):
@@ -53,7 +66,7 @@ class RemmitCreate(SuccessMessageMixin, CreateView):
         self.object = form.save(commit=False)
         # in case you want to modify the object before commit
         self.object.save()
-        req = Requestpay(remittance=self.object, created_by=self.request.user)
+        req = Requestpay(remittance=self.object, created_by=self.request.user, ip=get_client_ip(self.request))
         req.save()
         return super().form_valid(form)
 
@@ -366,6 +379,7 @@ def payment_confirm(request, pk):
                 payment = Payment()
                 payment.requestpay = req
                 payment.paid_by = request.user
+                payment.ip = get_client_ip(request)
                 payment.agent_screenshot = request.FILES.get('agent_screenshot',False) # REVIEW NEEDED
                 payment.customer_screenshot = request.FILES.get('customer_screenshot',False) # REVIEW NEEDED
                 payment.western_trm_screenshot = request.FILES.get('western_trm_screenshot',False) # REVIEW NEEDED
@@ -421,7 +435,7 @@ def request_resubmit(request, pk):
     return render(request,'rem/forms/remmit_resubmit.html',context)
 
 
-
+@transaction.atomic
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -438,3 +452,22 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'registration/signup.html', {'form': form})
+
+###################### django-registration views ##################################################
+class UserRegistrationView(RegistrationView):
+    form_class = SignUpForm
+    template_name = 'registration/signup.html'
+
+    def register(self,form):
+        new_user = super(UserRegistrationView,self).create_inactive_user(form)
+        new_user.refresh_from_db()
+        new_user.employee.branch= form.cleaned_data.get('branch')
+        new_user.employee.cell = form.cleaned_data.get('cell')
+        # set here all other values
+        new_user.save()
+        signals.user_registered.send(
+            sender=self.__class__,
+            user=new_user,
+            request=self.request
+        )
+        return new_user

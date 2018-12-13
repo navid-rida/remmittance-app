@@ -33,7 +33,7 @@ class Country(models.Model):
 
 class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    branch = models.ForeignKey(Branch,on_delete=models.CASCADE, verbose_name='Branch of the Employee')
+    branch = models.ForeignKey(Branch,on_delete=models.CASCADE, null=True, verbose_name='Branch of the Employee')
     cell = models.CharField("Cell number of Receiver", validators=[validate_mobile], max_length=14, unique=True)
     def __str__(self):
         return self.user.get_full_name()
@@ -112,6 +112,7 @@ class Requestpay(models.Model):
     status=models.CharField("Request Status",max_length=2, choices=STATUS_CHOICES, default=REVIEW)
     comment = models.TextField("Reason for rejection or any other remarks",null=True)
     resubmit_flag = models.BooleanField("Resubmit Yes/No",default=False)
+    ip = models.GenericIPAddressField("User IP Address")
     #payment = models.ForeignKey('Payment',  null=True, on_delete=models.SET_NULL)"""
 
 class Payment(models.Model):
@@ -130,3 +131,4 @@ class Payment(models.Model):
     agent_screenshot = models.ImageField("Agent Copy",upload_to = 'images/%Y/%m/%d/', default = 'images/None/no-img.jpg')
     western_trm_screenshot = models.ImageField("Pre Transaction Receipt",upload_to = 'western_trm/%Y/%m/%d/', default = 'images/None/no-img.jpg')
     customer_screenshot = models.ImageField("Customer Copy",upload_to = 'western_trm/%Y/%m/%d/', default = 'images/None/no-img.jpg')
+    ip = models.GenericIPAddressField("User IP Address")
