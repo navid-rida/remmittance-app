@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.db import transaction
 ############### imports for django-registration #############################
-from django_registration.forms import RegistrationForm
+from django_registration.forms import RegistrationForm, RegistrationFormUniqueEmail
 
 
 class RemmitForm(ModelForm):
@@ -93,8 +93,8 @@ class SearchForm(forms.Form):
     #date_from = forms.DateField(label="Starting Date", initial=timezone.now, required=False, input_formats=['%d/%m/%Y','%d/%m/%y','%d-%m-%Y','%d-%m-%y','%Y-%m-%d','%Y/%m/%d'])
     #date_to = forms.DateField(label="Ending Date", initial=timezone.now, required=False, input_formats=['%d/%m/%Y','%d/%m/%y','%d-%m-%Y','%d-%m-%y','%Y-%m-%d','%Y/%m/%d'])
     #date_from = forms.DateField(label="Starting Date", initial=timezone.now, required=False, widget=forms.SelectDateWidget)
-    date_from = forms.DateField(label="Starting Date", required=False, input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
-    date_to = forms.DateField(label="Ending Date",  required=False, input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
+    date_from = forms.DateField(label="Starting Date", initial= timezone.now, required=False, input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
+    date_to = forms.DateField(label="Ending Date", initial= timezone.now,  required=False, input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
     exchange = forms.ModelChoiceField(queryset=ExchangeHouse.objects.all(),required=False)
     branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'),required=False)
     REVIEW= 'RV'
@@ -145,13 +145,13 @@ class PaymentForm(forms.Form):
                     "Please confirm or reject the payment"
                 )"""
 
-class SignUpForm(RegistrationForm):
+class SignUpForm(RegistrationFormUniqueEmail):
     #first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
     #last_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
     #email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
     branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'))
     cell = forms.CharField(label="Mobile No.", validators=[validate_mobile])
-    email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
+    email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.',validators=[validate_nrbc_mail])
 
     class Meta:
         model = User
@@ -171,7 +171,7 @@ class SignUpForm(RegistrationForm):
 
         return cleaned_data
 
-    def save(self, commit=True):
+    """def save(self, commit=True):
         with transaction.atomic():
             user = super(SignUpForm, self).save()
             user.refresh_from_db()  # very important! this will load the profile instance created by the signal
@@ -179,4 +179,4 @@ class SignUpForm(RegistrationForm):
             user.employee.cell = self.cleaned_data.get('cell')
             # set here all other values
             user.save()
-            return user
+            return user"""

@@ -4,6 +4,8 @@
 {% block title %} Payment Details {% endblock %}
 {% block content %}
 
+{{ form.errors}}
+{{ rform.errors}}
 <h4 class="element_margin">Payment Request Details</h4>
 <div class="row justify-content-md-left">
   <div class="col-md-auto">
@@ -23,7 +25,7 @@
         </tr>
         <tr>
           <td>Request date and time</td>
-          <td>: {{ object.datecreate }}</td>
+          <td>: {{ object.datecreate|date:'d/m/Y P' }}</td>
         </tr>
         <tr>
           <td>Remitting Country</td>
@@ -56,6 +58,14 @@
         <tr>
           <td>Benificiary's Address</td>
           <td>: {{ object.remittance.receiver.address }}</td>
+        </tr>
+        <tr>
+          <td>Relationship to Sender</td>
+          <td>: {{ object.remittance.relationship }}</td>
+        </tr>
+        <tr>
+          <td>Purpose of Transaction</td>
+          <td>: {{ object.remittance.purpose }}</td>
         </tr>
         {% if object.payment and object.payment.screenshot.url != '' %}
         <tr>

@@ -13,20 +13,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'l=0zslut0dp9)(w1_3fl5ux#z&3i44n37ktqw=tlmb=+ygl4=x'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['127.0.0.1','192.168.100.58']
-
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Application definition
 
@@ -40,7 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     ########################## Additional Apps###################################
     'widget_tweaks',
-    'floppyforms',
+    #'floppyforms',
     'django.contrib.humanize'
 ]
 
@@ -74,18 +61,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'report.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 
@@ -114,39 +89,17 @@ TIME_ZONE = 'Asia/Dhaka'
 
 USE_I18N = True
 
-USE_L10N = True
+#USE_L10N = True
 
 USE_TZ = True
 
+DATE_FORMAT = 'd/m/Y'
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.0/howto/static-files/
+SHORT_DATETIME_FORMAT = 'm/d/Y P'
+#DATETIME_FORMAT= '%Y-%m-%d %H:%M:%S'
 
-STATIC_URL = '/static/'
-"""STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]"""
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = '/media/'
 
 #User registration and Authentication
 
 LOGOUT_REDIRECT_URL='login'
 LOGIN_REDIRECT_URL='index'
-
-######################### Email Settings##############################
-
-#EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-#EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
-EMAIL_HOST = '192.168.50.51'
-#EMAIL_HOST_USER = 'kazinavidanzum@nrbcommercialbank.com'
-#EMAIL_HOST_PASSWORD = 'rC#u1bD$1t1y'
-EMAIL_PORT = 25
-######################### Rem app sepcific settings##############################
-
-MAXIMUM_USER_PER_BRANCH=2
-
-############################ django-registration settings ##############################
-
-ACCOUNT_ACTIVATION_DAYS = 2

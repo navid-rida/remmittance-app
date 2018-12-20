@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required,user_passes_test
 from .models import Remmit, Requestpay, Receiver
 import datetime
 from .DataModels import *
+from .user_tests import *
 import io
 from django.contrib import messages
 from django.views.generic.edit import CreateView,UpdateView
@@ -24,20 +25,6 @@ from django_registration import signals
 MAXIMUM_AllOWWED_USER_PER_BRANCH = settings.MAXIMUM_USER_PER_BRANCH
 
 ###############User tests############################
-def check_headoffice(user):
-    group = Group.objects.get(name='Head office user')
-    if group in user.groups.all():
-        return True
-    else:
-        return False
-
-def check_branch(user):
-    group = Group.objects.get(name='branch user')
-    if group in user.groups.all():
-        return True
-    else:
-        return False
-
 """def check_user_available(branch, MAXIMUM_AllOWWED_USER_PER_BRANCH):
     number = branch.employee_set.all().count()
     if number >= MAXIMUM_AllOWWED_USER_PER_BRANCH:
@@ -421,6 +408,7 @@ def request_resubmit(request, pk):
             new_req = Requestpay()
             new_req.remittance = remitt
             new_req.created_by = request.user
+            new_req.ip = get_client_ip(request)
             new_req.save()
             req.resubmit_flag=True
             req.save()

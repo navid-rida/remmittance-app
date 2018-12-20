@@ -84,7 +84,7 @@
                 <td>{{entry.remittance.amount|intcomma}}</td>
                 <td>{{entry.created_by}}</td>
                 <td>{{entry.get_status_display}}</td>
-                <td>01XXXXXXXXX</td>
+                <td>{{entry.created_by.employee.cell}}</td>
                 {% block button %}{% endblock %}
             </tr>
 

@@ -128,3 +128,11 @@ def validate_bc(value):
 
 def validate_passport(value):
     return passport_re(value)
+
+def validate_nrbc_mail(email):
+    domain = email.split('@')[1]
+    if domain!="nrbcommercialbank.com":
+        raise ValidationError(
+            _('%(email)s is not a valid NRBC email'),
+            params={'email': email},
+        )
