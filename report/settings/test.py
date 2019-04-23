@@ -9,7 +9,7 @@ SECRET_KEY = 'l=0zslut0dp9)(w1_3fl5ux#z&3i44n37ktqw=tlmb=+ygl4=x'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','192.168.100.58']
+ALLOWED_HOSTS = ['127.0.0.1','192.168.100.58','192.168.30.41']
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
