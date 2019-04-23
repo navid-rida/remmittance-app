@@ -16,8 +16,12 @@ ALLOWED_HOSTS = ['127.0.0.1','192.168.100.58']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': '5432',
     }
 }
 
@@ -40,10 +44,6 @@ EMAIL_HOST = '192.168.50.51'
 #EMAIL_HOST_USER = 'kazinavidanzum@nrbcommercialbank.com'
 
 EMAIL_PORT = 25
-######################### Rem app sepcific settings##############################
-
-MAXIMUM_USER_PER_BRANCH=2
-
-############################ django-registration settings ##############################
-
-ACCOUNT_ACTIVATION_DAYS = 2
+DEFAULT_FROM_EMAIL='no-reply@cfrdsnrbc.com'
+ADMINS=[('Navid', 'kazinavidanzum@nrbcommercialbank.com'), ('Chakibbai', 'nazmussaqib@nrbcommercialbank.com')]
+MANAGERS=[('Navid', 'kazinavidanzum@nrbcommercialbank.com'), ('Chakibbai', 'nazmussaqib@nrbcommercialbank.com')]

@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+######### Required for python decouple#######################
+from decouple import config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -103,3 +105,12 @@ SHORT_DATETIME_FORMAT = 'm/d/Y P'
 
 LOGOUT_REDIRECT_URL='login'
 LOGIN_REDIRECT_URL='index'
+
+######################### Rem app sepcific settings##############################
+
+MAXIMUM_USER_PER_BRANCH=2
+MAXIMUM_USER_HEAD_OFFICE=10
+
+############################ django-registration settings ##############################
+
+ACCOUNT_ACTIVATION_DAYS = 2

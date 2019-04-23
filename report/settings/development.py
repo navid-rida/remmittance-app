@@ -4,10 +4,10 @@ from .base import *
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'l=0zslut0dp9)(w1_3fl5ux#z&3i44n37ktqw=tlmb=+ygl4=x'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = ['127.0.0.1','192.168.100.58']
 
@@ -40,10 +40,6 @@ EMAIL_HOST = '192.168.50.51'
 #EMAIL_HOST_USER = 'kazinavidanzum@nrbcommercialbank.com'
 
 EMAIL_PORT = 25
-######################### Rem app sepcific settings##############################
-
-MAXIMUM_USER_PER_BRANCH=2
-
-############################ django-registration settings ##############################
-
-ACCOUNT_ACTIVATION_DAYS = 2
+DEFAULT_FROM_EMAIL='no-reply@cfrdsnrbc.com'
+ADMINS=[('Navid', 'kazinavidanzum@nrbcommercialbank.com'), ('Chakibbai', 'nazmussaqib@nrbcommercialbank.com')]
+MANAGERS=[('Navid', 'kazinavidanzum@nrbcommercialbank.com'), ('Chakibbai', 'nazmussaqib@nrbcommercialbank.com')]

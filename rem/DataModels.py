@@ -2,6 +2,10 @@ from .models import *
 import pandas as pd
 from datetime import datetime, date,timedelta
 import io
+from django.db.models import IntegerField, F, Value
+####################### fuzzywuzzy imports ##################################
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 
 
 ############################# Variables and Lists ######################################
@@ -12,6 +16,7 @@ ac_list = gl + cd
 ####################### common functions#################################################
 
 def excel_output(df):
+    """ Takes DataFrame as input and returns excel file for download """
     output = io.BytesIO()
     #time = str(date.today())
     #filename = "output "+time+".xlsx"
@@ -47,7 +52,6 @@ def search(date_from=None,date_to=None,exchange=None,branch=None,status=None):
         rem_list = rem_list.filter(exchange=exchange)
     rem_list = rem_list.order_by('exchange', '-date')
     return rem_list
-
 
 ####################### Report Sepcific Functions #################################################
 def make_ac_df(list,category,columns):
@@ -109,6 +113,18 @@ def rem_bb_summary(list):
     frames = [gl_df, ac_df]
     complete_df = pd.concat(frames)
     return complete_df
+
+################################## name search related functions ##################################
+def name_search(search_text, db_txt):
+    if fuzz.token_set_ratio(search_text,db_text) > 70:
+        return True
+
+def name_search_result(qset, search_text):
+    #qset = qset.annotate(score=Value(0,IntegerField()))
+    df = qset_to_df(qset)
+    #df['score'] = df['name'].apply(lambda x: fuzz.partial_ratio(search_text,x))
+    df['score'] = df['name'].apply(lambda x: max(fuzz.partial_ratio(search_text,x),fuzz.token_sort_ratio(search_text,x)))
+
 
 
 ############################ helper functions #########################################

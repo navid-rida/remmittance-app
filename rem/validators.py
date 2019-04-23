@@ -3,6 +3,8 @@ from django.utils.translation import gettext_lazy as _
 #from datetime import date
 from django.utils import timezone
 from django.core.validators import RegexValidator,_lazy_re_compile
+from django.conf import settings
+################# models ##############################
 
 
 western_union = RegexValidator(
@@ -136,3 +138,12 @@ def validate_nrbc_mail(email):
             _('%(email)s is not a valid NRBC email'),
             params={'email': email},
         )
+
+def validate_user_limit(branch):
+    total_employee = branch.employee_count()
+    if branch.name == 'Head office':
+        maximum_allowed_user = settings.MAXIMUM_USER_HEAD_OFFICE
+    else:
+        maximum_allowed_user = settings.MAXIMUM_USER_PER_BRANCH
+    if maximum_allowed_user <= total_employee:
+        raise ValidationError(_('Maximum User Limit exceeded for this branch'))

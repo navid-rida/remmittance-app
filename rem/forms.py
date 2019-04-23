@@ -145,11 +145,11 @@ class PaymentForm(forms.Form):
                     "Please confirm or reject the payment"
                 )"""
 
-class SignUpForm(RegistrationFormUniqueEmail):
+class SignUpForm(RegistrationForm):
     #first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
     #last_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
     #email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
-    branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'))
+    branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'),validators=[validate_user_limit])
     cell = forms.CharField(label="Mobile No.", validators=[validate_mobile])
     email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.',validators=[validate_nrbc_mail])
 
@@ -157,7 +157,7 @@ class SignUpForm(RegistrationFormUniqueEmail):
         model = User
         fields=('username', 'first_name', 'last_name','branch', 'cell', 'email', 'password1', 'password2',)
 
-    def clean(self):
+    """def clean(self):
         cleaned_data = super().clean()
         branch = cleaned_data.get("branch")
         user_number = branch.employee_set.filter(user__is_active=True).count()
@@ -169,14 +169,4 @@ class SignUpForm(RegistrationFormUniqueEmail):
         else:
             cleaned_data["branch"] = branch
 
-        return cleaned_data
-
-    """def save(self, commit=True):
-        with transaction.atomic():
-            user = super(SignUpForm, self).save()
-            user.refresh_from_db()  # very important! this will load the profile instance created by the signal
-            user.employee.branch = self.cleaned_data.get('branch')
-            user.employee.cell = self.cleaned_data.get('cell')
-            # set here all other values
-            user.save()
-            return user"""
+        return cleaned_data"""

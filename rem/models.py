@@ -1,13 +1,27 @@
 from django.db import models
 from decimal import Decimal
 #from datetime import date
+from django.core.exceptions import ValidationError
 from .validators import validate_neg, validate_post_date, validate_mobile
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.conf import settings
+import pandas as pd
+################# import for validation errrors ##############################
+from django.utils.translation import gettext_lazy as _
 
+######################### Custom Managers ###############################
+"""class RemmitManager(models.Manager):
+    def get_queryset(self):
+        initset = super().get_queryset().only("sender","receiver").all()
+        for entry in initset:
+            sender = entry.sender
+            receiver = entry.receiver.name
+            if fuzz.token_set_ratio():
+                pass"""
 
 # Create your models here.
 numeric = RegexValidator(r'^[0-9]*$', 'Only numeric characters are allowed.')
@@ -23,6 +37,17 @@ class Branch(models.Model):
     def __str__(self):
         return self.name
 
+    def employee_count(self, active_status=None):
+        count = 0
+        if active_status==True:
+            count = self.employee_set.filter(user__is_active=active_status).count()
+        elif active_status==False:
+            count = self.employee_set.filter(user__is_active=active_status).count()
+        else:
+            count = self.employee_set.count()
+        return count
+
+
 class Country(models.Model):
     name = models.CharField("Remitting Country", max_length=50)
     code = models.CharField("Country code", max_length=20)
@@ -33,16 +58,42 @@ class Country(models.Model):
 
 class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    branch = models.ForeignKey(Branch,on_delete=models.CASCADE, null=True, verbose_name='Branch of the Employee')
-    cell = models.CharField("Cell number of Receiver", validators=[validate_mobile], max_length=14, unique=True)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, verbose_name='Branch of the Employee')
+    cell = models.CharField("Cell number of Receiver", validators=[validate_mobile], max_length=14)
     def __str__(self):
         return self.user.get_full_name()
 
-@receiver(post_save, sender=User)
+    def check_group(self, group_name):
+        if self.user.groups.filter(name=group_name).exists():
+            return True
+        else:
+            return False
+
+    def check_user_quota_available(self):
+        total_employee = self.branch.employee_count()
+        if self.branch.name == 'Head office':
+            maximum_allowed_user=settings.MAXIMUM_USER_HEAD_OFFICE
+        else:
+            maximum_allowed_user=settings.MAXIMUM_USER_PER_BRANCH
+        if maximum_allowed_user > total_employee:
+            return True
+        else:
+            return False
+
+    """def clean(self):
+        # Don't allow draft entries to have a pub_date.
+        if self.id and self.check_user_quota_available() == False:
+            raise ValidationError(_('Maximum User Limit exceeded'))
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super(Employee, self).save(*args, **kwargs)"""
+
+"""@receiver(post_save, sender=User)
 def update_user_employee(sender, instance, created, **kwargs):
     if created:
-        Employee.objects.create(user=instance)
-    instance.employee.save()
+        Employee.objects.create(user=instance, branch=None, cell=None)
+    instance.employee.save()"""
 
 class Receiver(models.Model):
     name = models.CharField("Name of Receiver", max_length=100)

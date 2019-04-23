@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect, get_object_or_404#, render_to_resp
 from django.http import HttpResponse
 from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm
 from django.contrib.auth.decorators import login_required,user_passes_test
-from .models import Remmit, Requestpay, Receiver
+from .models import Remmit, Requestpay, Receiver,Employee
 import datetime
 from .DataModels import *
 from .user_tests import *
@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.db import transaction
 from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
+from django.core.exceptions import ValidationError
 ############################### djang-registration imports ##########################
 from django_registration.backends.activation.views import RegistrationView
 from django_registration import signals
@@ -38,8 +39,6 @@ class RemmitCreate(SuccessMessageMixin, CreateView):
     form_class = RemmitForm
     template_name = 'rem/forms/remmit_create_form.html'
     success_message = "Remittance request was submitted successfully"
-    #pk = self.kwargs['pk']
-    #rcvr = Receiver.objects.get(pk=pk)
     success_url = reverse_lazy('index')
 
     """def get_success_url(self):
@@ -442,20 +441,37 @@ def signup(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 ###################### django-registration views ##################################################
+@method_decorator([transaction.atomic,], name='dispatch')
 class UserRegistrationView(RegistrationView):
     form_class = SignUpForm
     template_name = 'registration/signup.html'
 
+    """def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.branch = self.request.user.employee.branch
+        receiver = get_object_or_404(Receiver, pk=self.kwargs['pk'])
+        form.instance.receiver = receiver
+        self.object = form.save(commit=False)
+        # in case you want to modify the object before commit
+        self.object.save()
+        req = Requestpay(remittance=self.object, created_by=self.request.user, ip=get_client_ip(self.request))
+        req.save()
+        return super().form_valid(form)"""
+
     def register(self,form):
         new_user = super(UserRegistrationView,self).create_inactive_user(form)
         new_user.refresh_from_db()
-        new_user.employee.branch= form.cleaned_data.get('branch')
-        new_user.employee.cell = form.cleaned_data.get('cell')
+        branch= form.cleaned_data.get('branch')
+        cell = form.cleaned_data.get('cell')
+        #new_user.employee.branch = branch
+        #new_user.employee.cell = cell
+        employee =Employee.objects.create(user=new_user, branch=branch, cell=cell)
         # set here all other values
         new_user.save()
+        employee.save()
         signals.user_registered.send(
             sender=self.__class__,
             user=new_user,
             request=self.request
-        )
+            )
         return new_user
