@@ -151,7 +151,7 @@ class SignUpForm(RegistrationForm):
     #email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
     branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'),validators=[validate_user_limit])
     cell = forms.CharField(label="Mobile No.", validators=[validate_mobile])
-    email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.',validators=[validate_nrbc_mail])
+    email = forms.EmailField(max_length=254, help_text='Input your official Email address',validators=[validate_nrbc_mail])
 
     class Meta:
         model = User

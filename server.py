@@ -1,3 +1,6 @@
+import os
+###########change setting#######################
+os.environ["DJANGO_SETTINGS_MODULE"] = "report.settings.test"
 # Import your application as:
 # from wsgi import application
 # Example:

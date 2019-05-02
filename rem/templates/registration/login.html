@@ -15,7 +15,7 @@
 
   <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">-->
-  <title>{% block title %}Welcome to NRBCB Centralized Remittance Distribution System{% endblock %}</title>
+  <title>{% block title %}Welcome to Central Foreign Remittance Database{% endblock %}</title>
 </head>
 
 <body id="LoginForm">
@@ -24,7 +24,7 @@
     <div class="login-form">
       <div class="main-div">
         <div class="panel">
-          <h2>NRBCB Centralized Remittance Distribution System Login</h2>
+          <h2>Central Foreign Remittance Database</h2>
           <p>Please enter your Username and Password</p>
         </div>
         <form method="post" action="{% url 'login' %}" id="Login">
@@ -43,7 +43,7 @@
 
           </div>
           <div class="forgot">
-            <a href="{% url 'password_reset' %}">Reset password?</a>
+            <a href="{% url 'password_reset' %}">Reset Password?</a>
           </div>
           <div class="forgot">
             <a href="{% url 'register' %}">Create User</a>
