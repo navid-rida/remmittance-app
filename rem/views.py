@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect, get_object_or_404#, render_to_response
 from django.http import HttpResponse
-from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm
+from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm
 from django.contrib.auth.decorators import login_required,user_passes_test
 from .models import Remmit, Requestpay, Receiver,Employee
 import datetime
@@ -226,7 +226,8 @@ class ReceiverCreate(SuccessMessageMixin, CreateView):
     #success_url = reverse_lazy('remmit-create',args=(self.object.id,))
 
     def get_success_url(self):
-        return reverse('remmit-create', kwargs={'pk': self.object.id})
+        #return reverse('remmit-create', kwargs={'pk': self.object.id})
+        return reverse('remmit-create-with-payment', kwargs={'pk': self.object.id})
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -475,3 +476,31 @@ class UserRegistrationView(RegistrationView):
             request=self.request
             )
         return new_user
+
+############################################# Only information Update #########################################################
+
+@method_decorator([login_required,transaction.atomic], name='dispatch')
+class RemmitInfoCreate(SuccessMessageMixin, CreateView):
+    model = Remmit
+    form_class = RemittInfoForm
+    template_name = 'rem/forms/remmit_info_form.html'
+    success_message = "Remittance information was submitted successfully"
+    success_url = reverse_lazy('index')
+
+    """def get_success_url(self):
+        return reverse('add_req', kwargs={'pk': self.object.id})"""
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.branch = self.request.user.employee.branch
+        receiver = get_object_or_404(Receiver, pk=self.kwargs['pk'])
+        form.instance.receiver = receiver
+        self.object = form.save(commit=False)
+        # in case you want to modify the object before commit
+        self.object.save()
+        req = Requestpay(remittance=self.object, created_by=self.request.user, status='PD', ip=get_client_ip(self.request))
+        req.save()
+        req.refresh_from_db()
+        payment = Payment(requestpay=req, paid_by=self.request.user, agent_screenshot=self.request.FILES.get('screenshot',False), ip=get_client_ip(self.request))
+        payment.save()
+        return super().form_valid(form)

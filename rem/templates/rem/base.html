@@ -13,12 +13,12 @@
   <link rel="stylesheet" href="{% static "css/login.css" %}">
   <link rel="stylesheet" href="{% static "css/style.css" %}">
   <link rel="stylesheet" href="{% static "css/jquery-ui.css" %}">
-  <title>{% block title %}Welcome to NRBC Report Management{% endblock %}</title>
+  <title>{% block title %}Welcome to Central Foreign Remittance Database{% endblock %}</title>
 </head>
 
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">NRBCB Centralized Remittance Distribution System</a>
+    <a class="navbar-brand" href="#">NRBCB Central Foreign Remittance Database</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -35,7 +35,7 @@
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Reports</a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             {% comment %}<a class="dropdown-item" href="{% url 'show_rem'%}">Remmittance List</a>{% endcomment %}
-            <a class="dropdown-item" href="{% url 'show_req'%}">Request List</a>
+            {% comment %}<a class="dropdown-item" href="{% url 'show_req'%}">Request List</a>{% endcomment %}
             {% for group in request.user.groups.all %}
             {% if group.name == "Head office user" %}
             <a class="dropdown-item" href="{% url 'select_rem_list'%}">Remmittance Excel Download</a>
@@ -51,6 +51,7 @@
             Upload Data
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Request</a>
             <a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Information</a>
             {% comment %}<a class="dropdown-item" href="{% url 'remmit-create'%}">Remmittance Entry</a>
             <a class="dropdown-item" href="#">Quarterly Meeting minutes</a>

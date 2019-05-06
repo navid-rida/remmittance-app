@@ -88,6 +88,10 @@
   </div>
 </div>
 
+{% if object.payment.agent_screenshot.url != '' %}
+  <p>Agent Copy: <br><img src='{{ object.payment.agent_screenshot.url }}' class="img-fluid"><img></p>
+{% endif %}
+
 {% if object.payment and object.payment.agent_screenshot.url != '' %}
 <p>Agent Copy: <br><img src='{{ object.payment.agent_screenshot.url }}' class="img-fluid"><img></p>
 {% endif %}

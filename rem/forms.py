@@ -4,7 +4,7 @@ from django import forms
 #from datetime import date,datetime
 from django.utils import timezone
 from .validators import *
-import floppyforms as floppy
+#import floppyforms as floppy
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -18,9 +18,6 @@ class RemmitForm(ModelForm):
     class Meta:
         model = Remmit
         fields = ('exchange','rem_country','reference','sender','amount','relationship', 'purpose')
-        """widgets = {
-            'relationship': floppy.widgets.Input(datalist=['a','b','c']),
-        }"""
 
 
     def clean(self):
@@ -43,10 +40,13 @@ class RemmitForm(ModelForm):
                 )
 
 
+class RemittInfoForm(RemmitForm):
+    screenshot = forms.ImageField(required=False)
+
 class ReceiverForm(ModelForm):
     dob = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="Date of Birth",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
-    idissue = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="ID Issue Date",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
-    idexpire = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}),label="ID Expiry date",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
+    idissue = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="ID Issue Date",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'], required=False)
+    idexpire = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}),label="ID Expiry date",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'], required=False)
 
     class Meta:
         model = Receiver
@@ -78,7 +78,7 @@ class ReceiverForm(ModelForm):
     def clean_idissue(self):
         idissue = self.cleaned_data['idissue']
         #idtype = self.cleaned_data['idtype']
-        if idissue > timezone.now().date():
+        if idissue and idissue > timezone.now().date():
             raise ValidationError('ID Issue date cannot be a future date')
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
@@ -145,7 +145,7 @@ class PaymentForm(forms.Form):
                     "Please confirm or reject the payment"
                 )"""
 
-class SignUpForm(RegistrationForm):
+class SignUpForm(RegistrationFormUniqueEmail):
     #first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
     #last_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
     #email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')

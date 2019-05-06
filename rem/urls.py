@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('add/remmittance/<int:pk>/', views.RemmitCreate.as_view(), name='remmit-create'),
+    path('add/remmittancefull/<int:pk>/', views.RemmitInfoCreate.as_view(), name='remmit-create-with-payment'), # submits a remittance info only assuming payment is done
     path('edit/remmittance/<int:pk>/', views.RemmitUpdate.as_view(), name='remmit-update'),
     path('show/remmittance', views.show_rem, name='show_rem'),
     path('show/requests', views.show_req, name='show_req'),

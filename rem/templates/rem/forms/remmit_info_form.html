@@ -1,0 +1,118 @@
+{% extends "rem/base.html" %}
+{% load widget_tweaks %}
+
+{% block title %} Remittance Entry {% endblock %}
+{% block content %}
+
+<div class="row">
+  <div class="col-md-10 offset-3">
+    <h4 class="element_margin">Add Remmittance details</h4>
+    <form enctype="multipart/form-data" method="post">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-auto">
+          <ul>
+            {% for error in form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+              <li>{{error}}</li>
+            </div>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-auto">
+          {% for error in form.exchange.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.exchange.label_tag}}
+          {{ form.exchange|add_class:"form-control"}}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-auto">
+          {% for error in form.relationship.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.relationship.label_tag}}
+          {{ form.relationship|add_class:"form-control"}}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-auto">
+          {% for error in form.purpose.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.purpose.label_tag}}
+          {{ form.purpose|add_class:"form-control"}}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-auto">
+          {% for error in form.rem_country.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.rem_country.label_tag}}
+          {{ form.rem_country|add_class:"form-control"}}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-auto">
+
+          {% for error in form.reference.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.reference.label_tag}}
+          {{ form.reference|add_class:"form-control"}}
+
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-auto">
+
+          {% for error in form.sender.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.sender.label_tag}}
+          {{ form.sender|add_class:"form-control"}}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-auto">
+          {% for error in form.amount.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.amount.label_tag}}
+          {{ form.amount|add_class:"form-control"}}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-auto">
+          {% for error in form.screenshot.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.screenshot.label_tag}}
+          {{ form.screenshot|add_class:"form-control"}}
+        </div>
+      </div>
+      <input type="submit" class="btn btn-primary element_margin" value="Submit" />
+    </form>
+  </div>
+</div>
+{% endblock %}

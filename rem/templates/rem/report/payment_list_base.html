@@ -31,13 +31,6 @@
             {{form.exchange.label_tag}}
             {{form.exchange|add_class:"form-control"}}
         </div>
-        <div class="col-auto">
-            {% for error in form.status.errors %}
-              <div class="alert alert-danger" role="alert">{{ error}}</div>
-            {% endfor %}
-            {{form.status.label_tag}}
-            {{form.status|add_class:"form-control"}}
-        </div>
         {% block branch_dropdown %} {% endblock %}
     </div>
     <div class='form-row'>
@@ -48,15 +41,15 @@
 </form>
 </br>
 
-{%if req_list %}
+{%if pay_list %}
 
-{% regroup req_list by remittance.exchange as request_list %}
+{% regroup pay_list by remittance.exchange as payment_list %}
 
 <fieldset id="group_1">
     {% csrf_token %}
-    {% for req in request_list %}
+    {% for payment in payment_list %}
     </br>
-    <h4> {{ req.grouper }} </h4>
+    <h4> {{ payment.grouper }} </h4>
     <table id="table_{{forloop.counter}}" class='table table-hover table-sm'>
         <thead>
             <tr>

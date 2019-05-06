@@ -112,6 +112,7 @@ class Receiver(models.Model):
     idissue = models.DateField("Issue date of Identification Document", default=timezone.now)
     idexpire = models.DateField("Expiry date of Identification Document", null=True)
     idno = models.CharField("ID Number", max_length=17, unique=True)
+
     def __str__(self):
         return self.name
 
