@@ -172,7 +172,7 @@ def select_rem_list(request):
             filt['requestpay__remittance__branch'] = form.cleaned_data['branch']
             filt['status'] = 'U'
             filter_args = {k:v for k,v in filt.items() if v is not None}
-            rem_list = Payment.objects.filter(**filter_args)
+            rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','-dateresolved')
             if rem_list:
                 df = qset_to_df(rem_list)
                 #ids = list(df['id'][df.duplicated(['amount','branch_id','exchange_id'],keep=False)==True].values)

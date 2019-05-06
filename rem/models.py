@@ -109,7 +109,7 @@ class Receiver(models.Model):
         (BC, 'Birth Regestration Certificate'),
         )
     idtype=models.CharField("Type o Identification",max_length=8, choices=STATUS_CHOICES, default=NID)
-    idissue = models.DateField("Issue date of Identification Document", default=timezone.now)
+    idissue = models.DateField("Issue date of Identification Document", null=True)
     idexpire = models.DateField("Expiry date of Identification Document", null=True)
     idno = models.CharField("ID Number", max_length=17, unique=True)
 
