@@ -77,23 +77,42 @@ def index(request):
 def show_rem(request):
     if request.method == "POST":
         form = SearchForm(request.POST)
+        filt = {}
         if form.is_valid():
             date_from = form.cleaned_data['date_from']
             date_to = form.cleaned_data['date_to']
-            exchange = form.cleaned_data['exchange']
-            if check_headoffice(request.user):
-                rem_list = search(date_from=date_from,date_to=date_to,exchange=exchange)
+            if (date_from != None) and (date_to!= None):
+                filt['datecreate__date__range'] = (date_from,date_to)
             else:
-                rem_list = search(date_from=date_from,date_to=date_to,exchange=exchange, branch=request.user.employee.branch)
-            context = {'rem_list': rem_list, 'form':form, 'date': date_from}
-            return render(request, 'rem/report/rem_list.html', context)
+                filt['datecreate__date__range'] = None
+            filt['remittance__exchange'] = form.cleaned_data['exchange']
+            filt['status'] = 'PD'
+            filt['remittance__branch'] = form.cleaned_data['branch']
+            filt['resubmit_flag'] = False
+            if check_headoffice(request.user):
+                filter_args = {k:v for k,v in filt.items() if v is not None}
+                req_list = Requestpay.objects.filter(**filter_args).order_by('remittance__exchange','-datecreate')
+                context = {'pay_list': req_list, 'form':form}
+                return render(request, 'rem/report/payment_list_ho.html', context)
+            else:
+                filt['remittance__branch'] = request.user.employee.branch
+                filter_args = {k:v for k,v in filt.items() if v is not None}
+                req_list = Requestpay.objects.filter(**filter_args).order_by('remittance__exchange','-datecreate')
+                context = {'pay_list': req_list, 'form':form}
+                return render(request, 'rem/report/payment_list_branch.html', context)
         else:
-            context = {'form':form, 'valid':'Not valid'}
-
+            context = {'form':form }
+            if check_headoffice(request.user):
+                return render(request, 'rem/report/payment_list_ho.html', context)
+            else:
+                return render(request, 'rem/report/payment_list_branch.html', context)
     else:
         form = SearchForm()
         context = {'form':form}
-    return render(request, 'rem/report/rem_list.html', context)
+        if check_headoffice(request.user):
+            return render(request, 'rem/report/payment_list_ho.html', context)
+        else:
+            return render(request, 'rem/report/payment_list_branch.html', context)
 
 @login_required
 def show_req(request):

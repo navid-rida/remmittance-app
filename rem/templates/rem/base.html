@@ -34,7 +34,7 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Reports</a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            {% comment %}<a class="dropdown-item" href="{% url 'show_rem'%}">Remmittance List</a>{% endcomment %}
+            <a class="dropdown-item" href="{% url 'show_rem'%}">Remmittance List</a>
             {% comment %}<a class="dropdown-item" href="{% url 'show_req'%}">Request List</a>{% endcomment %}
             {% for group in request.user.groups.all %}
             {% if group.name == "Head office user" %}
@@ -51,7 +51,7 @@
             Upload Data
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Request</a>
+            {% comment %}<a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Request</a>{% endcomment %}
             <a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Information</a>
             {% comment %}<a class="dropdown-item" href="{% url 'remmit-create'%}">Remmittance Entry</a>
             <a class="dropdown-item" href="#">Quarterly Meeting minutes</a>

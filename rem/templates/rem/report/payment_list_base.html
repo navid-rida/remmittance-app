@@ -1,10 +1,10 @@
 {% extends "rem/base.html" %}
 {% load widget_tweaks %}
 {% load humanize %}
-{% block js %}{% endblock %}
+{% block js %}
 
 {% endblock %}
-{% block title %} Request List {% endblock %}
+{% block title %} Remittance List {% endblock %}
 {% block content %}
 <br>
 <form method="post">
@@ -12,7 +12,7 @@
     <div class='form-row'>
         <div class="col-auto">
             {% for error in form.date_from.errors %}
-              <div class="alert alert-danger" role="alert">{{ error}}</div>
+              <div class="alert alert-danger" role="alert">{{error}}</div>
             {% endfor %}
             {{form.date_from.label_tag}}
             {{form.date_from|add_class:"form-control date"}}
@@ -60,13 +60,12 @@
                 <th scope="col">Benificiary</th>
                 <th scope="col">Amount</th>
                 <th scope="col">Request Posted By</th>
-                <th scope="col">Status</th>
                 <th scope="col">Dealing Official's Phone</th>
                 <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
-            {% for entry in req.list %}
+            {% for entry in payment.list %}
 
             <tr>
                 {% block branch_value %}{% endblock %}
@@ -76,7 +75,6 @@
                 <td>{{entry.remittance.receiver}}</td>
                 <td>{{entry.remittance.amount|intcomma}}</td>
                 <td>{{entry.created_by}}</td>
-                <td>{{entry.get_status_display}}</td>
                 <td>{{entry.created_by.employee.cell}}</td>
                 {% block button %}{% endblock %}
             </tr>
