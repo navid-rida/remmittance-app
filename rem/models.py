@@ -175,7 +175,7 @@ class Requestpay(models.Model):
     #payment = models.ForeignKey('Payment',  null=True, on_delete=models.SET_NULL)"""
 
     def __str__(self):
-        return self.remittance.reference
+        return self.remittance.reference+" on "+self.remittance.branch.name
 
 class Payment(models.Model):
     requestpay = models.OneToOneField(Requestpay, on_delete=models.PROTECT)
@@ -196,4 +196,4 @@ class Payment(models.Model):
     ip = models.GenericIPAddressField("User IP Address")
 
     def __str__(self):
-        return self.requestpay.remittance.reference
+        return self.requestpay.remittance.reference+" on "+self.requestpay.remittance.branch.name
