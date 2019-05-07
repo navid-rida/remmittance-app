@@ -40,7 +40,7 @@ MEDIA_URL = '/media/'
 
 #EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 #EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
-EMAIL_HOST = '192.168.50.51'
+EMAIL_HOST = '192.168.50.54'
 #EMAIL_HOST_USER = 'kazinavidanzum@nrbcommercialbank.com'
 
 EMAIL_PORT = 25

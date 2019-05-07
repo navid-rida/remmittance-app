@@ -82,7 +82,7 @@ def make_ac_df(list,category,columns):
         type.append(dr_cr)
         amount.append(pay.requestpay.remittance.amount)
         if dr_cr == 'C':
-            narration = "Settlement agt "+ pay.requestpay.remittance.reference +" made on "+pay.dateresolved.strftime('%d/%m/%Y')
+            narration = "Adj for "+ pay.requestpay.remittance.exchange.name +" made on "+pay.dateresolved.strftime('%d/%m/%Y')
         else:
             narration = "Favoring "+pay.requestpay.remittance.branch.code+" agt "+ pay.requestpay.remittance.reference +" made on "+pay.dateresolved.strftime('%d/%m/%Y')
         narrations.append(narration)
