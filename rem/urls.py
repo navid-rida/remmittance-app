@@ -16,6 +16,7 @@ urlpatterns = [
     path('download/daily-remmittance-mark-settle', views.mark_settle, name='mark_settle'),
     path('search/client', views.search_receiver, name='search_client'),
     path('add/client', views.ReceiverCreate.as_view(), name='add_client'),
+    path('edit/client/<int:pk>/', views.ReceiverUpdate.as_view(), name='receiver_update'),
     path('add/req/<int:pk>/', views.ReceiverCreate.as_view(), name='add_req'),
     path('add/payment/<int:pk>/', views.payment_confirm, name='payment-confirm'),
     ########################## Details #########################################

@@ -46,6 +46,7 @@
     </tbody>
 </table>
   <a class="btn btn-primary btn-sm mb-2" href = "{% url 'remmit-create-with-payment' pk=receiver.id %}">proceed with this client</button>
+  <a class="btn btn-primary btn-sm mb-2" href = "{% url 'receiver_update' pk=receiver.id %}">Edit client</button>
 {% endif %}
 {% comment %}
 {% elif msg and msg == "Entry  Not Found" %}

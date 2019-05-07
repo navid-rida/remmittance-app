@@ -82,9 +82,9 @@ def make_ac_df(list,category,columns):
         type.append(dr_cr)
         amount.append(pay.requestpay.remittance.amount)
         if dr_cr == 'C':
-            narration = "Adj for "+ pay.requestpay.remittance.exchange.name +" made on "+pay.dateresolved.strftime('%d/%m/%Y')
+            narration = "Adj for "+ pay.requestpay.remittance.exchange.name +" Cash payment on "+pay.dateresolved.strftime('%d/%m/%Y')
         else:
-            narration = "Favoring "+pay.requestpay.remittance.branch.code+" agt "+ pay.requestpay.remittance.reference +" made on "+pay.dateresolved.strftime('%d/%m/%Y')
+            narration = pay.requestpay.remittance.reference +" pmt fvg "+pay.requestpay.remittance.branch.code+" on "+pay.dateresolved.strftime('%d/%m/%Y')
         narrations.append(narration)
         if category=='br_ac' and dr_cr == 'D':
             flag=1
@@ -103,7 +103,7 @@ def make_ac_df(list,category,columns):
         }
     df = pd.DataFrame(dict)
     df['ac_no'] = pd.Categorical(df['ac_no'], ac_list)
-    df = df.sort_values(by=['ac_no',])
+    df = df.sort_values(by=['ac_no','branch_code'])
     return df
 
 def rem_bb_summary(list):

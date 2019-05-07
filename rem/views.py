@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect, get_object_or_404#, render_to_resp
 from django.http import HttpResponse
 from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm
 from django.contrib.auth.decorators import login_required,user_passes_test
-from .models import Remmit, Requestpay, Receiver,Employee
+from .models import Remmit, Requestpay, Receiver,Employee, ReceiverUpdateHistory
 import datetime
 from .DataModels import *
 from .user_tests import *
@@ -204,7 +204,7 @@ def mark_rem_list(request):
             filt['requestpay_remittance__branch']  = form.cleaned_data['branch']
             filt['status']  = 'U'
             filter_args = {k:v for k,v in filt.items() if v is not None}
-            rem_list = Payment.objects.filter(**filter_args)
+            rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','-dateresolved')
             context = {'rem_list': rem_list, 'form':form}
             return render(request, 'rem/report/mark_settle.html', context)
     else:
@@ -264,14 +264,18 @@ class ReceiverCreate(SuccessMessageMixin, CreateView):
 class ReceiverUpdate(UpdateView):
     model = Receiver
     form_class = ReceiverForm
-    template_name = 'rem/forms/receiver_create_form.html'
+    template_name = 'rem/forms/receiver_edit_form.html'
     #success_url = reverse_lazy('remmit-create',args=(self.object.id,))
 
     def get_success_url(self):
-        return reverse('remmit-create', kwargs={'pk': self.object.id})
+        return reverse('remmit-create-with-payment', kwargs={'pk': self.object.id})
 
     def form_valid(self, form):
-        form.instance.created_by = self.request.user
+        update = ReceiverUpdateHistory()
+        update.receiver= self.object
+        update.createdby = self.request.user
+        update.ip = get_client_ip(self.request)
+        update.save()
         return super().form_valid(form)
 
     """def get_context_data(self, **kwargs):

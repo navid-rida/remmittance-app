@@ -116,6 +116,13 @@ class Receiver(models.Model):
     def __str__(self):
         return self.name
 
+class ReceiverUpdateHistory(models.Model):
+    receiver=models.ForeignKey(Receiver, on_delete=models.CASCADE, verbose_name= "Receiver")
+    datecreate = models.DateTimeField("Date of Editing", auto_now_add=True)
+    createdby = models.ForeignKey(User, on_delete=models.PROTECT)
+    ip = models.GenericIPAddressField("User IP Address")
+
+
 class ExchangeHouse(models.Model):
     name = models.CharField("Name of Exchange House", max_length=30)
     gl_no = models.CharField("GL Head of Exchange House", max_length=15,  validators=[numeric])
