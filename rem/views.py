@@ -201,7 +201,7 @@ def mark_rem_list(request):
             else:
                 filt['dateresolved__date__range'] = None
             filt['requestpay__remittance__exchange'] = form.cleaned_data['exchange']
-            filt['requestpay_remittance__branch']  = form.cleaned_data['branch']
+            filt['requestpay__remittance__branch']  = form.cleaned_data['branch']
             filt['status']  = 'U'
             filter_args = {k:v for k,v in filt.items() if v is not None}
             rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','-dateresolved')
