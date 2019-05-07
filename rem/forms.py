@@ -41,7 +41,7 @@ class RemmitForm(ModelForm):
 
 
 class RemittInfoForm(RemmitForm):
-    screenshot = forms.ImageField(required=False)
+    screenshot = forms.ImageField(required=True)
 
 class ReceiverForm(ModelForm):
     dob = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="Date of Birth",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
