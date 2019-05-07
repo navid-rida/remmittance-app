@@ -154,6 +154,8 @@ class Remmit(models.Model):
         (PAID, 'Amount Payable to Customer'),
         )
     status=models.CharField("Request Status",max_length=2, choices=STATUS_CHOICES, default=REVIEW)"""
+    def __str__(self):
+        return self.reference+" on "+self.branch.name
 
 
 class Requestpay(models.Model):

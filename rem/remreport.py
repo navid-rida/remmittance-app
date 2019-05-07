@@ -118,7 +118,7 @@ def ria_batch(ex_df,branch_df):
     return df
 
 def hellobello():
-    p1 = Path("F:\\Projects\\Remittance Report\\May\\677. NRBCB Statement Payment date May 01-02, 2019.xls")
+    p1 = Path("F:\\Projects\\Remittance Report\\May\\679. NRBCB Statement Payment date May 06, 2019.xls")
     p2 = Path("F:\\Projects\\Remittance Report\\march\\RIA BR MAP.xlsx")
     rdf = ria_excel_to_df(p1)
     bdf = pd.read_excel(p2,skiprows=[1,])
