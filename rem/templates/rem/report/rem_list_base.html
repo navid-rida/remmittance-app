@@ -141,7 +141,7 @@
                 <td>{{entry.requestpay.get_status_display}}</td>
                 <td>{{entry.requestpay.created_by}}</td>
                 <td>{{entry.requestpay.resubmit_flag}}</td>
-                <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-detail' entry.pk %}"><i class="fas fa-info-square"></i> Details</a></td>
+                <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-detail' entry.requestpay.pk %}"><i class="fas fa-info-square"></i> Details</a></td>
             </tr>
 
             {% endfor %}

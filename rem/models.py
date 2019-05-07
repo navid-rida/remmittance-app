@@ -174,6 +174,9 @@ class Requestpay(models.Model):
     ip = models.GenericIPAddressField("User IP Address")
     #payment = models.ForeignKey('Payment',  null=True, on_delete=models.SET_NULL)"""
 
+    def __str__(self):
+        return self.remittance.reference
+
 class Payment(models.Model):
     requestpay = models.OneToOneField(Requestpay, on_delete=models.PROTECT)
     dateresolved = models.DateTimeField("Date of payment/rejection", auto_now_add=True)
@@ -191,3 +194,6 @@ class Payment(models.Model):
     western_trm_screenshot = models.ImageField("Pre Transaction Receipt",upload_to = 'western_trm/%Y/%m/%d/', default = 'images/None/no-img.jpg')
     customer_screenshot = models.ImageField("Customer Copy",upload_to = 'western_trm/%Y/%m/%d/', default = 'images/None/no-img.jpg')
     ip = models.GenericIPAddressField("User IP Address")
+
+    def __str__(self):
+        return self.requestpay.remittance.reference
