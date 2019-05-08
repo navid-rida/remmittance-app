@@ -91,13 +91,13 @@ def show_rem(request):
             filt['resubmit_flag'] = False
             if check_headoffice(request.user):
                 filter_args = {k:v for k,v in filt.items() if v is not None}
-                req_list = Requestpay.objects.filter(**filter_args).order_by('remittance__exchange','-datecreate')
+                req_list = Requestpay.objects.filter(**filter_args).order_by('remittance__exchange','remittance__branch__code','-datecreate')
                 context = {'pay_list': req_list, 'form':form}
                 return render(request, 'rem/report/payment_list_ho.html', context)
             else:
                 filt['remittance__branch'] = request.user.employee.branch
                 filter_args = {k:v for k,v in filt.items() if v is not None}
-                req_list = Requestpay.objects.filter(**filter_args).order_by('remittance__exchange','-datecreate')
+                req_list = Requestpay.objects.filter(**filter_args).order_by('remittance__exchange','remittance__branch__code','-datecreate')
                 context = {'pay_list': req_list, 'form':form}
                 return render(request, 'rem/report/payment_list_branch.html', context)
         else:
@@ -172,7 +172,7 @@ def select_rem_list(request):
             filt['requestpay__remittance__branch'] = form.cleaned_data['branch']
             filt['status'] = 'U'
             filter_args = {k:v for k,v in filt.items() if v is not None}
-            rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','-dateresolved')
+            rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','requestpay__remittance__branch__code','-dateresolved')
             if rem_list:
                 df = qset_to_df(rem_list)
                 #ids = list(df['id'][df.duplicated(['amount','branch_id','exchange_id'],keep=False)==True].values)
@@ -204,7 +204,7 @@ def mark_rem_list(request):
             filt['requestpay__remittance__branch']  = form.cleaned_data['branch']
             filt['status']  = 'U'
             filter_args = {k:v for k,v in filt.items() if v is not None}
-            rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','-dateresolved')
+            rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','requestpay__remittance__branch__code','-dateresolved')
             context = {'rem_list': rem_list, 'form':form}
             return render(request, 'rem/report/mark_settle.html', context)
     else:
@@ -286,7 +286,7 @@ class ReceiverUpdate(UpdateView):
         context['form'] = ReceiverSearchForm()
         return context"""
 
-@login_required
+"""@login_required
 @user_passes_test(check_headoffice)
 def download_bb_excel(request):
     date = "no date "
@@ -313,7 +313,7 @@ def download_bb_excel(request):
     return render(request, 'rem/forms/csv_download.html', {
         'form': form,
         'date' : date,
-    })
+    })"""
 
 @login_required
 @user_passes_test(check_headoffice)

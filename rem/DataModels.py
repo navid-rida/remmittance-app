@@ -57,10 +57,11 @@ def search(date_from=None,date_to=None,exchange=None,branch=None,status=None):
 def make_ac_df(list,category,columns):
     #day = date.strftime('%Y-%m-%d')
     dict = {}
-    payments = Payment.objects.filter(id__in=list)
+    payments = Payment.objects.filter(id__in=list).order_by('requestpay__remittance__exchange','requestpay__remittance__branch__code','-dateresolved')
     #Sl= []
     tr_date = []
     br_code = []
+    br_name= []
     ac_no = []
     type = []
     amount = []
@@ -79,6 +80,7 @@ def make_ac_df(list,category,columns):
         else:
             br_code.append("0101")
             ac_no.append(pay.requestpay.remittance.exchange.ac_no)
+        br_name.append(pay.requestpay.remittance.branch.name)
         type.append(dr_cr)
         amount.append(pay.requestpay.remittance.amount)
         if dr_cr == 'C':
@@ -95,6 +97,7 @@ def make_ac_df(list,category,columns):
         #'Sl' : Sl,
         'date' : tr_date,
         'branch_code': br_code,
+        'branch_name': br_name,
         'ac_no' : ac_no,
         'type' : type,
         'amount' : amount,
@@ -103,11 +106,11 @@ def make_ac_df(list,category,columns):
         }
     df = pd.DataFrame(dict)
     df['ac_no'] = pd.Categorical(df['ac_no'], ac_list)
-    df = df.sort_values(by=['ac_no','branch_code'])
+    #df = df.sort_values(by=['ac_no','branch_code'])
     return df
 
 def rem_bb_summary(list):
-    columns=['date', 'br_code', 'ac_no', 'type', 'amount', 'narration', 'flag']
+    columns=['date', 'br_code', 'br_name', 'ac_no', 'type', 'amount', 'narration', 'flag']
     gl_df = make_ac_df(list,'gl',columns)
     ac_df = make_ac_df(list,'br_ac',columns)
     frames = [gl_df, ac_df]

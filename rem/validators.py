@@ -56,8 +56,8 @@ smart_nid_re = RegexValidator(
 )
 
 bc_re = RegexValidator(
-    _lazy_re_compile(r'^[0-9]{1,10}$'),
-    message=_('Please enter a valid NID/ Smart Card number'),
+    _lazy_re_compile(r'^[0-9]{1,17}$'),
+    message=_('Please enter a valid Birth Certificate number'),
     code='invalid_bc',
 )
 
