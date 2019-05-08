@@ -1,4 +1,4 @@
-from .models import Remmit, ExchangeHouse, Branch, Receiver, Requestpay
+from .models import Remmit, ExchangeHouse, Branch, Receiver, Requestpay, Country
 from django.forms import ModelForm
 from django import forms
 #from datetime import date,datetime
@@ -18,6 +18,10 @@ class RemmitForm(ModelForm):
     class Meta:
         model = Remmit
         fields = ('exchange','rem_country','reference','sender','amount','relationship', 'purpose')
+
+    def __init__(self, *args, **kwargs):
+            super(RemmitForm, self).__init__(*args, **kwargs)
+            self.fields['rem_country'].queryset = Country.objects.exclude(name="BANGLADESH")
 
 
     def clean(self):

@@ -61,7 +61,7 @@
                 <th scope="col">Benificiary</th>
                 <th scope="col">Amount</th>
                 <th scope="col">Request Posted By</th>
-                <th scope="col">Dealing Official's Phone</th>
+                <th scope="col">Settlment Status</th>
                 <th scope="col"></th>
             </tr>
         </thead>
@@ -76,7 +76,7 @@
                 <td>{{entry.remittance.receiver}}</td>
                 <td>{{entry.remittance.amount|intcomma}}</td>
                 <td>{{entry.created_by}}</td>
-                <td>{{entry.created_by.employee.cell}}</td>
+                <td>{{entry.payment.get_status_display}}</td>
                 {% block button %}{% endblock %}
             </tr>
 

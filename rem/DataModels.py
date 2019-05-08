@@ -67,6 +67,7 @@ def make_ac_df(list,category,columns):
     amount = []
     narrations = []
     flags = []
+    country = []
     i = 1
     for pay in payments:
         #Sl.append(i)
@@ -93,6 +94,7 @@ def make_ac_df(list,category,columns):
         else:
             flag=0
         flags.append(flag)
+        country.append(pay.requestpay.remittance.rem_country.name)
         dict ={
         #'Sl' : Sl,
         'date' : tr_date,
@@ -102,7 +104,8 @@ def make_ac_df(list,category,columns):
         'type' : type,
         'amount' : amount,
         'narrations' : narrations,
-        'flags' : flags
+        'flags' : flags,
+        'country' : country
         }
     df = pd.DataFrame(dict)
     df['ac_no'] = pd.Categorical(df['ac_no'], ac_list)
@@ -110,7 +113,7 @@ def make_ac_df(list,category,columns):
     return df
 
 def rem_bb_summary(list):
-    columns=['date', 'br_code', 'br_name', 'ac_no', 'type', 'amount', 'narration', 'flag']
+    columns=['date', 'br_code', 'br_name', 'ac_no', 'type', 'amount', 'narration', 'flag', 'country']
     gl_df = make_ac_df(list,'gl',columns)
     ac_df = make_ac_df(list,'br_ac',columns)
     frames = [gl_df, ac_df]
