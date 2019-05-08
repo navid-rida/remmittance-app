@@ -2,6 +2,9 @@
 {% load widget_tweaks %}
 {% load humanize %}
 {% block js %}
+{% load l10n %}
+{% load tz %}
+
 <script type="text/javascript">
     $(document).ready(function() {
         $('#selecctall_1').click(function(event) {
@@ -136,8 +139,8 @@
                 <td>{{entry.requestpay.remittance.sender.title}}</td>
                 <td>{{entry.requestpay.remittance.receiver.name.title}}</td>
                 <td>{{entry.requestpay.remittance.amount|intcomma}}</td>
-                <td>{{entry.requestpay.remittance.date}}</td>
-                <td>{{entry.requestpay.datecreate}}</td>
+                <td>{{entry.requestpay.remittance.date|localtime}}</td>
+                <td>{{entry.requestpay.datecreate|localtime}}</td>
                 <td>{{entry.requestpay.get_status_display}}</td>
                 <td>{{entry.requestpay.created_by}}</td>
                 <td>{{entry.requestpay.resubmit_flag}}</td>
