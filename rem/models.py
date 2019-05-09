@@ -112,9 +112,26 @@ class Receiver(models.Model):
     idissue = models.DateField("Issue date of Identification Document", null=True)
     idexpire = models.DateField("Expiry date of Identification Document", null=True)
     idno = models.CharField("ID Number", max_length=17, unique=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, default=0)
+
 
     def __str__(self):
         return self.name
+
+    def get_first_remit_user(self):
+        remittance = self.remmit_set.order_by('date_create').first()
+        if remittance:
+            return remittance.created_by
+        else:
+            return False
+
+    def set_first_remit_user_as_creator(self):
+        user = self.get_first_remit_user()
+        if user:
+            self.created_by = user
+            return self.save()
+        else:
+            return False
 
 class ReceiverUpdateHistory(models.Model):
     receiver=models.ForeignKey(Receiver, on_delete=models.CASCADE, verbose_name= "Receiver")
@@ -156,6 +173,19 @@ class Remmit(models.Model):
     status=models.CharField("Request Status",max_length=2, choices=STATUS_CHOICES, default=REVIEW)"""
     def __str__(self):
         return self.reference+" on "+self.branch.name
+
+    def get_completed_payment(self):
+        r = self.requestpay_set.order_by('datecreate',).last()
+        if r.payment:
+            return r.payment
+        else:
+            return False
+
+class RemittanceUpdateHistory(models.Model):
+    remittance=models.ForeignKey(Remmit, on_delete=models.CASCADE, verbose_name= "Remittance Entry")
+    datecreate = models.DateTimeField("Date of Editing", auto_now_add=True)
+    createdby = models.ForeignKey(User, on_delete=models.PROTECT)
+    ip = models.GenericIPAddressField("User IP Address")
 
 
 class Requestpay(models.Model):

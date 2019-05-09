@@ -16,6 +16,7 @@ from django.contrib.auth.models import Group
 from django.utils import timezone
 from django.db import transaction
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.conf import settings
 from django.core.exceptions import ValidationError
 ############################### djang-registration imports ##########################
@@ -261,11 +262,20 @@ class ReceiverCreate(SuccessMessageMixin, CreateView):
         return context"""
 
 @method_decorator([login_required,transaction.atomic],name='dispatch')
-class ReceiverUpdate(UpdateView):
+class ReceiverUpdate(UserPassesTestMixin, UpdateView):
     model = Receiver
     form_class = ReceiverForm
     template_name = 'rem/forms/receiver_edit_form.html'
     #success_url = reverse_lazy('remmit-create',args=(self.object.id,))
+
+    def test_func(self):
+        id = int(self.kwargs['pk'])
+        receiver = Receiver.objects.get(pk=id)
+        user = receiver.created_by
+        if self.request.user == user:
+            return True
+        else:
+            return False
 
     def get_success_url(self):
         return reverse('remmit-create-with-payment', kwargs={'pk': self.object.id})
@@ -526,4 +536,32 @@ class RemmitInfoCreate(SuccessMessageMixin, CreateView):
         req.refresh_from_db()
         payment = Payment(requestpay=req, paid_by=self.request.user, agent_screenshot=self.request.FILES.get('screenshot',False), ip=get_client_ip(self.request))
         payment.save()
+        return super().form_valid(form)
+
+@method_decorator([login_required,transaction.atomic], name='dispatch')
+class RemmitInfoUpdate(UserPassesTestMixin, UpdateView):
+
+    def test_func(self):
+        id = int(self.kwargs['pk'])
+        remittance = Remmit.objects.get(pk=id)
+        user = remittance.created_by
+        if self.request.user == user:
+            return True
+        else:
+            return False
+
+    model = Remmit
+    form_class = RemittInfoForm
+    template_name = 'rem/forms/remmit_info_update_form.html'
+    success_url = reverse_lazy('show_rem')
+
+    def form_valid(self, form):
+        payment = self.object.get_completed_payment()
+        payment.agent_screenshot = self.request.FILES.get('screenshot',False)
+        payment.save()
+        update = RemittanceUpdateHistory()
+        update.remittance= self.object
+        update.createdby = self.request.user
+        update.ip = get_client_ip(self.request)
+        update.save()
         return super().form_valid(form)

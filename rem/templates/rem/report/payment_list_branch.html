@@ -2,9 +2,11 @@
 {% load widget_tweaks %}
 {% block title %} Remittance List {% endblock %}
 {% block button %}
-  {% if entry.status == "RJ"%}
-    <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-resubmit' entry.pk %}"><i class="far fa-info-square"></i> Resubmit</a></td>
+  {% if entry.payment.status == "U"%}
+    <td><a class="btn btn-success btn-sm" href="{% url 'remmit-update-with-payment-screenshot' entry.remittance.id %}"><i class="far fa-info-square"></i> Edit</a></td>
   {% else %}
-      <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-detail' entry.pk %}"><i class="far fa-info-square"></i> Details</a></td>
+  <td></td>
   {% endif %}
+    <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-detail' entry.pk %}"><i class="far fa-info-square"></i> Details</a></td>
+
 {% endblock %}
