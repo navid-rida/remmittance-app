@@ -16,10 +16,6 @@
           <td>: {{object.remittance.reference}}</td>
         </tr>
         <tr>
-          <td>Value</td>
-          <td>:<b class="text-danger"> BDT {{object.remittance.amount|intcomma }}</b></td>
-        </tr>
-        <tr>
           <td>Exchange House</td>
           <td>: {{ object.remittance.exchange }}</td>
         </tr>
@@ -83,6 +79,10 @@
         </tr>
         {% else %}
         {% endif %}
+        <tr>
+          <td>Value</td>
+          <td>:<b class="text-danger"> BDT {{object.remittance.amount|intcomma }}</b></td>
+        </tr>
       </tbody>
     </table>
   </div>
