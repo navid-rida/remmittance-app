@@ -88,11 +88,11 @@ def validate_even(value):
         )
 
 
-def validate_post_date(day):
-    if day > timezone.localdate():
+def validate_post_date(datetime):
+    if datetime > timezone.now():
         raise ValidationError(
             _('%(value)s is a future date'),
-            params={'value': day},
+            params={'value': datetime},
         )
 
 def validate_western_code(value):
