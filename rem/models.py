@@ -25,13 +25,15 @@ from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 numeric = RegexValidator(r'^[0-9]*$', 'Only numeric characters are allowed.')
+name = RegexValidator(r'^[a-zA-Z .-]*$', 'Only alphabets are allowed.')
+alpha = RegexValidator(r'^[a-zA-Z]*$', 'Only alphabets are allowed.')
 alpha_num = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only Alphabet and numeric characters are allowed.')
 western_union = RegexValidator(r'^[0-9]{10}$', 'Western union mtcn can contain only 10 digit numbers')
 
 
 class Branch(models.Model):
     name = models.CharField("Name of The branch", max_length=20,default='Principal')
-    code = models.CharField("Branch Code", max_length=4,default='0101')
+    code = models.CharField("Branch Code", validators=[numeric], max_length=4,default='0101')
     address = models.TextField("Address of the branch")
 
     def __str__(self):
@@ -96,7 +98,7 @@ def update_user_employee(sender, instance, created, **kwargs):
     instance.employee.save()"""
 
 class Receiver(models.Model):
-    name = models.CharField("Name of Receiver", max_length=100)
+    name = models.CharField("Name of Receiver", validators=[name], max_length=100)
     address = models.TextField("Address of Receiver")
     dob = models.DateField("Date of Birth of Receiver")
     cell = models.CharField("Cell number of Receiver", validators=[validate_mobile], max_length=14, unique=True)
@@ -151,7 +153,7 @@ class ExchangeHouse(models.Model):
 class Remmit(models.Model):
     exchange = models.ForeignKey(ExchangeHouse,on_delete=models.CASCADE, verbose_name='Channel of Remittance')
     rem_country = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Remitting Country')
-    sender = models.CharField("Name of Remitter",max_length=50)
+    sender = models.CharField("Name of Remitter", validators=[name], max_length=50)
     relationship = models.CharField("Relationship to Sender",max_length=50, null=True)
     purpose = models.CharField("Purpose of Transaction",max_length=50, null=True)
     receiver = models.ForeignKey(Receiver, on_delete=models.PROTECT, verbose_name="Receiver")
