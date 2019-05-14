@@ -355,6 +355,8 @@ def mark_settle(request):
         for id in list:
             entry = Payment.objects.get(pk=id)
             entry.status = 'S'
+            entry.date_settle = timezone.now()
+            entry.settled_by=request.user
             entry.save()
     return redirect('mark_rem_list')
 
