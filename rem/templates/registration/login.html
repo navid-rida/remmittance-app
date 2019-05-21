@@ -18,13 +18,14 @@
   <title>{% block title %}Welcome to Central Foreign Remittance Database{% endblock %}</title>
 </head>
 
-<body id="LoginForm">
+<body id="LoginForm" background="{% get_media_prefix %}images/background.jpg">
   <div class="container">
     <h1 class="form-heading"></h1>
     <div class="login-form">
       <div class="main-div">
         <div class="panel">
-          <h2>Central Foreign Remittance Database</h2>
+          <img src="{% get_media_prefix %}images/logo.png" class="img-fluid"><img>
+          <h5>Central Foreign Remittance Database</h5>
           <p>Please enter your Username and Password</p>
         </div>
         <form method="post" action="{% url 'login' %}" id="Login">

@@ -13,6 +13,11 @@
   <link rel="stylesheet" href="{% static "css/login.css" %}">
   <link rel="stylesheet" href="{% static "css/style.css" %}">
   <link rel="stylesheet" href="{% static "css/jquery-ui.css" %}">
+  <style type="text/css">
+    body { background: #C2C2C2 !important; } /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
+    .container { background: #FFFFFF !important; } /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
+  </style>
+
   <title>{% block title %}Welcome to Central Foreign Remittance Database{% endblock %}</title>
 </head>
 
@@ -75,7 +80,7 @@
   </nav>
 
   <div id="content">
-    <div class="container">
+    <div class="container" bgcolor="#FFFFFF">
       {% if messages %}
       <ul class="messages">
         {% for message in messages %}

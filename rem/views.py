@@ -92,13 +92,13 @@ def show_rem(request):
             filt['resubmit_flag'] = False
             if check_headoffice(request.user):
                 filter_args = {k:v for k,v in filt.items() if v is not None}
-                req_list = Requestpay.objects.filter(**filter_args).order_by('remittance__exchange','remittance__branch__code','-datecreate')
+                req_list = Requestpay.objects.filter(**filter_args).order_by('remittance__exchange','-datecreate','remittance__branch__code')
                 context = {'pay_list': req_list, 'form':form}
                 return render(request, 'rem/report/payment_list_ho.html', context)
             else:
                 filt['remittance__branch'] = request.user.employee.branch
                 filter_args = {k:v for k,v in filt.items() if v is not None}
-                req_list = Requestpay.objects.filter(**filter_args).order_by('remittance__exchange','remittance__branch__code','-datecreate')
+                req_list = Requestpay.objects.filter(**filter_args).order_by('remittance__exchange','-datecreate','remittance__branch__code')
                 context = {'pay_list': req_list, 'form':form}
                 return render(request, 'rem/report/payment_list_branch.html', context)
         else:
@@ -173,7 +173,7 @@ def select_rem_list(request):
             filt['requestpay__remittance__branch'] = form.cleaned_data['branch']
             filt['status'] = 'U'
             filter_args = {k:v for k,v in filt.items() if v is not None}
-            rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','requestpay__remittance__branch__code','-dateresolved')
+            rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','-dateresolved','requestpay__remittance__branch__code')
             if rem_list:
                 df = qset_to_df(rem_list)
                 #ids = list(df['id'][df.duplicated(['amount','branch_id','exchange_id'],keep=False)==True].values)
@@ -205,7 +205,7 @@ def mark_rem_list(request):
             filt['requestpay__remittance__branch']  = form.cleaned_data['branch']
             filt['status']  = 'U'
             filter_args = {k:v for k,v in filt.items() if v is not None}
-            rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','requestpay__remittance__branch__code','-dateresolved')
+            rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','-dateresolved','requestpay__remittance__branch__code')
             context = {'rem_list': rem_list, 'form':form}
             return render(request, 'rem/report/mark_settle.html', context)
     else:
@@ -288,43 +288,6 @@ class ReceiverUpdate(UserPassesTestMixin, UpdateView):
         update.save()
         return super().form_valid(form)
 
-    """def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super(ReceiverCreate, self).get_context_data(**kwargs)
-        # Add in a QuerySet of all the books
-        context['rform'] = context['form']
-        context['form'] = ReceiverSearchForm()
-        return context"""
-
-"""@login_required
-@user_passes_test(check_headoffice)
-def download_bb_excel(request):
-    date = "no date "
-    if request.method == 'POST': # If the form has been submitted...
-        form = CsvForm(request.POST) # A form bound to the POST data
-        if form.is_valid(): # All validation rules pass
-            # Process the data in form.cleaned_data
-            # ...
-
-            date = form.cleaned_data['date']
-            df = rem_bb_summary(date)
-            xlsx_data = excel_output(df)
-            response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            time = str(tomezone.now)
-            #filename = "output "+time+".xls"
-            response['Content-Disposition'] = 'attachment; filename="somefilename.xlsx"'
-            #writer.save(re)
-            return response
-
-            #return HttpResponseRedirect('/') # Redirect after POST
-    else:
-        form = CsvForm() # An unbound form
-
-    return render(request, 'rem/forms/csv_download.html', {
-        'form': form,
-        'date' : date,
-    })"""
-
 @login_required
 @user_passes_test(check_headoffice)
 def download_selected_excel(request):
@@ -334,9 +297,9 @@ def download_selected_excel(request):
         df = rem_bb_summary(list)
         xlsx_data = excel_output(df)
         response = HttpResponse(xlsx_data,content_type='pplication/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        time = str(timezone.now)
-        #filename = "output "+time+".xls"
-        response['Content-Disposition'] = 'attachment; filename="somefilename.xlsx"'
+        time = str(timezone.now().date())
+        filename = "batch "+time+".xlsx"
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
         #writer.save(re)
         return response
     else:
