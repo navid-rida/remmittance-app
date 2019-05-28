@@ -38,7 +38,7 @@ moneygram_re = RegexValidator(
 )
 
 mobile_re = RegexValidator(
-    _lazy_re_compile(r'^(\+8801|8801|01)[56789][0-9]{8}$'),
+    _lazy_re_compile(r'^(\+8801|8801|01)[3456789][0-9]{8}$'),
     message=_('Please enter a valid Mobile phone number'),
     code='invalid_moneygram',
 )
