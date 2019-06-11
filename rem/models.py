@@ -105,10 +105,12 @@ class Receiver(models.Model):
     NID= 'NID'
     PASSPORT = 'PASSPORT'
     BC = 'BC'
+    DL = 'DL'
     STATUS_CHOICES = (
         (NID,'National ID'),
         (PASSPORT, 'Passport'),
         (BC, 'Birth Regestration Certificate'),
+        (DL, 'Driving License'),
         )
     idtype=models.CharField("Type o Identification",max_length=8, choices=STATUS_CHOICES, default=NID)
     idissue = models.DateField("Issue date of Identification Document", null=True)

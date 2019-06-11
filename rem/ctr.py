@@ -70,6 +70,7 @@ def lola(path='.'):
     xml_list = get_xml_list(file_list)
     merged_xml = merge_xml(xml_list)
     df = xml_to_df(merged_xml)
+    df['Amount'] = df['Amount'].apply(float)
     return df
 
 """____________________________________________________________________________________________________________________________________________"""
