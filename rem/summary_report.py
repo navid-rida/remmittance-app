@@ -35,3 +35,4 @@ def get_ex_wise_branch_summary():
         name=house.name
         df = group_branchwise(year=year,month=month,ex_column=True,house=house)
         dc[name] = df
+    return dc
