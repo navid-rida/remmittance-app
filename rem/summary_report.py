@@ -2,6 +2,7 @@ from django.db.models import Sum, Count
 from django.utils import timezone
 from .models import Remmit, Branch, ExchangeHouse
 import pandas as pd
+from .DataModels import *
 
 year = timezone.now().date().year
 
