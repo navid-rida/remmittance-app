@@ -15,7 +15,7 @@ def group_branchwise(year,month, ex_column=False):
         q = Remmit.objects.filter(date_create__year=year,date_create__month=month).values('branch__code','branch__name').annotate(sum = Sum('amount'), number = Count('amount')).order_by('branch__code')
     df = pd.DataFrame(q)
     br = qset_to_df(Branch.objects.all())
-    df = df.merge(br, left_on='branch__code', right_on='code')
+    df = df.merge(br, left_on='branch__code', right_on='code', how='outer')
     return df
 
 
