@@ -10,7 +10,7 @@ def group_branchwise(year,month, ex_column=False, house=None):
     """ Returns number and sum of
     remittance for each branch"""
     if ex_column:
-        q = Remmit.objects.filter(date_create__year=year,date_create__month=month).values('branch__code','branch__name').annotate(sum = Sum('amount'), number = Count('amount'), exchange=F('exchange__name')).order_by('branch__code')
+        q = Remmit.objects.filter(date_create__year=year,date_create__month=month,exchange=house).values('branch__code','branch__name').annotate(sum = Sum('amount'), number = Count('amount'), exchange=F('exchange__name')).order_by('branch__code')
     else:
         q = Remmit.objects.filter(date_create__year=year,date_create__month=month).values('branch__code','branch__name').annotate(sum = Sum('amount'), number = Count('amount')).order_by('branch__code')
     df = pd.DataFrame(q)
