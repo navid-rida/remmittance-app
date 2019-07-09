@@ -140,7 +140,7 @@ def validate_nrbc_mail(email):
         )
 
 def validate_user_limit(branch):
-    total_employee = branch.employee_count()
+    total_employee = branch.employee_count(active_status=True)
     if branch.name == 'Head office':
         maximum_allowed_user = settings.MAXIMUM_USER_HEAD_OFFICE
     else:
