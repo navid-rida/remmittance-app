@@ -57,7 +57,7 @@ def search(date_from=None,date_to=None,exchange=None,branch=None,status=None):
 def make_ac_df(list,category,columns):
     #day = date.strftime('%Y-%m-%d')
     dict = {}
-    payments = Payment.objects.filter(id__in=list).order_by('requestpay__remittance__exchange','requestpay__remittance__branch__code','-dateresolved')
+    payments = Payment.objects.filter(id__in=list).order_by('requestpay__remittance__exchange','dateresolved','requestpay__remittance__branch__code')
     #Sl= []
     tr_date = []
     br_code = []
