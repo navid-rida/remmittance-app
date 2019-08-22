@@ -10,6 +10,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 import pandas as pd
+########################## aggregate functions ###############################
+from django.db.models import Sum
 ################# import for validation errrors ##############################
 from django.utils.translation import gettext_lazy as _
 
@@ -48,6 +50,25 @@ class Branch(models.Model):
         else:
             count = self.employee_set.count()
         return count
+
+    def branch_total(self, year=None, month=None, start_date=None, end_date= None):
+        p = Payment.objects.all()
+        if year and not month:
+            p = p.filter(requestpay__remittance__branch=self).filter(date_settle__year=year)
+        elif year and month:
+            p = p.filter(requestpay__remittance__branch=self).filter(date_settle__year=year).filter(date_settle__month=month)
+        elif start_date and end_date:
+            p = p.filter(requestpay__remittance__branch=self).filter(date_settle__range=(start_date,end_date))
+        else:
+            p = p.filter(requestpay__remittance__branch=self)
+        sum = p.aggregate(sum = Sum('requestpay__remittance__amount'))
+        return sum['sum'] if sum['sum'] else 0
+
+    def branch_total_month(self, year):
+        p = Payment.objects.filter(requestpay__remittance__branch=self).filter(date_settle__year=year)
+
+
+    #def branch_total(year=None,month=None,date=None,exchan_house=None,start_date=None,end_date=None):
 
 
 class Country(models.Model):

@@ -24,13 +24,21 @@ def get_file_list(path='.',ext='.csv'):
                 files.append(dir.resolve())
     return files
 
-def merge_xl(xllist):
+def merge_xl(xllist,column=None):
     df_all = pd.DataFrame()
+    final_df = pd.DataFrame()
     for file in xllist:
         #df_single_file = pd.read_excel(file,header=None, names=['date','br_code','gl_key','dc','amount','narration','flag'])
-        df_single_file = pd.read_excel(file,header=None, names=['date','br_code','gl_key','dc','amount','narration','flag'])
+        df_single_file=pd.DataFrame()
+        if column:
+            df_single_file = pd.read_excel(file,header=None, names=column)
+        else:
+            df_single_file = pd.read_excel(file,)
         df_all = df_all.append(df_single_file)
-    final_df = df_all[df_all['dc']=='C']
+    if column:
+        final_df = df_all[df_all['dc']=='C']
+    else:
+        final_df=df_all
     return final_df
 
 def merge_csv(csvlist):
@@ -44,10 +52,11 @@ def merge_csv(csvlist):
     #final_df = final_df.drop("Unnamed: 14", axis=1)
     return df_all
 
+column=['date','br_code','gl_key','dc','amount','narration','flag']
 #Unnamed: 14
-def hellopops(path='.',ext='.csv'):
+def hellopops(path='.',ext='.csv',column=None):
     xllist= get_file_list(path,ext)
-    df = merge_xl(xllist)
+    df = merge_xl(xllist,column=column)
     return df
 
 def month_summary(path='.',ext='.csv'):
