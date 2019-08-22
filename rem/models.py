@@ -51,7 +51,7 @@ class Branch(models.Model):
             count = self.employee_set.count()
         return count
 
-    def branch_total(self, year=None, month=None, start_date=None, end_date= None):
+    def branch_total(self, year=None, month=None, start_date=None, end_date= None, exchange_house=None):
         p = Payment.objects.all()
         if year and not month:
             p = p.filter(requestpay__remittance__branch=self).filter(date_settle__year=year)
@@ -61,6 +61,8 @@ class Branch(models.Model):
             p = p.filter(requestpay__remittance__branch=self).filter(date_settle__range=(start_date,end_date))
         else:
             p = p.filter(requestpay__remittance__branch=self)
+        if exchange_house:
+            p = p.filter(requestpay__remittance__exchange=exchange_house)
         sum = p.aggregate(sum = Sum('requestpay__remittance__amount'))
         return sum['sum'] if sum['sum'] else 0
 
