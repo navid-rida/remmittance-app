@@ -16,6 +16,7 @@ def group_branchwise(year,month, ex_column=False, house=None):
     df = pd.DataFrame(q)
     br = qset_to_df(Branch.objects.all())
     df = df.merge(br, left_on='requestpay__remittance__branch__code', right_on='code', how='outer')
+    df = df[['code','name','sum','number']]
     return df
 
 
