@@ -340,7 +340,8 @@ def download_selected_excel(request):
     if request.method == 'POST' and request.POST.getlist('checks'):
         list = request.POST.getlist('checks') # If the form has been submitted...
         #form = Remmit.objects.filter(id__in=selected_values)
-        df = rem_bb_summary(list)
+        payments = Payment.objects.order_by('requestpay__remittance__exchange','dateresolved','requestpay__remittance__branch__code')
+        df = rem_bb_summary(list, payments)
         xlsx_data = excel_output(df)
         response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         time = str(timezone.now().date())

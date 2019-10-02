@@ -1,8 +1,9 @@
-from rem.models import *
+#from .models import Remmit,Branch,Booth,ExchangeHouse
 import pandas as pd
 from datetime import datetime, date,timedelta
 import io
 from django.db.models import IntegerField, F, Value
+#from rem.models import *
 ####################### fuzzywuzzy imports ##################################
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
@@ -54,10 +55,10 @@ def search(date_from=None,date_to=None,exchange=None,branch=None,status=None):
     return rem_list
 
 ####################### Report Sepcific Functions #################################################
-def make_ac_df(list,category,columns):
+def make_ac_df(list,category,columns,payments):
     #day = date.strftime('%Y-%m-%d')
     dict = {}
-    payments = Payment.objects.filter(id__in=list).order_by('requestpay__remittance__exchange','dateresolved','requestpay__remittance__branch__code')
+    #payments = Payment.objects.filter(id__in=list).order_by('requestpay__remittance__exchange','dateresolved','requestpay__remittance__branch__code')
     #Sl= []
     tr_date = []
     br_code = []
@@ -112,10 +113,11 @@ def make_ac_df(list,category,columns):
     #df = df.sort_values(by=['ac_no','branch_code'])
     return df
 
-def rem_bb_summary(list):
+def rem_bb_summary(list, payments):
+    payments = payments.filter(id__in=list)
     columns=['date', 'br_code', 'br_name', 'ac_no', 'type', 'amount', 'narration', 'flag', 'country']
-    gl_df = make_ac_df(list,'gl',columns)
-    ac_df = make_ac_df(list,'br_ac',columns)
+    gl_df = make_ac_df(list,'gl',columns, payments)
+    ac_df = make_ac_df(list,'br_ac',columns, payments)
     frames = [gl_df, ac_df]
     complete_df = pd.concat(frames)
     return complete_df
