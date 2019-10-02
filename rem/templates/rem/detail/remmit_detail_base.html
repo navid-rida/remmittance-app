@@ -1,0 +1,97 @@
+{% extends "rem/base.html" %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block title %} Payment Details {% endblock %}
+{% block content %}
+
+{{ form.errors}}
+{{ rform.errors}}
+<h4 class="element_margin">Payment Request Details</h4>
+<div class="row justify-content-md-left">
+  <div class="col-md-auto">
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>Reference No.</td>
+          <td>: {{object.reference}}</td>
+        </tr>
+        <tr>
+          <td>Exchange House</td>
+          <td>: {{ object.exchange }}</td>
+        </tr>
+        <tr>
+          <td>Date and time</td>
+          <td>: {{ object.date_create|date:'d/m/Y P' }}</td>
+        </tr>
+        <tr>
+          <td>Remitting Country</td>
+          <td>: <b>{{ object.rem_country }}</b></td>
+        </tr>
+        <tr>
+          <td>Sender</td>
+          <td>: <b>{{ object.sender }}</b></td>
+        </tr>
+        <tr>
+          <td>Benificiary Name</td>
+          <td>: <b>{{ object.receiver.name }}</b></td>
+        </tr>
+        <tr>
+          <td>Benificiary Identification ( {{ object.receiver.idtype }} )</td>
+          <td>: {{ object.receiver.idno }} [ <b>Issue Date:</b> {{ object.receiver.idissue }}, <b>Expiry Date:</b> {{ object.remittance.idexpire }}]</td>
+        </tr>
+        <tr>
+          <td>Requested Posted by</td>
+          <td>: {{ object.created_by }} Branch: {{object.branch}}</td>
+        </tr>
+        <tr>
+          <td>Date of Birth of Benificiary</td>
+          <td>: {{ object.receiver.dob }}</td>
+        </tr>
+        <tr>
+          <td>Benificiary's cell No.</td>
+          <td>: {{ object.receiver.cell }}</td>
+        </tr>
+        <tr>
+          <td>Benificiary's Address</td>
+          <td>: {{ object.receiver.address }}</td>
+        </tr>
+        <tr>
+          <td>Relationship to Sender</td>
+          <td>: {{ object.relationship }}</td>
+        </tr>
+        <tr>
+          <td>Purpose of Transaction</td>
+          <td>: {{ object.purpose }}</td>
+        </tr>
+        {% if object.payment and object.payment.screenshot.url != '' %}
+        <tr>
+          <td>Status</td>
+          <td class="table-warning">: Payable to customer</td>
+        </tr>
+        {% elif object.status == 'RJ'%}
+        <tr>
+          <td>Status</td>
+          <td class="table-danger">: Rejected</td>
+        </tr>
+        <tr>
+          <td>Reason of Rejection/ Other Comments</td>
+          <td class="table-info">: {{ object.comment}}</td>
+        </tr>
+        {% else %}
+        {% endif %}
+        <tr>
+          <td>Value</td>
+          <td>:<b class="text-danger"> BDT {{object.amount|intcomma }}</b></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if object.requestpay_set.last.payment.agent_screenshot.url != '' %}
+  <p>Agent Copy: <br><img src='{{ object.requestpay_set.last.payment.agent_screenshot.url }}' class="img-fluid"><img></p>
+{% endif %}
+
+
+{% block payment_action %}{% endblock %}
+{% endblock %}

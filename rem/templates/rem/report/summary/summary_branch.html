@@ -1,0 +1,10 @@
+{% extends "rem/report/summary/summary_base.html" %}
+{% load widget_tweaks %}
+{% block title %} Summary {% endblock %}
+{% block button %}
+  {% if entry.status == "RJ"%}
+    <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-resubmit' entry.pk %}"><i class="far fa-info-square"></i> Resubmit</a></td>
+  {% else %}
+      <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-detail' entry.pk %}"><i class="far fa-info-square"></i> Details</a></td>
+  {% endif %}
+{% endblock %}

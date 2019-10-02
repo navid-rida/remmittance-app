@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect, get_object_or_404#, render_to_resp
 from django.http import HttpResponse
 from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm
 from django.contrib.auth.decorators import login_required,user_passes_test
-from .models import Remmit, Requestpay, Receiver,Employee, ReceiverUpdateHistory
+from .models import Remmit, Requestpay, Payment, Receiver,Employee, ReceiverUpdateHistory,RemittanceUpdateHistory, Branch
 import datetime
 from .DataModels import *
 from .user_tests import *
@@ -22,6 +22,12 @@ from django.core.exceptions import ValidationError
 ############################### djang-registration imports ##########################
 from django_registration.backends.activation.views import RegistrationView
 from django_registration import signals
+################################ Reports ######################
+from .summary_report import branch_remittance_summary
+############################ Rules and Permissions #########################
+from rules.contrib.views import PermissionRequiredMixin, permission_required
+#from rules.contrib.views import permission_required
+import rem.rule_set
 # Create your views here.
 
 MAXIMUM_AllOWWED_USER_PER_BRANCH = settings.MAXIMUM_USER_PER_BRANCH
@@ -74,7 +80,7 @@ def index(request):
     context = {'latest_question_list': latest_question_list}
     return render(request, 'rem/base.html', context)
 
-@login_required
+"""@login_required
 def show_rem(request):
     if request.method == "POST":
         form = SearchForm(request.POST)
@@ -113,7 +119,46 @@ def show_rem(request):
         if check_headoffice(request.user):
             return render(request, 'rem/report/payment_list_ho.html', context)
         else:
+            return render(request, 'rem/report/payment_list_branch.html', context)"""
+
+@login_required
+def show_rem(request):
+    if request.method == "POST":
+        form = SearchForm(request.POST)
+        #filt = {}
+        if form.is_valid():
+            date_from = form.cleaned_data['date_from']
+            date_to = form.cleaned_data['date_to']
+            """if (date_from != None) and (date_to!= None):
+                filt['datecreate__date__range'] = (date_from,date_to)
+            else:
+                filt['datecreate__date__range'] = None"""
+            exchange_house = form.cleaned_data['exchange']
+            #filt['status'] = 'PD'
+            branch = form.cleaned_data['branch']
+            booth = form.cleaned_data['booth']
+            #filt['resubmit_flag'] = False
+            #filter_args = {k:v for k,v in filt.items() if v is not None}
+            req_list = request.user.employee.get_related_remittance(start_date=date_from, end_date= date_to, branch= branch, booth= booth, exchange_house=exchange_house)
+            context = {'pay_list': req_list, 'form':form}
+            if check_headoffice(request.user):
+                return render(request, 'rem/report/payment_list_ho.html', context)
+            else:
+                return render(request, 'rem/report/payment_list_branch.html', context)
+        else:
+            context = {'form':form }
+            if check_headoffice(request.user):
+                return render(request, 'rem/report/payment_list_ho.html', context)
+            else:
+                return render(request, 'rem/report/payment_list_branch.html', context)
+    else:
+        form = SearchForm()
+        context = {'form':form}
+        if check_headoffice(request.user):
+            return render(request, 'rem/report/payment_list_ho.html', context)
+        else:
             return render(request, 'rem/report/payment_list_branch.html', context)
+
 
 @login_required
 def show_req(request):
@@ -214,7 +259,8 @@ def mark_rem_list(request):
     return render(request, 'rem/report/mark_settle.html', context)
 
 @login_required
-@user_passes_test(check_branch)
+@permission_required('rem.add_remmit')
+#@user_passes_test(check_branch)
 #@user_passes_test(check_headoffice)
 def search_receiver(request):
     if request.method == "POST":
@@ -296,7 +342,7 @@ def download_selected_excel(request):
         #form = Remmit.objects.filter(id__in=selected_values)
         df = rem_bb_summary(list)
         xlsx_data = excel_output(df)
-        response = HttpResponse(xlsx_data,content_type='pplication/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         time = str(timezone.now().date())
         filename = "batch "+time+".xlsx"
         response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
@@ -344,6 +390,17 @@ class RequestpayDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['form'] = PaymentForm()
         return context"""
+
+@method_decorator([login_required,], name='dispatch')
+class RemmitDetailView(DetailView):
+    model = Remmit
+    template_name = 'rem/detail/remmit_detail_base.html'
+
+    """def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = PaymentForm()
+        return context"""
+
 
 @login_required
 @user_passes_test(check_headoffice)
@@ -462,9 +519,10 @@ class UserRegistrationView(RegistrationView):
         new_user.refresh_from_db()
         branch= form.cleaned_data.get('branch')
         cell = form.cleaned_data.get('cell')
+        booth = form.cleaned_data.get('booth')
         #new_user.employee.branch = branch
         #new_user.employee.cell = cell
-        employee =Employee.objects.create(user=new_user, branch=branch, cell=cell)
+        employee =Employee.objects.create(user=new_user, branch=branch, cell=cell, booth=booth)
         # set here all other values
         new_user.save()
         employee.save()
@@ -480,6 +538,7 @@ class UserRegistrationView(RegistrationView):
 @method_decorator([login_required,transaction.atomic], name='dispatch')
 class RemmitInfoCreate(SuccessMessageMixin, CreateView):
     model = Remmit
+    #permission_required = 'rem.add_remmit'
     form_class = RemittInfoForm
     template_name = 'rem/forms/remmit_info_form.html'
     success_message = "Remittance information was submitted successfully"
@@ -491,6 +550,8 @@ class RemmitInfoCreate(SuccessMessageMixin, CreateView):
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         form.instance.branch = self.request.user.employee.branch
+        if self.request.user.employee.booth:
+            form.instance.booth = self.request.user.employee.booth
         receiver = get_object_or_404(Receiver, pk=self.kwargs['pk'])
         form.instance.receiver = receiver
         self.object = form.save(commit=False)
@@ -504,18 +565,19 @@ class RemmitInfoCreate(SuccessMessageMixin, CreateView):
         return super().form_valid(form)
 
 @method_decorator([login_required,transaction.atomic], name='dispatch')
-class RemmitInfoUpdate(UserPassesTestMixin, UpdateView):
+class RemmitInfoUpdate(PermissionRequiredMixin, UpdateView):
 
-    def test_func(self):
+    """def test_func(self):
         id = int(self.kwargs['pk'])
         remittance = Remmit.objects.get(pk=id)
         user = remittance.created_by
         if self.request.user == user:
             return True
         else:
-            return False
+            return False"""
 
     model = Remmit
+    permission_required = 'rem.change_remmit'
     form_class = RemittInfoForm
     template_name = 'rem/forms/remmit_info_update_form.html'
     success_url = reverse_lazy('show_rem')
@@ -530,3 +592,45 @@ class RemmitInfoUpdate(UserPassesTestMixin, UpdateView):
         update.ip = get_client_ip(self.request)
         update.save()
         return super().form_valid(form)
+
+
+################################ Reports ################################
+
+@login_required
+@permission_required('rem.view_ho_br_booth_reports')
+def summary_report(request):
+    if request.method == "POST":
+        form = SearchForm(request.POST)
+        filt = {}
+        if form.is_valid():
+            date_from = form.cleaned_data['date_from']
+            date_to = form.cleaned_data['date_to']
+            exchange = form.cleaned_data['exchange']
+            #status = form.cleaned_data['status']
+            """if status == 'AL':
+                filt['status'] = None
+            else:
+                filt['status'] = status"""
+            #branch = form.cleaned_data['branch']
+            #filt['resubmit_flag'] = False
+            branch_list = Branch.objects.all()
+            summary_list = branch_remittance_summary(branch_list, start_date=date_from, end_date= date_to, exchange_house= exchange)
+            if '_show' in request.POST:
+                context = {'form':form, 'df': summary_list, }
+                return render(request, 'rem/report/summary/summary_base.html', context)
+            elif '_download' in request.POST:
+                df = pd.DataFrame(summary_list, columns=['code','name','count','sum'])
+                xlsx_data = excel_output(df)
+                response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                time = str(timezone.now().date())
+                filename = "summary report "+time+".xlsx"
+                response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+                #writer.save(re)
+                return response
+        else:
+            context = {'form':form }
+            return render(request, 'rem/report/summary/summary_base.html', context)
+    else:
+        form = SearchForm()
+        context = {'form':form}
+        return render(request, 'rem/report/summary/summary_base.html', context)

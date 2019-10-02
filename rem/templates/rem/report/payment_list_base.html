@@ -32,6 +32,13 @@
             {{form.exchange.label_tag}}
             {{form.exchange|add_class:"form-control"}}
         </div>
+        <div class="col-auto">
+            {% for error in form.booth.errors %}
+              <div class="alert alert-danger" role="alert">{{ error}}</div>
+            {% endfor %}
+            {{form.booth.label_tag}}
+            {{form.booth|add_class:"form-control"}}
+        </div>
         {% block branch_dropdown %} {% endblock %}
     </div>
     <div class='form-row'>
@@ -44,7 +51,7 @@
 
 {%if pay_list %}
 
-{% regroup pay_list by remittance.exchange as payment_list %}
+{% regroup pay_list by exchange as payment_list %}
 
 <fieldset id="group_1">
     {% csrf_token %}
@@ -55,13 +62,13 @@
         <thead>
             <tr>
                 {% block branch_column %}{% endblock %}
+                <th scope="col">Booth</th>
                 <th scope="col">Sender's Country</th>
                 <th scope="col">Ref. No</th>
                 <th scope="col">Sender</th>
                 <th scope="col">Benificiary</th>
                 <th scope="col">Amount</th>
-                <th scope="col">Request Posted By</th>
-                <th scope="col">Settlment Status</th>
+                <th scope="col">Information posted by</th>
                 <th scope="col"></th>
             </tr>
         </thead>
@@ -70,13 +77,13 @@
 
             <tr>
                 {% block branch_value %}{% endblock %}
-                <td>{{entry.remittance.rem_country}}</td>
-                <td>{{entry.remittance.reference}}</td>
-                <td>{{entry.remittance.sender.title}}</td>
-                <td>{{entry.remittance.receiver}}</td>
-                <td>{{entry.remittance.amount|intcomma}}</td>
+                <td>{{entry.booth}}</td>
+                <td>{{entry.rem_country}}</td>
+                <td>{{entry.reference}}</td>
+                <td>{{entry.sender.title}}</td>
+                <td>{{entry.receiver}}</td>
+                <td>{{entry.amount|intcomma}}</td>
                 <td>{{entry.created_by}}</td>
-                <td>{{entry.payment.get_status_display}}</td>
                 {% block button %}{% endblock %}
             </tr>
 

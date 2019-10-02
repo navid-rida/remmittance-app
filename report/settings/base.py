@@ -31,7 +31,9 @@ INSTALLED_APPS = [
     ########################## Additional Apps###################################
     'widget_tweaks',
     #'floppyforms',
-    'django.contrib.humanize'
+    'django.contrib.humanize',
+    #Rules
+    'rules',
 ]
 
 MIDDLEWARE = [
@@ -104,12 +106,18 @@ SHORT_DATETIME_FORMAT = 'm/d/Y P'
 
 #User registration and Authentication
 
+AUTHENTICATION_BACKENDS = (
+    'rules.permissions.ObjectPermissionBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
 LOGOUT_REDIRECT_URL='login'
 LOGIN_REDIRECT_URL='index'
 
 ######################### Rem app sepcific settings##############################
 
-MAXIMUM_USER_PER_BRANCH=2
+MAXIMUM_USER_PER_BRANCH=10
+MAXIMUM_USER_PER_BOOTH=5
 MAXIMUM_USER_HEAD_OFFICE=10
 
 ############################ django-registration settings ##############################

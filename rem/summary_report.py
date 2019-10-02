@@ -1,10 +1,42 @@
 from django.db.models import Sum, Count
 from django.utils import timezone
-from .models import Remmit, Branch, ExchangeHouse, Payment
+from .models import Remmit, Branch, ExchangeHouse, Payment, Branch
 import pandas as pd
 from .DataModels import *
 
 year = timezone.now().date().year
+
+################################ Branchwise remittance count and sum ####################################
+
+def branch_remittance_summary(branch_list, year=None, month=None, start_date=None, end_date= None, exchange_house=None):
+    """ Takes branch list, exchange house, date range as args
+        and return DataFrame containing list of branches, remittance
+        amount sum and count"""
+    #sum_list = []  #### will countain list of sums from each branch
+    #name_list = [] #### will countain list of name of each branch
+    #count_list = [] #### will countain list of counts from each branch
+    branch_total_list = []
+    for branch in branch_list:
+        #name_list.append(branch.name)
+        code = branch.code
+        name = branch.name
+        sum, count = branch.branch_total(year, month, start_date, end_date, exchange_house)
+        branch_dict = {'code': code,
+                        'name': name,
+                        'count': count,
+                        'sum': sum,}
+        #sum_list.append(sum)
+        #count_list.append(count)
+        branch_total_list.append(branch_dict)
+    """total_dict = {'name': name_list,
+                'sum': sum_list,
+                'count': count_list}"""
+    #total_df = branch_total_list
+    return branch_total_list
+
+
+
+#######################################################################################################################
 
 def group_branchwise(year,month, ex_column=False, house=None):
     """ Returns number and sum of

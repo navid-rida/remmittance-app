@@ -10,21 +10,17 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 import pandas as pd
+from rem.DataModels import filter_remittance
 ########################## aggregate functions ###############################
 from django.db.models import Sum
 ################# import for validation errrors ##############################
 from django.utils.translation import gettext_lazy as _
 
-######################### Custom Managers ###############################
-"""class RemmitManager(models.Manager):
-    def get_queryset(self):
-        initset = super().get_queryset().only("sender","receiver").all()
-        for entry in initset:
-            sender = entry.sender
-            receiver = entry.receiver.name
-            if fuzz.token_set_ratio():
-                pass"""
+####################### Rules ################################
+import rem.rule_set
+import rules
 
+######################### Custom Managers ###############################
 # Create your models here.
 numeric = RegexValidator(r'^[0-9]*$', 'Only numeric characters are allowed.')
 name = RegexValidator(r'^[a-zA-Z .-]*$', 'Only alphabets are allowed.')
@@ -58,13 +54,15 @@ class Branch(models.Model):
         elif year and month:
             p = p.filter(requestpay__remittance__branch=self).filter(date_settle__year=year).filter(date_settle__month=month)
         elif start_date and end_date:
-            p = p.filter(requestpay__remittance__branch=self).filter(date_settle__range=(start_date,end_date))
+            p = p.filter(requestpay__remittance__branch=self).filter(date_settle__date__range=(start_date,end_date))
         else:
             p = p.filter(requestpay__remittance__branch=self)
         if exchange_house:
             p = p.filter(requestpay__remittance__exchange=exchange_house)
         sum = p.aggregate(sum = Sum('requestpay__remittance__amount'))
-        return sum['sum'] if sum['sum'] else 0
+        count = p.count()
+        sum = sum['sum'] if sum['sum'] else 0
+        return sum, count
 
     def branch_total_month(self, year):
         p = Payment.objects.filter(requestpay__remittance__branch=self).filter(date_settle__year=year)
@@ -72,6 +70,27 @@ class Branch(models.Model):
 
     #def branch_total(year=None,month=None,date=None,exchan_house=None,start_date=None,end_date=None):
 
+class Booth(models.Model):
+    name = models.CharField("Name of the Booth", max_length=20)
+    code = models.CharField("Booth Code", validators=[numeric], max_length=4)
+    address = models.TextField("Address of the Booth")
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, verbose_name='Branch Attached')
+
+    def __str__(self):
+        return self.name
+
+    def employee_count(self, active_status=None):
+        count = 0
+        if active_status==True:
+            count = self.employee_set.filter(user__is_active=active_status).count()
+        elif active_status==False:
+            count = self.employee_set.filter(user__is_active=active_status).count()
+        else:
+            count = self.employee_set.count()
+        return count
+
+    def is_under_branch(self,branch):
+        return self.branch == branch
 
 class Country(models.Model):
     name = models.CharField("Remitting Country", max_length=50)
@@ -84,6 +103,7 @@ class Country(models.Model):
 class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, verbose_name='Branch of the Employee')
+    booth = models.ForeignKey(Booth, on_delete=models.CASCADE, verbose_name='Booth of the Employee', null=True, blank=True)
     cell = models.CharField("Cell number of Receiver", validators=[validate_mobile], max_length=14)
     def __str__(self):
         return self.user.get_full_name()
@@ -104,6 +124,21 @@ class Employee(models.Model):
             return True
         else:
             return False
+
+    def get_related_remittance(self, start_date=None, end_date= None, branch= None, booth= None, exchange_house=None):
+        query_set = Remmit.objects.all()
+        if self.user.has_perm('rem.view_all_remitt'):
+            rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, branch= branch, booth= booth, exchange_house=exchange_house)
+        elif self.user.has_perm('rem.view_branch_remitt'):
+            rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, branch= self.branch, booth= booth, exchange_house=exchange_house)
+        elif self.user.has_perm('rem.view_booth_remitt'):
+            rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, booth= self.booth, exchange_house=exchange_house)
+        else:
+            if self.booth:
+                rem = self.user.remmit_set.filter(booth=self.booth)
+            else:
+                rem = self.user.remmit_set.filter(branch=self.branch)
+        return rem
 
     """def clean(self):
         # Don't allow draft entries to have a pub_date.
@@ -135,7 +170,7 @@ class Receiver(models.Model):
         (BC, 'Birth Regestration Certificate'),
         (DL, 'Driving License'),
         )
-    idtype=models.CharField("Type o Identification",max_length=8, choices=STATUS_CHOICES, default=NID)
+    idtype=models.CharField("Type of Identification",max_length=8, choices=STATUS_CHOICES, default=NID)
     idissue = models.DateField("Issue date of Identification Document", null=True)
     idexpire = models.DateField("Expiry date of Identification Document", null=True)
     idno = models.CharField("ID Number", max_length=17, unique=True)
@@ -184,6 +219,7 @@ class Remmit(models.Model):
     receiver = models.ForeignKey(Receiver, on_delete=models.PROTECT, verbose_name="Receiver")
     amount = models.DecimalField("Amount of Payment",max_digits=20,decimal_places=2, validators=[validate_neg])
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+    booth = models.ForeignKey(Booth, on_delete=models.CASCADE, null=True)
     date_create = models.DateTimeField("Date of posting", auto_now_add=True)
     date_edited = models.DateTimeField("Date of last modified", auto_now=True)
     reference = models.CharField("Referene No./PIN/MTCN", max_length=16, unique=True)

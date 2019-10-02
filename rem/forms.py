@@ -1,4 +1,4 @@
-from .models import Remmit, ExchangeHouse, Branch, Receiver, Requestpay, Country
+from .models import Remmit, ExchangeHouse, Branch, Receiver, Requestpay, Country,Booth
 from django.forms import ModelForm
 from django import forms
 #from datetime import date,datetime
@@ -101,6 +101,7 @@ class SearchForm(forms.Form):
     date_to = forms.DateField(label="Ending Date", initial= timezone.now,  required=False, input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'], localize=True)
     exchange = forms.ModelChoiceField(queryset=ExchangeHouse.objects.all(),required=False)
     branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'),required=False)
+    booth = forms.ModelChoiceField(queryset=Booth.objects.all().order_by('name'),required=False)
     REVIEW= 'RV'
     REJECTED = 'RJ'
     PAID = 'PD'
@@ -149,17 +150,26 @@ class PaymentForm(forms.Form):
                     "Please confirm or reject the payment"
                 )"""
 
-class SignUpForm(RegistrationFormUniqueEmail):
-    #first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
-    #last_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
-    #email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
+class SignUpForm(RegistrationForm):
     branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'),validators=[validate_user_limit])
+    booth = forms.ModelChoiceField(queryset=Booth.objects.all().order_by('name'),validators=[validate_booth_user_limit],required=False)
     cell = forms.CharField(label="Mobile No.", validators=[validate_mobile])
     email = forms.EmailField(max_length=254, help_text='Input your official Email address',validators=[validate_nrbc_mail])
 
     class Meta:
         model = User
-        fields=('username', 'first_name', 'last_name','branch', 'cell', 'email', 'password1', 'password2',)
+        fields=('username', 'first_name', 'last_name','branch','booth', 'cell', 'email', 'password1', 'password2',)
+
+    def clean_booth(self):
+        booth = self.cleaned_data['booth']
+        if booth:
+            branch = self.cleaned_data['branch']
+        #idtype = self.cleaned_data['idtype']
+            if branch != booth.branch:
+                raise ValidationError('BRANCH-BOOTH MISMATCH')
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return booth
 
     """def clean(self):
         cleaned_data = super().clean()

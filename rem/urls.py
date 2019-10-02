@@ -22,7 +22,10 @@ urlpatterns = [
     path('add/payment/<int:pk>/', views.payment_confirm, name='payment-confirm'),
     ########################## Details #########################################
     path('detail/req/<int:pk>/', views.RequestpayDetailView.as_view(), name='requestpay-detail'),
+    path('detail/remittance/<int:pk>/', views.RemmitDetailView.as_view(), name='remitt-detail'),
     path('resubmit/req/<int:pk>/', views.request_resubmit, name='requestpay-resubmit'),
     ############################## USer Regestration & Authentication #########################
     path('signup', views.signup, name='signup'),
+    ############################ report ################################
+    path('summary', views.summary_report, name='summary'),
 ]

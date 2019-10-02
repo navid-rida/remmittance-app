@@ -147,3 +147,9 @@ def validate_user_limit(branch):
         maximum_allowed_user = settings.MAXIMUM_USER_PER_BRANCH
     if maximum_allowed_user <= total_employee:
         raise ValidationError(_('Maximum User Limit exceeded for this branch'))
+
+def validate_booth_user_limit(booth):
+    total_employee = booth.employee_count(active_status=True)
+    maximum_allowed_user = settings.MAXIMUM_USER_PER_BOOTH
+    if maximum_allowed_user <= total_employee:
+        raise ValidationError(_('Maximum User Limit exceeded for this booth'))

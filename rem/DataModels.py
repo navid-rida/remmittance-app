@@ -1,4 +1,4 @@
-from .models import *
+from rem.models import *
 import pandas as pd
 from datetime import datetime, date,timedelta
 import io
@@ -22,7 +22,7 @@ def excel_output(df):
     #filename = "output "+time+".xlsx"
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
     #writer.book.filename = io
-    df.to_excel(writer,'Sheet1', index=False, header=False)
+    df.to_excel(writer,'Sheet1', index=False, header=True)
     writer.save()
     xlsx_data = output.getvalue()
     return xlsx_data
@@ -130,6 +130,7 @@ def name_search_result(qset, search_text):
     df = qset_to_df(qset)
     #df['score'] = df['name'].apply(lambda x: fuzz.partial_ratio(search_text,x))
     df['score'] = df['name'].apply(lambda x: max(fuzz.partial_ratio(search_text,x),fuzz.token_sort_ratio(search_text,x)))
+    pass
 
 
 
@@ -142,3 +143,21 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+def get_branch_from_ip(ip):
+    code = '0'+ip.split('.')[2]
+    branch = Branch.objects.get(code=code)
+    return branch
+
+################################# Remittance list Search ########################################
+def filter_remittance(query_set, start_date=None, end_date= None, branch= None, booth= None, exchange_house=None):
+    r = query_set
+    if start_date and end_date:
+        r = r.filter(date_create__date__range=(start_date,end_date))
+    if branch:
+        r = r.filter(branch=branch)
+    if booth:
+        r = r.filter(booth=booth)
+    if exchange_house:
+        r = r.filter(exchange=exchange_house)
+    return r.order_by('exchange','-date_create','branch__code')

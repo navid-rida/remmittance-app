@@ -1,12 +1,12 @@
 Dear Sir/Madam,
 
-Greetings from CRDS.
+Greetings from CFRD.
 
-Please click on the URL below to activate your CRDS User:
+Please click on the URL below to activate your CFRD User:
 
 {{scheme}}://{{site}}/accounts/activate/{{activation_key}}/
 
-Please be informed that, you will be liable for all remittance requests sent through this CRDS User. You are requested to secure your User ID and password in that regard.
+Please be informed that you will be liable for all remittance information sent through this CFRD User. You are requested to secure your User ID and password in that regard.
 
 Thanking you,
 International Division, NRBC Bank Ltd.

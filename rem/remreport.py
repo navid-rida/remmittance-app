@@ -52,7 +52,8 @@ def merge_csv(csvlist):
     #final_df = final_df.drop("Unnamed: 14", axis=1)
     return df_all
 
-column=['date','br_code','gl_key','dc','amount','narration','flag']
+#column=['date','br_code','gl_key','dc','amount','narration','flag']
+column2=['acc_no','acc_name','limit','inst_size','interest','eff_date','expiry','pcode','overdue','outstanding','fix_later','status','extra']
 #Unnamed: 14
 def hellopops(path='.',ext='.csv',column=None):
     xllist= get_file_list(path,ext)

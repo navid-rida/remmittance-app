@@ -1,4 +1,5 @@
 {% load static %}
+{% load rules %}
 <!doctype html>
 <html lang="en">
 
@@ -41,14 +42,18 @@
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a class="dropdown-item" href="{% url 'show_rem'%}">Remmittance List</a>
             {% comment %}<a class="dropdown-item" href="{% url 'show_req'%}">Request List</a>{% endcomment %}
-            {% for group in request.user.groups.all %}
-            {% if group.name == "Head office user" %}
+            {% comment %}{% for group in request.user.groups.all %}
+            {% if group.name == "HO Settlement User" %}{% endcomment %}
             <a class="dropdown-item" href="{% url 'select_rem_list'%}">Remmittance Excel Download</a>
             <a class="dropdown-item" href="{% url 'mark_rem_list'%}">Mark Settled</a>
+            {% has_perm 'rem.view_ho_br_booth_reports' user as can_view_summary_report_menu %}
+            {% if can_view_summary_report_menu %}
+            <a class="dropdown-item" href="{% url 'summary'%}">Branchwise Summary Report</a>
+            {% endif %}
             {% comment %}<div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#">Export Import Summary</a>{% endcomment %}
-            {% endif%}
-            {% endfor%}
+            {% comment %}{% endif%}
+            {% endfor%}{% endcomment %}
           </div>
         </li>
         <li class="nav-item dropdown">

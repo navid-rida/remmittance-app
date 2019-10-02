@@ -4,15 +4,17 @@ from pathlib import Path
 import datetime
 
 ###################### paths ###########################################
-folder_path = 'F:\\Projects\\Return RIT\\nrb comm_April 2019'
+folder_path = 'F:\\Projects\\Return RIT\\Return RIT_August 2019'
 export_text_file = 'exprecpt.txt'
 import_payment_text_file = 'imppaynt.txt'
 invisible_payment_text_file = 'invpaynt.txt'
 invisible_receipt_text_file = 'invrecpt.txt'
+wage_remit_text_file = 'wagremit.txt'
 export_text_path = Path(folder_path,export_text_file)
 import_payment_text_path = Path(folder_path,import_payment_text_file)
 invisible_payment_text_path = Path(folder_path,invisible_payment_text_file)
 invisible_receipt_text_path = Path(folder_path,invisible_receipt_text_file)
+wage_remit_text_path = Path(folder_path,wage_remit_text_file)
 
 
 ############################ Reference path and DFs #########################################################
@@ -110,17 +112,36 @@ def get_inv_rec_rit_df(df):
     new_df = df[['DATED','FI_NAME','SERIAL_NO','FI_BR_CODE','REPORT_TYPE','CURRENCY','Schedule','Type','COUNTRY','fc_amount','PURPOSE_CODE']]
     return new_df
 
+###################################################### Wage Remiitance ############################################
+wage_remit_columns = ['Schedule','Type','Month','AD','CUR_CODE','Serial','COUNTRY_CODE','fc_amount',]
+wage_remit_df = pd.read_csv(wage_remit_text_path,sep='|', names=wage_remit_columns, )
+
+def get_wage_remit_rit_df(df):
+    #df = exp_df
+    df['DATED'] = datetime.datetime.today().strftime("%d-%b-%Y")
+    df['FI_NAME'] = "NRB COMMERCIAL BANK LTD."
+    df['SERIAL_NO'] = np.arange(1,len(df)+1)
+    df = df.merge(ref_ad_fi_branch, how='left', left_on='AD',right_on='AD_CODE')
+    df = df.merge(ref_currency, how='left')
+    df = df.merge(ref_country, how='left',)
+    #df = df.merge(ref_commodity, how='left',)
+    #df = df.merge(ref_unit, how='left',)
+    df['REPORT_TYPE'] = df['Schedule'].apply(get_fx_trn_type,args=[ref_fx_type_df])
+    new_df = df[['DATED','FI_NAME','SERIAL_NO','FI_BR_CODE','REPORT_TYPE','CURRENCY','Schedule','Type','COUNTRY','fc_amount',]]
+    return new_df
 
 ###################################################### Other Functions ############################################
 
-def rit_all_df(exp_rec,imp_pay,inv_pay,inv_rec):
+def rit_all_df(exp_rec,imp_pay,inv_pay,inv_rec,wage_remit):
     exp_rit_df = get_exp_rit_df(exp_rec)
     imp_pay_rit_df = get_imp_pay_rit_df(imp_pay)
     inv_rec_rit_df = get_inv_rec_rit_df(inv_rec)
     inv_pay_rit_df = get_inv_pay_rit_df(inv_pay)
-    frames = [exp_rit_df, imp_pay_rit_df, inv_pay_rit_df, inv_rec_rit_df]
+    wage_remit_rit_df = get_wage_remit_rit_df(wage_remit)
+    frames = [exp_rit_df, imp_pay_rit_df, inv_pay_rit_df, inv_rec_rit_df,wage_remit_rit_df]
     df = pd.concat(frames, sort=False)
+    df['SERIAL_NO'] = np.arange(1,len(df)+1)
     return df
 
 
-final_df = rit_all_df(exp_df,imp_pay_df,invisible_pay_df,invisible_rec_df)
+final_df = rit_all_df(exp_df,imp_pay_df,invisible_pay_df,invisible_rec_df,wage_remit_df)
