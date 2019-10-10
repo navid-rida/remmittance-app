@@ -47,16 +47,18 @@ class Branch(models.Model):
             count = self.employee_set.count()
         return count
 
-    def branch_total(self, year=None, month=None, start_date=None, end_date= None, exchange_house=None):
-        p = Payment.objects.all()
+    def total_sum_count(self, year=None, month=None, start_date=None, end_date= None, exchange_house=None, BranchBooth=None):
+        p = Payment.objects.filter(requestpay__remittance__branch=self)
+        if BranchBooth=='branch':
+            p = p.filter(requestpay__remittance__booth__isnull=True)
         if year and not month:
-            p = p.filter(requestpay__remittance__branch=self).filter(date_settle__year=year)
+            p = p.filter(date_settle__year=year)
         elif year and month:
-            p = p.filter(requestpay__remittance__branch=self).filter(date_settle__year=year).filter(date_settle__month=month)
+            p = p.filter(date_settle__year=year).filter(date_settle__month=month)
         elif start_date and end_date:
-            p = p.filter(requestpay__remittance__branch=self).filter(date_settle__date__range=(start_date,end_date))
+            p = p.filter(date_settle__date__range=(start_date,end_date))
         else:
-            p = p.filter(requestpay__remittance__branch=self)
+            pass
         if exchange_house:
             p = p.filter(requestpay__remittance__exchange=exchange_house)
         sum = p.aggregate(sum = Sum('requestpay__remittance__amount'))
@@ -92,6 +94,23 @@ class Booth(models.Model):
     def is_under_branch(self,branch):
         return self.branch == branch
 
+    def total_sum_count(self, year=None, month=None, start_date=None, end_date= None, exchange_house=None, BranchBooth=None):
+        p = Payment.objects.all()
+        if year and not month:
+            p = p.filter(requestpay__remittance__booth=self).filter(date_settle__year=year)
+        elif year and month:
+            p = p.filter(requestpay__remittance__booth=self).filter(date_settle__year=year).filter(date_settle__month=month)
+        elif start_date and end_date:
+            p = p.filter(requestpay__remittance__booth=self).filter(date_settle__date__range=(start_date,end_date))
+        else:
+            p = p.filter(requestpay__remittance__booth=self)
+        if exchange_house:
+            p = p.filter(requestpay__remittance__exchange=exchange_house)
+        sum = p.aggregate(sum = Sum('requestpay__remittance__amount'))
+        count = p.count()
+        sum = sum['sum'] if sum['sum'] else 0
+        return Decimal(sum), count
+
 class Country(models.Model):
     name = models.CharField("Remitting Country", max_length=50)
     code = models.CharField("Country code", max_length=20)
@@ -104,7 +123,7 @@ class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, verbose_name='Branch of the Employee')
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, verbose_name='Booth of the Employee', null=True, blank=True)
-    cell = models.CharField("Cell number of Receiver", validators=[validate_mobile], max_length=14)
+    cell = models.CharField("Cell number of Employee", validators=[validate_mobile], max_length=14)
     def __str__(self):
         return self.user.get_full_name()
 
@@ -135,9 +154,11 @@ class Employee(models.Model):
             rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, booth= self.booth, exchange_house=exchange_house)
         else:
             if self.booth:
-                rem = self.user.remmit_set.filter(booth=self.booth)
+                query_set = self.user.remmit_set.filter(booth=self.booth)
+                rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, exchange_house=exchange_house)
             else:
-                rem = self.user.remmit_set.filter(branch=self.branch)
+                query_set = self.user.remmit_set.filter(branch=self.branch)
+                rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, booth= booth, exchange_house=exchange_house)
         return rem
 
     """def clean(self):
