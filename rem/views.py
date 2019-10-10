@@ -19,6 +19,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from decimal import Decimal
 ############################### djang-registration imports ##########################
 from django_registration.backends.activation.views import RegistrationView
 from django_registration import signals
@@ -556,6 +557,7 @@ class RemmitInfoCreate(SuccessMessageMixin, CreateView):
             form.instance.booth = self.request.user.employee.booth
         receiver = get_object_or_404(Receiver, pk=self.kwargs['pk'])
         form.instance.receiver = receiver
+        form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.02)
         self.object = form.save(commit=False)
         # in case you want to modify the object before commit
         self.object.save()
@@ -585,6 +587,10 @@ class RemmitInfoUpdate(PermissionRequiredMixin, UpdateView):
     success_url = reverse_lazy('show_rem')
 
     def form_valid(self, form):
+        form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.02)
+        self.object = form.save(commit=False)
+        # in case you want to modify the object before commit
+        self.object.save()
         payment = self.object.get_completed_payment()
         payment.agent_screenshot = self.request.FILES.get('screenshot',False)
         payment.save()
