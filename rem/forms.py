@@ -102,6 +102,8 @@ class SearchForm(forms.Form):
     exchange = forms.ModelChoiceField(queryset=ExchangeHouse.objects.all(),required=False)
     branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'),required=False)
     booth = forms.ModelChoiceField(queryset=Booth.objects.all().order_by('name'),required=False)
+    BRANCH_BOOTH_CHOICES= (('all','All'),('branch','Only Branch'),('booth','Only Booth'))
+    BranchBooth = forms.ChoiceField(label="Branch/ Booth",choices=BRANCH_BOOTH_CHOICES, required=False)
     REVIEW= 'RV'
     REJECTED = 'RJ'
     PAID = 'PD'
