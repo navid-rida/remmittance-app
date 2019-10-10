@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect, get_object_or_404#, render_to_resp
 from django.http import HttpResponse
 from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm
 from django.contrib.auth.decorators import login_required,user_passes_test
-from .models import Remmit, Requestpay, Payment, Receiver,Employee, ReceiverUpdateHistory,RemittanceUpdateHistory, Branch
+from .models import Remmit, Requestpay, Payment, Receiver,Employee, ReceiverUpdateHistory,RemittanceUpdateHistory, Branch, Booth
 import datetime
 from .DataModels import *
 from .user_tests import *
@@ -23,7 +23,7 @@ from django.core.exceptions import ValidationError
 from django_registration.backends.activation.views import RegistrationView
 from django_registration import signals
 ################################ Reports ######################
-from .summary_report import branch_remittance_summary
+from .summary_report import exchange_housewise_remittance_summary
 ############################ Rules and Permissions #########################
 from rules.contrib.views import PermissionRequiredMixin, permission_required
 #from rules.contrib.views import permission_required
@@ -308,20 +308,21 @@ class ReceiverCreate(SuccessMessageMixin, CreateView):
         return context"""
 
 @method_decorator([login_required,transaction.atomic],name='dispatch')
-class ReceiverUpdate(UserPassesTestMixin, UpdateView):
+class ReceiverUpdate(PermissionRequiredMixin, UpdateView):
     model = Receiver
+    permission_required = 'rem.change_reciver'
     form_class = ReceiverForm
     template_name = 'rem/forms/receiver_edit_form.html'
     #success_url = reverse_lazy('remmit-create',args=(self.object.id,))
 
-    def test_func(self):
+    """def test_func(self):
         id = int(self.kwargs['pk'])
         receiver = Receiver.objects.get(pk=id)
         user = receiver.created_by
         if self.request.user == user:
             return True
         else:
-            return False
+            return False"""
 
     def get_success_url(self):
         return reverse('remmit-create-with-payment', kwargs={'pk': self.object.id})
@@ -607,15 +608,14 @@ def summary_report(request):
             date_from = form.cleaned_data['date_from']
             date_to = form.cleaned_data['date_to']
             exchange = form.cleaned_data['exchange']
-            #status = form.cleaned_data['status']
-            """if status == 'AL':
-                filt['status'] = None
-            else:
-                filt['status'] = status"""
-            #branch = form.cleaned_data['branch']
-            #filt['resubmit_flag'] = False
-            branch_list = Branch.objects.all()
-            summary_list = branch_remittance_summary(branch_list, start_date=date_from, end_date= date_to, exchange_house= exchange)
+            BranchBooth = form.cleaned_data['BranchBooth']
+            lst=Branch.objects.none().order_by('code') # This will contain branch or booth list for summary function
+            if BranchBooth=='branch' or BranchBooth=='all':
+                lst = Branch.objects.all().order_by('code')
+                #summary_list = branch_remittance_summary(branch_list, start_date=date_from, end_date= date_to, exchange_house= exchange)
+            elif BranchBooth=='booth':
+                lst = Booth.objects.all().order_by('code')
+            summary_list = exchange_housewise_remittance_summary(lst, start_date=date_from, end_date= date_to, exchange_house= exchange, BranchBooth=BranchBooth)
             if '_show' in request.POST:
                 context = {'form':form, 'df': summary_list, }
                 return render(request, 'rem/report/summary/summary_base.html', context)
