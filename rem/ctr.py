@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import os
 import pandas as pd
+import numpy as np
 from pathlib import Path
 
 def check_xml(file):
@@ -71,6 +72,7 @@ def lola(path='.'):
     merged_xml = merge_xml(xml_list)
     df = xml_to_df(merged_xml)
     df['Amount'] = df['Amount'].apply(float)
+    df = df[['Branch','Amount']].groupby('Branch').agg([np.sum,np.size])
     return df
 
 """____________________________________________________________________________________________________________________________________________"""
