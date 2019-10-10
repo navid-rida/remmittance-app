@@ -113,6 +113,17 @@
       </div>
       <div class="form-row">
         <div class="col-auto">
+          {% for error in form.cash_incentive_status.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.cash_incentive_status.label_tag}}
+          {{ form.cash_incentive_status|add_class:"form-control"}}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-auto">
           {% for error in form.screenshot.errors %}
           <div class="alert alert-danger" role="alert">
             {{error}}

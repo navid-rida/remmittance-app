@@ -237,11 +237,20 @@ class Remmit(models.Model):
     sender = models.CharField("Name of Remitter", validators=[name], max_length=50)
     relationship = models.CharField("Relationship to Sender",max_length=50, null=True)
     purpose = models.CharField("Purpose of Transaction",max_length=50, null=True)
+    PAID= 'P'
+    HELD = 'H'
+    UNPAID = 'U'
+    CASHINC_CHOICES = (
+        (PAID,'Paid'),
+        (HELD, 'Held'),
+        (UNPAID, 'Unpaid'),
+        )
+    cash_incentive_status = models.CharField("Cash Incentive Status", choices=CASHINC_CHOICES, max_length=1)
     receiver = models.ForeignKey(Receiver, on_delete=models.PROTECT, verbose_name="Receiver")
     amount = models.DecimalField("Amount of Payment",max_digits=20,decimal_places=2, validators=[validate_neg])
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, null=True)
-    date_sending = models.DateField("Date of Sending Remittance")
+    date_sending = models.DateField("Date of Sending Remittance from Abroad")
     date_create = models.DateTimeField("Date of posting", auto_now_add=True)
     date_edited = models.DateTimeField("Date of last modified", auto_now=True)
     reference = models.CharField("Referene No./PIN/MTCN", max_length=16, unique=True)
