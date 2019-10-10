@@ -17,7 +17,7 @@ class RemmitForm(ModelForm):
 
     class Meta:
         model = Remmit
-        fields = ('exchange','rem_country','reference','sender','amount','relationship', 'purpose')
+        fields = ('exchange','rem_country','reference','sender','amount','relationship', 'purpose','date_sending')
 
     def __init__(self, *args, **kwargs):
             super(RemmitForm, self).__init__(*args, **kwargs)

@@ -91,6 +91,17 @@
       </div>
       <div class="form-row">
         <div class="col-auto">
+          {% for error in form.date_sending.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+          {{ form.date_sending.label_tag}}
+          {{ form.date_sending|add_class:"form-control date"}}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-auto">
           {% for error in form.amount.errors %}
           <div class="alert alert-danger" role="alert">
             {{error}}

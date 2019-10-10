@@ -241,6 +241,7 @@ class Remmit(models.Model):
     amount = models.DecimalField("Amount of Payment",max_digits=20,decimal_places=2, validators=[validate_neg])
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, null=True)
+    date_sending = models.DateField("Date of Sending Remittance")
     date_create = models.DateTimeField("Date of posting", auto_now_add=True)
     date_edited = models.DateTimeField("Date of last modified", auto_now=True)
     reference = models.CharField("Referene No./PIN/MTCN", max_length=16, unique=True)
