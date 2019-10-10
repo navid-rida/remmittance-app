@@ -35,11 +35,11 @@
     </div>
 
     <div class="col-auto">
-      {% for error in form.branch.errors %}
+      {% for error in form.BranchBooth.errors %}
       <div class="alert alert-danger" role="alert">{{ error}}</div>
       {% endfor %}
-      {{form.branch.label_tag}}
-      {{form.branch|add_class:"form-control"}}
+      {{form.BranchBooth.label_tag}}
+      {{form.BranchBooth|add_class:"form-control"}}
     </div>
 
   </div>

@@ -48,7 +48,7 @@
             <a class="dropdown-item" href="{% url 'mark_rem_list'%}">Mark Settled</a>
             {% has_perm 'rem.view_ho_br_booth_reports' user as can_view_summary_report_menu %}
             {% if can_view_summary_report_menu %}
-            <a class="dropdown-item" href="{% url 'summary'%}">Branchwise Summary Report</a>
+            <a class="dropdown-item" href="{% url 'summary'%}">Exchange House wise Summary Report</a>
             {% endif %}
             {% comment %}<div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#">Export Import Summary</a>{% endcomment %}
