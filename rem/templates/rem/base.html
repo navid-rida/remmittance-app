@@ -45,6 +45,7 @@
             {% comment %}{% for group in request.user.groups.all %}
             {% if group.name == "HO Settlement User" %}{% endcomment %}
             <a class="dropdown-item" href="{% url 'select_rem_list'%}">Remmittance Excel Download</a>
+            <a class="dropdown-item" href="{% url 'select-cash-incentive'%}">Cash Incentive Excel Download</a>
             <a class="dropdown-item" href="{% url 'mark_rem_list'%}">Mark Settled</a>
             {% has_perm 'rem.view_ho_br_booth_reports' user as can_view_summary_report_menu %}
             {% if can_view_summary_report_menu %}

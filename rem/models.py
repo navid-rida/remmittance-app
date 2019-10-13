@@ -226,6 +226,7 @@ class ReceiverUpdateHistory(models.Model):
 class ExchangeHouse(models.Model):
     name = models.CharField("Name of Exchange House", max_length=30)
     gl_no = models.CharField("GL Head of Exchange House", max_length=15,  validators=[numeric])
+    cash_incentive_gl_no = models.CharField("GL Head of Cash Incentive distribution", max_length=15,  validators=[numeric])
     ac_no = models.CharField("Account no. of Exchange House", max_length=11,  validators=[numeric])
 
     def __str__(self):

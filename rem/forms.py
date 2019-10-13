@@ -14,6 +14,7 @@ from django_registration.forms import RegistrationForm, RegistrationFormUniqueEm
 
 
 class RemmitForm(ModelForm):
+    date_sending = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
 
     class Meta:
         model = Remmit

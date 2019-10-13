@@ -221,7 +221,7 @@ def select_rem_list(request):
             filter_args = {k:v for k,v in filt.items() if v is not None}
             rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','-dateresolved','requestpay__remittance__branch__code')
             if rem_list:
-                df = qset_to_df(rem_list)
+                #df = qset_to_df(rem_list)
                 #ids = list(df['id'][df.duplicated(['amount','branch_id','exchange_id'],keep=False)==True].values)
                 context = {'rem_list': rem_list, 'form':form}
             else:
@@ -233,6 +233,35 @@ def select_rem_list(request):
         context = {'form':form}
 
     return render(request, 'rem/report/download_excel.html', context)
+
+@login_required
+@user_passes_test(check_headoffice)
+def select_cash_incentive_list(request):
+    if request.method == "POST":
+        form = SearchForm(request.POST)
+        filt = {}
+        if form.is_valid():
+            #date_from = form.cleaned_data['date_from']
+            #date_to = form.cleaned_data['date_to']
+            filt['requestpay__remittance__exchange'] = form.cleaned_data['exchange']
+            filt['requestpay__remittance__branch'] = form.cleaned_data['branch']
+            filt['requestpay__remittance__cash_incentive_status'] = 'P'
+            filter_args = {k:v for k,v in filt.items() if v is not None}
+            rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','-dateresolved','requestpay__remittance__branch__code')
+            if rem_list:
+                #df = qset_to_df(rem_list)
+                #ids = list(df['id'][df.duplicated(['amount','branch_id','exchange_id'],keep=False)==True].values)
+                context = {'rem_list': rem_list, 'form':form}
+            else:
+                context = {'form':form}
+        else:
+            context = {'form':form}
+    else:
+        form = SearchForm()
+        context = {'form':form}
+
+    return render(request, 'rem/report/cash_incentive_excel.html', context)
+
 
 @login_required
 @user_passes_test(check_headoffice)
@@ -354,8 +383,27 @@ def download_selected_excel(request):
     else:
         form = SearchForm()
         list = "Please select at least one entry " # An unbound form
-
     return redirect('select_rem_list')
+
+@login_required
+@user_passes_test(check_headoffice)
+def download_cash_incentive_excel(request):
+    if request.method == 'POST' and request.POST.getlist('checks'):
+        list = request.POST.getlist('checks') # If the form has been submitted...
+        #form = Remmit.objects.filter(id__in=selected_values)
+        payments = Payment.objects.order_by('requestpay__remittance__exchange','dateresolved','requestpay__remittance__branch__code')
+        df = cash_incentive_df(list, payments)
+        xlsx_data = excel_output(df)
+        response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        time = str(timezone.now().date())
+        filename = "Cash Incentive Batch "+time+".xlsx"
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+        #writer.save(re)
+        return response
+    else:
+        form = SearchForm()
+        list = "Please select at least one entry " # An unbound form
+    return redirect('select-cash-incentive')
 
 @login_required
 @user_passes_test(check_headoffice)

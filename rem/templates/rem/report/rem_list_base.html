@@ -113,13 +113,14 @@
                 <th scope="col">Branch</th>
                 <th scope="col">Country</th>
                 <th scope="col">Ref. No</th>
-                <th scope="col">Payment Status</th>
+
                 <th scope="col">Sender</th>
                 <th scope="col">Benificiary</th>
                 <th scope="col">Amount</th>
-                <th scope="col">Date Paid</th>
+                <th scope="col">Cash Incentive</th>
+
                 <th scope="col">Posting Date</th>
-                <th scope="col">Rquest Status</th>
+
                 <th scope="col">Request Posted By</th>
                 <th scope="col">Dealing Official's Phone</th>
 
@@ -138,13 +139,14 @@
                 <td>{{entry.requestpay.remittance.branch}}</td>
                 <td>{{entry.requestpay.remittance.rem_country}}</td>
                 <td>{{entry.requestpay.remittance.reference}}</td>
-                <td>{{entry.get_status_display}}</td>
+
                 <td>{{entry.requestpay.remittance.sender.title}}</td>
                 <td>{{entry.requestpay.remittance.receiver.name.title}}</td>
                 <td>{{entry.requestpay.remittance.amount|intcomma}}</td>
-                <td>{{entry.requestpay.remittance.date|localtime}}</td>
-                <td>{{entry.requestpay.datecreate|localtime}}</td>
-                <td>{{entry.requestpay.get_status_display}}</td>
+                <td>{{entry.requestpay.remittance.cash_incentive_amount|intcomma}}</td>
+                <td>{{entry.requestpay.remittance.date_create|localtime}}</td>
+
+
                 <td>{{entry.requestpay.created_by}}</td>
                 <td>{{entry.requestpay.created_by.employee.cell}}</td>
                 <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-detail' entry.requestpay.pk %}"><i class="fas fa-info-square"></i> Details</a></td>
