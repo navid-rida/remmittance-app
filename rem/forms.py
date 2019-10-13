@@ -18,6 +18,13 @@ class RemmitForm(ModelForm):
     class Meta:
         model = Remmit
         fields = ('exchange','rem_country','reference','sender','amount','relationship', 'purpose','date_sending', 'cash_incentive_status')
+        widgets = {
+            #'dob': forms.SelectDateWidget,
+            #'cash_incentive_status': forms.RadioSelect,
+            #'dob': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+            #'idissue': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+            #'idexpire': forms.DateInput(format['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+        }
 
     def __init__(self, *args, **kwargs):
             super(RemmitForm, self).__init__(*args, **kwargs)

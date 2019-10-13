@@ -245,9 +245,9 @@ class Remmit(models.Model):
         (HELD, 'Held'),
         (UNPAID, 'Unpaid'),
         )
-    cash_incentive_status = models.CharField("Cash Incentive Status", choices=CASHINC_CHOICES, max_length=1)
+    cash_incentive_status = models.CharField("Cash Incentive Status", choices=CASHINC_CHOICES, max_length=1, help_text="Please select 'Held' if required documents not collected and incentive not paid")
     receiver = models.ForeignKey(Receiver, on_delete=models.PROTECT, verbose_name="Receiver")
-    amount = models.DecimalField("Amount of Payment",max_digits=20,decimal_places=2, validators=[validate_neg])
+    amount = models.DecimalField("Amount of Payment",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Required documents must be collected and retained for paying inentive against Remittances valuing more than USD 1500.00 or equivalent")
     cash_incentive_amount = models.DecimalField("Amount of Cash Incentive",max_digits=20,decimal_places=2, validators=[validate_neg])
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, null=True)

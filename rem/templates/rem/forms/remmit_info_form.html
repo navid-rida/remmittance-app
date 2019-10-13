@@ -109,6 +109,9 @@
           {% endfor %}
           {{ form.amount.label_tag}}
           {{ form.amount|add_class:"form-control"}}
+          {% if form.amount.help_text %}
+            <small style="color: grey">{{ form.amount.help_text|safe }}</small>
+          {% endif %}
         </div>
       </div>
       <div class="form-row">
@@ -120,6 +123,9 @@
           {% endfor %}
           {{ form.cash_incentive_status.label_tag}}
           {{ form.cash_incentive_status|add_class:"form-control"}}
+          {% if form.cash_incentive_status.help_text %}
+            <small style="color: grey">{{ form.cash_incentive_status.help_text|safe }}</small>
+          {% endif %}
         </div>
       </div>
       <div class="form-row">
