@@ -243,16 +243,18 @@ class Remmit(models.Model):
     UNPAID = 'U'
     CASHINC_CHOICES = (
         (PAID,'Paid'),
-        (HELD, 'Held'),
+        #(HELD, 'Held'),
         (UNPAID, 'Unpaid'),
         )
     cash_incentive_status = models.CharField("Cash Incentive Status", choices=CASHINC_CHOICES, max_length=1, help_text="Please select 'Held' if required documents not collected and incentive not paid")
+    unpaid_cash_incentive_reason = models.CharField("Reason for not paying cash incentive", max_length=50, null=True, blank=True, help_text="This field is mandatory if you mark cash incentive as unpaid")
     receiver = models.ForeignKey(Receiver, on_delete=models.PROTECT, verbose_name="Receiver")
     amount = models.DecimalField("Amount of Payment",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Required documents must be collected and retained for paying inentive against Remittances valuing more than USD 1500.00 or equivalent")
     cash_incentive_amount = models.DecimalField("Amount of Cash Incentive",max_digits=20,decimal_places=2, validators=[validate_neg])
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, null=True)
     date_sending = models.DateField("Date of Sending Remittance from Abroad")
+    date_cash_incentive_settlement = models.DateField("Date of Cash Incentive Settlement", null=True)
     date_create = models.DateTimeField("Date of posting", auto_now_add=True)
     date_edited = models.DateTimeField("Date of last modified", auto_now=True)
     reference = models.CharField("Referene No./PIN/MTCN", max_length=16, unique=True)

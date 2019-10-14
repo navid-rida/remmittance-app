@@ -18,7 +18,7 @@ class RemmitForm(ModelForm):
 
     class Meta:
         model = Remmit
-        fields = ('exchange','rem_country','reference','sender','amount','relationship', 'purpose','date_sending', 'cash_incentive_status')
+        fields = ('exchange','rem_country','reference','sender','amount','relationship', 'purpose','date_sending', 'cash_incentive_status','unpaid_cash_incentive_reason')
         widgets = {
             #'dob': forms.SelectDateWidget,
             #'cash_incentive_status': forms.RadioSelect,
@@ -31,11 +31,22 @@ class RemmitForm(ModelForm):
             super(RemmitForm, self).__init__(*args, **kwargs)
             self.fields['rem_country'].queryset = Country.objects.exclude(name="BANGLADESH")
 
+    def clean_unpaid_cash_incentive_reason(self):
+        unpaid_cash_incentive_reason = self.cleaned_data['unpaid_cash_incentive_reason']
+        cash_incentive_status = self.cleaned_data['cash_incentive_status']
+        if cash_incentive_status == 'U' and unpaid_cash_incentive_reason==None:
+            raise ValidationError('Reason is required if cash incentive status is unpaid')
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return unpaid_cash_incentive_reason
 
     def clean(self):
         cleaned_data = super().clean()
         exchange = cleaned_data.get("exchange")
         reference = cleaned_data.get("reference")
+        cash_incentive_status = cleaned_data.get("cash_incentive_status")
+        unpaid_cash_incentive_reason = cleaned_data.get("unpaid_cash_incentive_reason")
+
         if exchange.name == 'WESTERN UNION':
             validate_western_code(reference)
         elif exchange.name == 'XPRESS MONEY':
