@@ -1,0 +1,22 @@
+{% extends "rem/report/rem_list_base.html" %}
+{% load widget_tweaks %}
+{% block title %} Cash incentive Settlement {% endblock %}
+{% block select_date%}
+  <div class="col-auto">
+    {{form.date_from.label_tag}}
+    {{form.date_from|add_class:"form-control date"}}
+    {% for error in form.date_from.errors %}
+      <div class="alert alert-danger" role="alert">{{ error}}</div>
+    {% endfor %}
+  </div>
+  <div class="col-auto">
+    {{form.date_to.label_tag}}
+    {{form.date_to|add_class:"form-control date"}}
+    {% for error in form.date_to.errors %}
+      <div class="alert alert-danger" role="alert">{{ error}}</div>
+    {% endfor %}
+  </div>
+{% endblock %}
+{% block form %}
+<form method="post" action="{% url 'cash_incentive_mark_settle'%}">
+{% endblock %}

@@ -35,6 +35,7 @@ rules.add_perm('rem.view_branch_remitt', is_branch_report_observer_user)
 rules.add_perm('rem.view_booth_remitt', is_booth_report_observer_user)
 rules.add_perm('rem.view_all_remitt', is_ho_report_user)
 rules.add_perm('rem.view_ho_br_booth_reports', is_ho_report_user)
+rules.add_perm('rem.can_settle_remitts_cash_incentive', is_ho_settlement_user)
 
 #---------------------------------------------------------------------------------
 

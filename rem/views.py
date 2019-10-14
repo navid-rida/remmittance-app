@@ -246,6 +246,7 @@ def select_cash_incentive_list(request):
             filt['requestpay__remittance__exchange'] = form.cleaned_data['exchange']
             filt['requestpay__remittance__branch'] = form.cleaned_data['branch']
             filt['requestpay__remittance__cash_incentive_status'] = 'P'
+            filt['requestpay__remittance__date_cash_incentive_settlement__isnull'] = False
             filter_args = {k:v for k,v in filt.items() if v is not None}
             rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','-dateresolved','requestpay__remittance__branch__code')
             if rem_list:
@@ -287,6 +288,33 @@ def mark_rem_list(request):
         form = SearchForm()
         context = {'form':form}
     return render(request, 'rem/report/mark_settle.html', context)
+
+@login_required
+@user_passes_test(check_headoffice)
+def mark_cash_incentive_list(request):
+    if request.method == "POST":
+        form = SearchForm(request.POST)
+        filt = {}
+        if form.is_valid():
+            date_from = form.cleaned_data['date_from']
+            date_to = form.cleaned_data['date_to']
+            if (date_from != None) and (date_to!= None):
+                filt['dateresolved__date__range'] = (date_from,date_to)
+            else:
+                filt['dateresolved__date__range'] = None
+            filt['requestpay__remittance__exchange'] = form.cleaned_data['exchange']
+            filt['requestpay__remittance__branch']  = form.cleaned_data['branch']
+            filt['requestpay__remittance__cash_incentive_status']  = 'P'
+            filt['requestpay__remittance__date_cash_incentive_settlement__isnull'] = True
+            filter_args = {k:v for k,v in filt.items() if v is not None}
+            rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','-dateresolved','requestpay__remittance__branch__code')
+            context = {'rem_list': rem_list, 'form':form}
+            return render(request, 'rem/report/cash_incentive_mark_settle.html', context)
+    else:
+        form = SearchForm()
+        context = {'form':form}
+    return render(request, 'rem/report/mark_settle.html', context)
+
 
 @login_required
 @permission_required('rem.add_remmit')
@@ -419,6 +447,24 @@ def mark_settle(request):
             entry.settled_by=request.user
             entry.save()
     return redirect('mark_rem_list')
+
+@login_required
+@user_passes_test(check_headoffice)
+@transaction.atomic
+def cash_incentive_mark_settle(request):
+    if request.method == 'POST':
+        list = request.POST.getlist('checks') # If the form has been submitted...
+        #form = Remmit.objects.filter(id__in=selected_values)
+        """messages.info(request, 'This request is successfully resubmitted'+list[0])
+        return redirect('show_req')"""
+        for id in list:
+            entry = Payment.objects.get(pk=id)
+            #entry.requestpay.remittance.cash_incentive_status = 'S'
+            entry.requestpay.remittance.date_cash_incentive_settlement = timezone.now().date()
+            #entry.settled_by=request.user
+            entry.requestpay.remittance.save()
+            entry.save()
+    return redirect('mark_cash_incentive_list')
 
 @login_required
 @user_passes_test(check_branch)
