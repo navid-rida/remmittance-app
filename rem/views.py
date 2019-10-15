@@ -246,7 +246,7 @@ def select_cash_incentive_list(request):
             filt['requestpay__remittance__exchange'] = form.cleaned_data['exchange']
             filt['requestpay__remittance__branch'] = form.cleaned_data['branch']
             filt['requestpay__remittance__cash_incentive_status'] = 'P'
-            filt['requestpay__remittance__date_cash_incentive_settlement__isnull'] = False
+            #filt['requestpay__remittance__date_cash_incentive_settlement__isnull'] = False
             filter_args = {k:v for k,v in filt.items() if v is not None}
             rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','-dateresolved','requestpay__remittance__branch__code')
             if rem_list:
