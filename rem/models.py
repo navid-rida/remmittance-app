@@ -254,7 +254,7 @@ class Remmit(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, null=True, blank=True)
     date_sending = models.DateField("Date of Sending Remittance from Abroad")
-    date_cash_incentive_settlement = models.DateField("Date of Cash Incentive Settlement", null=True)
+    date_cash_incentive_settlement = models.DateField("Date of Cash Incentive Settlement", null=True, blank= True)
     date_create = models.DateTimeField("Date of posting", auto_now_add=True)
     date_edited = models.DateTimeField("Date of last modified", auto_now=True)
     reference = models.CharField("Referene No./PIN/MTCN", max_length=16, unique=True)
