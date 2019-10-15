@@ -118,6 +118,8 @@
                 <th scope="col">Benificiary</th>
                 <th scope="col">Amount</th>
                 <th scope="col">Cash Incentive</th>
+                <th scope="col">Cash Incentive Status</th>
+                <th scope="col">Cash Incentive Settle Date</th>
 
                 <th scope="col">Posting Date</th>
 
@@ -144,6 +146,8 @@
                 <td>{{entry.requestpay.remittance.receiver.name.title}}</td>
                 <td>{{entry.requestpay.remittance.amount|intcomma}}</td>
                 <td>{{entry.requestpay.remittance.cash_incentive_amount|intcomma}}</td>
+                <td>{{entry.requestpay.remittance.cash_incentive_status}}</td>
+                <td>{{entry.requestpay.remittance.date_cash_incentive_settlement}}</td>
                 <td>{{entry.requestpay.remittance.date_create|localtime}}</td>
 
 
