@@ -221,7 +221,7 @@ def get_branch_from_ip(ip):
     return branch
 
 ################################# Remittance list Search ########################################
-def filter_remittance(query_set, start_date=None, end_date= None, branch= None, booth= None, exchange_house=None):
+def filter_remittance(query_set, start_date=None, end_date= None, branch= None, booth= None, exchange_house=None, cash_incentive_status=None, cash_incentive_settlement_done=None):
     r = query_set
     if start_date and end_date:
         r = r.filter(date_create__date__range=(start_date,end_date))
@@ -231,4 +231,8 @@ def filter_remittance(query_set, start_date=None, end_date= None, branch= None, 
         r = r.filter(booth=booth)
     if exchange_house:
         r = r.filter(exchange=exchange_house)
+    if cash_incentive_status:
+        r = r.filter(cash_incentive_status=cash_incentive_status)
+    if cash_incentive_settlement_done==True:
+        r = r.filter(date_cash_incentive_settlement__isnull=False)
     return r.order_by('exchange','-date_create','branch__code')
