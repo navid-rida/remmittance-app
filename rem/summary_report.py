@@ -34,6 +34,49 @@ def exchange_housewise_remittance_summary(list, year=None, month=None, start_dat
     #total_df = branch_total_list
     return branch_booth_total_list
 
+def cash_incentive_bb_statement(qset,start_date, end_date, cash_incentive_status='P', cash_incentive_settlement_done=True):
+    q = qset
+    ben_name_address=[]
+    ben_id=[]
+    #ben_acc=[]
+    #bank_name=[]
+    sender_name=[]
+    #sender_occuption=[]
+    exchange_house=[]
+    date_sending_remittance=[]
+    #fc_amount=[]
+    #exchange_rate=[]
+    lc_amount=[]
+    #trn_type=[]
+    cash_incentive_amount=[]
+    date_remittance_paid=[]
+    #remarks=[]
+    for r in q:
+        ben_name_address.append(r.receiver.name+' , '+r.receiver.address)
+        ben_id.append(r.receiver.idno)
+        sender_name.append(r.sender)
+        exchange_house.append(r.exchange.name)
+        date_sending_remittance.append(r.date_sending)
+        lc_amount.append(r.amount)
+        cash_incentive_amount.append(r.cash_incentive_amount)
+        date_remittance_paid.append(r.date_create.date())
+    dct = {"Benificiary Name & Address": ben_name_address,
+            "Identification": ben_id,
+            #"Benificiary Account": ben_acc,
+            "Name of Sender": sender_name,
+            #"Occupation of Sender": sender_occuption,
+            "Exchange House":exchange_house,
+            "Date of Sending Remittance":date_sending_remittance,
+            #"FC Amount":fc_amount,
+            #"Exchange rate": exchange_rate,
+            "BDT Amount": lc_amount,
+            #"Type":trn_type,
+            "Incentive Amount": cash_incentive_amount,
+            "Date of Payment": date_remittance_paid,
+            #"Remrks": remarks
+            }
+    df = pd.DataFrame(dct)
+    return df
 
 
 #######################################################################################################################
