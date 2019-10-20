@@ -32,4 +32,5 @@ urlpatterns = [
     path('signup', views.signup, name='signup'),
     ############################ report ################################
     path('summary', views.summary_report, name='summary'),
+    path('cash_incentive_bb_statement', views.monthly_cash_incentive_bb_statement, name='cash_incentive_bb_statement'),
 ]

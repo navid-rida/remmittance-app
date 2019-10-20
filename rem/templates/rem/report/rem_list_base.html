@@ -95,6 +95,13 @@
     </div>
 </form>
 </br>
+{%if done_list %}
+<ul>
+  {% for entity in done_list %}
+    <li>{{ entity.requestpay.remittance.reference}}, Amount:{{ entity.requestpay.remittance.amount}}, Incentive: {{ entity.requestpay.remittance.cash_incentive_amount}}, Settlement- Payment: {{ entity.date_settle}} Incentive: {{ entity.requestpay.remittance.date_cash_incentive_settlement}} </li>
+  {% endfor %}
+</ul>
+{% endif%}
 {%if rem_list %}
 {% regroup rem_list by requestpay.remittance.exchange as remmittance_list %}
 {% block form %}{% endblock %}
@@ -141,7 +148,6 @@
                 <td>{{entry.requestpay.remittance.branch}}</td>
                 <td>{{entry.requestpay.remittance.rem_country}}</td>
                 <td>{{entry.requestpay.remittance.reference}}</td>
-
                 <td>{{entry.requestpay.remittance.sender.title}}</td>
                 <td>{{entry.requestpay.remittance.receiver.name.title}}</td>
                 <td>{{entry.requestpay.remittance.amount|intcomma}}</td>
@@ -149,8 +155,6 @@
                 <td>{{entry.requestpay.remittance.cash_incentive_status}}</td>
                 <td>{{entry.requestpay.remittance.date_cash_incentive_settlement}}</td>
                 <td>{{entry.requestpay.remittance.date_create|localtime}}</td>
-
-
                 <td>{{entry.requestpay.created_by}}</td>
                 <td>{{entry.requestpay.created_by.employee.cell}}</td>
                 <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-detail' entry.requestpay.pk %}"><i class="fas fa-info-square"></i> Details</a></td>

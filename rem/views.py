@@ -24,7 +24,7 @@ from decimal import Decimal
 from django_registration.backends.activation.views import RegistrationView
 from django_registration import signals
 ################################ Reports ######################
-from .summary_report import exchange_housewise_remittance_summary
+from .summary_report import exchange_housewise_remittance_summary, cash_incentive_bb_statement
 ############################ Rules and Permissions #########################
 from rules.contrib.views import PermissionRequiredMixin, permission_required
 #from rules.contrib.views import permission_required
@@ -424,7 +424,7 @@ def download_cash_incentive_excel(request):
         xlsx_data = excel_output(df)
         response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         time = str(timezone.now().date())
-        filename = "Cash Incentive Batch "+time+".xlsx"
+        filename = "Cash In "+time+".xlsx"
         response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
         #writer.save(re)
         return response
@@ -446,7 +446,11 @@ def mark_settle(request):
             entry.date_settle = timezone.now()
             entry.settled_by=request.user
             entry.save()
-    return redirect('mark_rem_list')
+        done_list=Payment.objects.filter(id__in=list)
+        form = SearchForm()
+        context = {'done_list': done_list, 'form':form}
+        return render(request, 'rem/report/mark_settle.html', context)
+    #return redirect('mark_rem_list')
 
 @login_required
 @user_passes_test(check_headoffice)
@@ -464,6 +468,10 @@ def cash_incentive_mark_settle(request):
             #entry.settled_by=request.user
             entry.requestpay.remittance.save()
             entry.save()
+        done_list=Payment.objects.filter(id__in=list)
+        form = SearchForm()
+        context = {'done_list': done_list, 'form':form}
+        return render(request, 'rem/report/cash_incentive_mark_settle.html', context)
     return redirect('mark_cash_incentive_list')
 
 @login_required
@@ -735,3 +743,35 @@ def summary_report(request):
         form = SearchForm()
         context = {'form':form}
         return render(request, 'rem/report/summary/summary_base.html', context)
+
+#@login_required
+#@permission_required('rem.view_ho_br_booth_reports')
+def monthly_cash_incentive_bb_statement(request):
+    if request.method == "POST":
+        form = SearchForm(request.POST)
+        #filt = {}
+        if form.is_valid():
+            date_from = form.cleaned_data['date_from']
+            date_to = form.cleaned_data['date_to']
+            query_set = Remmit.objects.all()
+            q = filter_remittance(query_set, start_date=date_from, end_date= date_to, cash_incentive_status='P', cash_incentive_settlement_done=True)
+            statement = cash_incentive_bb_statement(qset=q, start_date=date_from, end_date= date_to, cash_incentive_status='P', cash_incentive_settlement_done=True)
+            if '_show' in request.POST:
+                context = {'form':form, 'df': statement, }
+                return render(request, 'rem/report/cash_incentive_bb_statement/cash_incentive_base.html', context)
+            if '_download' in request.POST:
+                #df = pd.DataFrame(summary_list, columns=['code','name','count','sum'])
+                xlsx_data = excel_output(statement)
+                response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                time = str(timezone.now().date())
+                filename = "cash incentive statement "+time+".xlsx"
+                response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+                #writer.save(re)
+                return response
+        else:
+            context = {'form':form }
+            return render(request, 'rem/report/cash_incentive_bb_statement/cash_incentive_base.html', context)
+    else:
+        form = SearchForm()
+        context = {'form':form}
+        return render(request, 'rem/report/cash_incentive_bb_statement/cash_incentive_base.html', context)

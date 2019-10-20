@@ -47,6 +47,7 @@
             {% has_perm 'rem.view_ho_br_booth_reports' user as can_view_summary_report_menu %}
               {% if can_view_summary_report_menu %}
                 <a class="dropdown-item" href="{% url 'summary'%}">Exchange House wise Summary Report</a>
+                <a class="dropdown-item" href="{% url 'cash_incentive_bb_statement'%}">Cash Incentive Statemment (BB)</a>
               {% endif %}
             {% has_perm 'rem.can_settle_remitts_cash_incentive' user as can_settle %}
             {% if can_settle %}

@@ -67,12 +67,11 @@
                 <th scope="col">Ref. No</th>
                 <th scope="col">Sender</th>
                 <th scope="col">Benificiary</th>
-                <th scope="col">Amount</th>
-                <th scope="col">Information posted by</th>
-                <th scope="col">Cash incentive Amount</th>
+                <th scope="col">Remittance Amount</th>
+                <th scope="col">Cash Incentive Amount</th>
                 <th scope="col">Cash Incentive Status</th>
                 <th scope="col">Cash Incentive Settlement Date</th>
-                <th scope="col"></th>
+                <th scope="col">Posted By</th>
             </tr>
         </thead>
         <tbody>
@@ -87,7 +86,7 @@
                 <td>{{entry.receiver}}</td>
                 <td>{{entry.amount|intcomma}}</td>
                 <td>{{entry.cash_incentive_amount|intcomma}}</td>
-                <td>{{entry.cash_incentive_status}}</td>
+                <td>{{entry.get_cash_incentive_status_display}}</td>
                 <td>{{entry.date_cash_incentive_settlement}}</td>
                 <td>{{entry.created_by}}</td>
                 {% block button %}{% endblock %}

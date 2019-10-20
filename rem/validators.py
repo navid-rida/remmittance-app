@@ -153,3 +153,9 @@ def validate_booth_user_limit(booth):
     maximum_allowed_user = settings.MAXIMUM_USER_PER_BOOTH
     if maximum_allowed_user <= total_employee:
         raise ValidationError(_('Maximum User Limit exceeded for this booth'))
+
+numeric = RegexValidator(r'^[0-9]*$', 'Only numeric characters are allowed.')
+name = RegexValidator(r'^[a-zA-Z .-]*$', 'Only alphabets are allowed.')
+alpha = RegexValidator(r'^[a-zA-Z]*$', 'Only alphabets are allowed.')
+alpha_num = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only Alphabet and numeric characters are allowed.')
+western_union = RegexValidator(r'^[0-9]{10}$', 'Western union mtcn can contain only 10 digit numbers')
