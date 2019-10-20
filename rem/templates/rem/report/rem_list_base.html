@@ -96,11 +96,11 @@
 </form>
 </br>
 {%if done_list %}
-<ul>
+<ol>
   {% for entity in done_list %}
     <li>{{ entity.requestpay.remittance.reference}}, Amount:{{ entity.requestpay.remittance.amount}}, Incentive: {{ entity.requestpay.remittance.cash_incentive_amount}}, Settlement- Payment: {{ entity.date_settle}} Incentive: {{ entity.requestpay.remittance.date_cash_incentive_settlement}} </li>
   {% endfor %}
-</ul>
+</ol>
 {% endif%}
 {%if rem_list %}
 {% regroup rem_list by requestpay.remittance.exchange as remmittance_list %}
