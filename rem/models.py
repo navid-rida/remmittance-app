@@ -2,7 +2,7 @@ from django.db import models
 from decimal import Decimal
 #from datetime import date
 from django.core.exceptions import ValidationError
-from .validators import validate_neg, validate_post_date, validate_mobile
+from .validators import validate_neg, validate_post_date, validate_mobile, numeric, name, alpha, alpha_num, western_union
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -22,16 +22,12 @@ import rules
 
 ######################### Custom Managers ###############################
 # Create your models here.
-numeric = RegexValidator(r'^[0-9]*$', 'Only numeric characters are allowed.')
-name = RegexValidator(r'^[a-zA-Z .-]*$', 'Only alphabets are allowed.')
-alpha = RegexValidator(r'^[a-zA-Z]*$', 'Only alphabets are allowed.')
-alpha_num = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only Alphabet and numeric characters are allowed.')
-western_union = RegexValidator(r'^[0-9]{10}$', 'Western union mtcn can contain only 10 digit numbers')
-
 
 class Branch(models.Model):
     name = models.CharField("Name of The branch", max_length=20,default='Principal')
     code = models.CharField("Branch Code", validators=[numeric], max_length=4,default='0101')
+    ad_code = models.CharField("AD Code", validators=[numeric], max_length=4, null=True)
+    division = models.CharField("Division", validators=[alpha], max_length=20)
     address = models.TextField("Address of the branch")
 
     def __str__(self):
