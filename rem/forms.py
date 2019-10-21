@@ -73,7 +73,7 @@ class ReceiverForm(ModelForm):
 
     class Meta:
         model = Receiver
-        fields = ('name','cell','address','dob','idtype','idno','idissue','idexpire')
+        fields = ('name','cell','address','dob','idtype','idno','idissue','idexpire','ac_no')
         widgets = {
             #'dob': forms.SelectDateWidget,
             'address': forms.Textarea(attrs={'rows':4, 'cols':45}),

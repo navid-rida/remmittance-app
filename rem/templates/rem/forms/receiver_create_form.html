@@ -42,6 +42,17 @@
       </div>
       <div class='form-row'>
         <div class="col-auto">
+          {{form.ac_no.label_tag}}
+          {{form.ac_no|add_class:"form-control"}}
+          {% for error in form.ac_no.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class='form-row'>
+        <div class="col-auto">
           {{form.address.label_tag}}
           {{form.address|add_class:"form-control element_margin"}}
           {% for error in form.address.errors %}
