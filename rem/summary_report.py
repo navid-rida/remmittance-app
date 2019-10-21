@@ -38,42 +38,50 @@ def cash_incentive_bb_statement(qset,start_date, end_date, cash_incentive_status
     q = qset
     ben_name_address=[]
     ben_id=[]
-    #ben_acc=[]
-    #bank_name=[]
+    ben_acc=[]
+    bank_name=[]
     sender_name=[]
-    #sender_occuption=[]
+    sender_occupation=[]
     exchange_house=[]
     date_sending_remittance=[]
-    #fc_amount=[]
-    #exchange_rate=[]
+    fc_amount=[]
+    exchange_rate=[]
     lc_amount=[]
-    #trn_type=[]
+    trn_type=[]
     cash_incentive_amount=[]
     date_remittance_paid=[]
-    #remarks=[]
+    remarks=[]
     for r in q:
         ben_name_address.append(r.receiver.name+' , '+r.receiver.address)
         ben_id.append(r.receiver.idno)
+        ben_acc.append(r.receiver.ac_no)
+        bank_name.append("NRB Commercial Bank")
         sender_name.append(r.sender)
+        sender_occupation.append(r.sender_occupation)
         exchange_house.append(r.exchange.name)
         date_sending_remittance.append(r.date_sending)
+        fc_amount.append(None)
+        exchange_rate.append(None)
         lc_amount.append(r.amount)
+        trn_type.append('MFS')
         cash_incentive_amount.append(r.cash_incentive_amount)
-        date_remittance_paid.append(r.date_create.date())
+        date_remittance_paid.append(r.date_cash_incentive_settlement)
+        remarks.append('')
     dct = {"Benificiary Name & Address": ben_name_address,
             "Identification": ben_id,
-            #"Benificiary Account": ben_acc,
+            "Benificiary Account": ben_acc,
+            "Bank Name": bank_name,
             "Name of Sender": sender_name,
-            #"Occupation of Sender": sender_occuption,
+            "Occupation of Sender": sender_occupation,
             "Exchange House":exchange_house,
             "Date of Sending Remittance":date_sending_remittance,
-            #"FC Amount":fc_amount,
-            #"Exchange rate": exchange_rate,
+            "FC Amount":fc_amount,
+            "Exchange rate": exchange_rate,
             "BDT Amount": lc_amount,
-            #"Type":trn_type,
+            "Type":trn_type,
             "Incentive Amount": cash_incentive_amount,
             "Date of Payment": date_remittance_paid,
-            #"Remrks": remarks
+            "Remrks": remarks
             }
     df = pd.DataFrame(dct)
     return df
