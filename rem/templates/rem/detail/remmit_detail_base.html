@@ -63,6 +63,21 @@
           <td>Purpose of Transaction</td>
           <td>: {{ object.purpose }}</td>
         </tr>
+        <tr>
+          <td>Cash Incentive Amount</td>
+          <td>: BDT {{ object.cash_incentive_amount|intcomma }}</td>
+        </tr>
+        <tr>
+          <td>Cash Incentive Status</td>
+          <td>
+            : {{ object.get_cash_incentive_status_display }}
+            {% if object.date_cash_incentive_settlement %}
+              (Settled on: {{object.date_cash_incentive_settlement}})
+            {% else %}
+              (Not Settled)
+            {% endif %}
+          </td>
+        </tr>
         {% if object.payment and object.payment.screenshot.url != '' %}
         <tr>
           <td>Status</td>
