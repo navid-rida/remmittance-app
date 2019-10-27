@@ -4,7 +4,7 @@ from pathlib import Path
 import datetime
 
 ###################### paths ###########################################
-folder_path = 'F:\\Projects\\Return RIT\\Return RIT_September'
+folder_path = ''
 export_text_file = 'exprecpt.txt'
 import_payment_text_file = 'imppaynt.txt'
 invisible_payment_text_file = 'invpaynt.txt'
