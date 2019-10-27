@@ -4,7 +4,7 @@ from pathlib import Path
 import datetime
 
 ###################### paths ###########################################
-folder_path = 'F:\\Projects\\Return RIT\\Return RIT_August 2019'
+folder_path = 'F:\\Projects\\Return RIT\\Return RIT_September'
 export_text_file = 'exprecpt.txt'
 import_payment_text_file = 'imppaynt.txt'
 invisible_payment_text_file = 'invpaynt.txt'
@@ -18,7 +18,7 @@ wage_remit_text_path = Path(folder_path,wage_remit_text_file)
 
 
 ############################ Reference path and DFs #########################################################
-ref_file_path = Path('F:\\Projects\\Return RIT\\REFERENCE_FILE.xlsm')
+ref_file_path = Path('REFERENCE_FILE.xlsm')
 ref_ad_fi_branch = pd.read_excel(ref_file_path, sheet_name='AD_TO_BR', dtype= {'FI_BR_CODE':object,} )
 ref_currency = pd.read_excel(ref_file_path, sheet_name='CURRENCY')
 ref_country = pd.read_excel(ref_file_path, sheet_name='COUNTRY', )
@@ -144,4 +144,10 @@ def rit_all_df(exp_rec,imp_pay,inv_pay,inv_rec,wage_remit):
     return df
 
 
-final_df = rit_all_df(exp_df,imp_pay_df,invisible_pay_df,invisible_rec_df,wage_remit_df)
+#final_df = rit_all_df(exp_df,imp_pay_df,invisible_pay_df,invisible_rec_df,wage_remit_df)
+
+
+########################################### Remittance Reports from DB ########################################
+
+def get_daily_bb_remittance():
+    
