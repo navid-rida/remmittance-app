@@ -4,7 +4,7 @@ from pathlib import Path
 import datetime
 
 ###################### paths ###########################################
-folder_path = ''
+""""folder_path = ''
 export_text_file = 'exprecpt.txt'
 import_payment_text_file = 'imppaynt.txt'
 invisible_payment_text_file = 'invpaynt.txt'
@@ -14,7 +14,7 @@ export_text_path = Path(folder_path,export_text_file)
 import_payment_text_path = Path(folder_path,import_payment_text_file)
 invisible_payment_text_path = Path(folder_path,invisible_payment_text_file)
 invisible_receipt_text_path = Path(folder_path,invisible_receipt_text_file)
-wage_remit_text_path = Path(folder_path,wage_remit_text_file)
+wage_remit_text_path = Path(folder_path,wage_remit_text_file)"""
 
 
 ############################ Reference path and DFs #########################################################
