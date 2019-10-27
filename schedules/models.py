@@ -4,7 +4,7 @@ from rem.validators import validate_neg, validate_post_date, validate_mobile, nu
 # Create your models here.
 
 class Currency(models.Model):
-    name = models.CharField("Name of Currenct", max_length=40)
+    name = models.CharField("Name of Currenct", max_length=50)
     ccy_id = models.CharField("CCY ID", max_length=4,  validators=[numeric])
     cur_code = models.CharField("Currency Code", max_length=3,  validators=[numeric])
 
