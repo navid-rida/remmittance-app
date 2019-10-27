@@ -150,4 +150,4 @@ def rit_all_df(exp_rec,imp_pay,inv_pay,inv_rec,wage_remit):
 ########################################### Remittance Reports from DB ########################################
 
 def get_daily_bb_remittance():
-    
+    pass
