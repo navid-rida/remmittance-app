@@ -12,9 +12,12 @@ class EmployeeInline(admin.StackedInline):
 class UserAdmin(BaseUserAdmin):
     inlines = (EmployeeInline, )
 
+class RemmitAdmin(admin.ModelAdmin):
+    search_fields = ('reference',)
+
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-admin.site.register(Remmit)
+admin.site.register(Remmit, RemmitAdmin)
 admin.site.register(Branch)
 admin.site.register(ExchangeHouse)
 admin.site.register(Employee)
