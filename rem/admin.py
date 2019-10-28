@@ -15,6 +15,9 @@ class UserAdmin(BaseUserAdmin):
 class RemmitAdmin(admin.ModelAdmin):
     search_fields = ('reference',)
 
+class ReceiverAdmin(admin.ModelAdmin):
+    search_fields = ('idno','name')
+
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(Remmit, RemmitAdmin)
@@ -22,7 +25,7 @@ admin.site.register(Branch)
 admin.site.register(ExchangeHouse)
 admin.site.register(Employee)
 admin.site.register(Country)
-admin.site.register(Receiver)
+admin.site.register(Receiver,ReceiverAdmin)
 admin.site.register(Requestpay)
 admin.site.register(Payment)
 admin.site.register(ReceiverUpdateHistory)
