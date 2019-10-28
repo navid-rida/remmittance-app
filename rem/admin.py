@@ -16,7 +16,7 @@ class RemmitAdmin(admin.ModelAdmin):
     search_fields = ('reference',)
 
 class ReceiverAdmin(admin.ModelAdmin):
-    search_fields = ('idno','name')
+    search_fields = ('idno','name','cell')
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
