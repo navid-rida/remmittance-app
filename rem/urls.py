@@ -28,6 +28,7 @@ urlpatterns = [
     path('detail/req/<int:pk>/', views.RequestpayDetailView.as_view(), name='requestpay-detail'),
     path('detail/remittance/<int:pk>/', views.RemmitDetailView.as_view(), name='remitt-detail'),
     path('resubmit/req/<int:pk>/', views.request_resubmit, name='requestpay-resubmit'),
+    path('detail/mark_paid/<int:pk>/', views.pay_unpaid_incentive, name='pay_unpaid_incentive'),
     ############################## USer Regestration & Authentication #########################
     path('signup', views.signup, name='signup'),
     ############################ report ################################

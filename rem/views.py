@@ -26,7 +26,7 @@ from django_registration import signals
 ################################ Reports ######################
 from .summary_report import exchange_housewise_remittance_summary, cash_incentive_bb_statement
 ############################ Rules and Permissions #########################
-from rules.contrib.views import PermissionRequiredMixin, permission_required
+from rules.contrib.views import PermissionRequiredMixin, permission_required, objectgetter
 #from rules.contrib.views import permission_required
 import rem.rule_set
 # Create your views here.
@@ -662,6 +662,8 @@ class RemmitInfoCreate(SuccessMessageMixin, CreateView):
         form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.02)
         self.object = form.save(commit=False)
         # in case you want to modify the object before commit
+        if self.object.cash_incentive_status=='P':
+            self.object.date_cash_incentive_paid=timezone.now()
         self.object.save()
         req = Requestpay(remittance=self.object, created_by=self.request.user, status='PD', ip=get_client_ip(self.request))
         req.save()
@@ -690,6 +692,8 @@ class RemmitInfoUpdate(PermissionRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.02)
+        if form.has_changed() and 'cash_incentive_status' in form.changed_data:
+            raise ValidationError('Payment status cannot be changed form this view')
         self.object = form.save(commit=False)
         # in case you want to modify the object before commit
         self.object.save()
@@ -703,7 +707,24 @@ class RemmitInfoUpdate(PermissionRequiredMixin, UpdateView):
         update.save()
         return super().form_valid(form)
 
-
+@login_required
+@permission_required('rem.change_remmit', fn=objectgetter(Remmit, 'pk'))
+@transaction.atomic
+def pay_unpaid_incentive(request, pk):
+    rem = Remmit.objects.get(pk=pk)
+    result = rem.pay_previously_unpaid_cash_incentive()
+    if result:
+        update = RemittanceUpdateHistory()
+        update.remittance= result
+        update.createdby = request.user
+        update.ip = get_client_ip(request)
+        update.save()
+        messages.success(request, 'Cash incentive now marked as paid')
+        return redirect('show_rem')
+    else:
+        messages.warning(request, 'Cannot process the request right now')
+        return redirect('show_rem')
+    #return render(request,'rem/forms/remmit_resubmit.html',context)
 ################################ Reports ################################
 
 @login_required
