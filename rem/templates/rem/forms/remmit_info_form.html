@@ -33,6 +33,17 @@
       </div>
       <div class="form-row">
         <div class="col-auto">
+          {{ form.currency.label_tag}}
+          {{ form.currency|add_class:"form-control"}}
+          {% for error in form.currency.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-auto">
           {{ form.relationship.label_tag}}
           {{ form.relationship|add_class:"form-control"}}
           {% for error in form.relationship.errors %}

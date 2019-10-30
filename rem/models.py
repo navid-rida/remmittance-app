@@ -19,6 +19,8 @@ from django.utils.translation import gettext_lazy as _
 ####################### Rules ################################
 import rem.rule_set
 import rules
+################################### Other app models ##################
+from schedules.models import District, Currency
 
 ######################### Custom Managers ###############################
 # Create your models here.
@@ -26,8 +28,8 @@ import rules
 class Branch(models.Model):
     name = models.CharField("Name of The branch", max_length=20,default='Principal')
     code = models.CharField("Branch Code", validators=[numeric], max_length=4,default='0101')
-    ad_code = models.CharField("AD Code", validators=[numeric], max_length=4, null=True)
-    division = models.CharField("Division", validators=[alpha], max_length=20)
+    ad_fi_code = models.CharField("AD Code", validators=[numeric], max_length=4, null=True)
+    district = models.ForeignKey(District, on_delete=models.CASCADE, verbose_name='District', null=True)
     address = models.TextField("Address of the branch")
 
     def __str__(self):
@@ -231,6 +233,7 @@ class ExchangeHouse(models.Model):
 
 class Remmit(models.Model):
     exchange = models.ForeignKey(ExchangeHouse,on_delete=models.CASCADE, verbose_name='Channel of Remittance')
+    currency = models.ForeignKey(Currency,on_delete=models.CASCADE, verbose_name='Currency of Remittance', default=Currency.objects.get(name='BANGLADESHI TAKA').id)
     rem_country = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Remitting Country')
     sender = models.CharField("Name of Remitter", validators=[name], max_length=50)
     sender_occupation = models.CharField("Occupation of Remitter", validators=[alpha], max_length=50, null=True, blank=True)
@@ -252,6 +255,7 @@ class Remmit(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, null=True, blank=True)
     date_sending = models.DateField("Date of Sending Remittance from Abroad")
+    date_cash_incentive_paid = models.DateTimeField("Date of Cash Incentive payment", null=True, blank= True)
     date_cash_incentive_settlement = models.DateField("Date of Cash Incentive Settlement", null=True, blank= True)
     date_create = models.DateTimeField("Date of posting", auto_now_add=True)
     date_edited = models.DateTimeField("Date of last modified", auto_now=True)
@@ -267,13 +271,34 @@ class Remmit(models.Model):
         (PAID, 'Amount Payable to Customer'),
         )
     status=models.CharField("Request Status",max_length=2, choices=STATUS_CHOICES, default=REVIEW)"""
+
     def __str__(self):
         return self.reference+" on "+self.branch.name
+
+    def clean(self):
+        if self.cash_incentive_status=='U' and self.date_cash_incentive_paid is not None:
+            raise ValidationError({'cash_incentive_status': _('A remittance cannot be marked unpaid once it is paid')})
 
     def get_completed_payment(self):
         r = self.requestpay_set.order_by('datecreate',).last()
         if r.payment:
             return r.payment
+        else:
+            return False
+
+    def check_unpaid_cash_incentive(self):
+        if self.cash_incentive_status=='U' and self.date_cash_incentive_paid is None:
+            return True
+        else:
+            return False
+
+    def pay_previously_unpaid_cash_incentive(self):
+        if self.check_unpaid_cash_incentive():
+            self.cash_incentive_status='P'
+            self.date_cash_incentive_paid=timezone.now()
+            self.save()
+            self.refresh_from_db()
+            return self
         else:
             return False
 

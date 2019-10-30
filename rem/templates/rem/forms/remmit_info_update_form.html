@@ -22,71 +22,80 @@
       </div>
       <div class="form-row">
         <div class="col-auto">
+          {{ form.exchange.label_tag}}
+          {{ form.exchange|add_class:"form-control"}}
           {% for error in form.exchange.errors %}
           <div class="alert alert-danger" role="alert">
             {{error}}
           </div>
           {% endfor %}
-          {{ form.exchange.label_tag}}
-          {{ form.exchange|add_class:"form-control"}}
         </div>
       </div>
       <div class="form-row">
         <div class="col-auto">
+          {{ form.currency.label_tag}}
+          {{ form.currency|add_class:"form-control"}}
+          {% for error in form.currency.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-auto">
+          {{ form.relationship.label_tag}}
+          {{ form.relationship|add_class:"form-control"}}
           {% for error in form.relationship.errors %}
           <div class="alert alert-danger" role="alert">
             {{error}}
           </div>
           {% endfor %}
-          {{ form.relationship.label_tag}}
-          {{ form.relationship|add_class:"form-control"}}
         </div>
       </div>
       <div class="form-row">
         <div class="col-auto">
+          {{ form.purpose.label_tag}}
+          {{ form.purpose|add_class:"form-control"}}
           {% for error in form.purpose.errors %}
           <div class="alert alert-danger" role="alert">
             {{error}}
           </div>
           {% endfor %}
-          {{ form.purpose.label_tag}}
-          {{ form.purpose|add_class:"form-control"}}
         </div>
       </div>
       <div class="form-row">
         <div class="col-auto">
+          {{ form.rem_country.label_tag}}
+          {{ form.rem_country|add_class:"form-control"}}
           {% for error in form.rem_country.errors %}
           <div class="alert alert-danger" role="alert">
             {{error}}
           </div>
           {% endfor %}
-          {{ form.rem_country.label_tag}}
-          {{ form.rem_country|add_class:"form-control"}}
         </div>
       </div>
       <div class="form-row">
         <div class="col-auto">
-
+          {{ form.reference.label_tag}}
+          {{ form.reference|add_class:"form-control"}}
           {% for error in form.reference.errors %}
           <div class="alert alert-danger" role="alert">
             {{error}}
           </div>
           {% endfor %}
-          {{ form.reference.label_tag}}
-          {{ form.reference|add_class:"form-control"}}
 
         </div>
       </div>
       <div class="form-row">
         <div class="col-auto">
-
+          {{ form.sender.label_tag}}
+          {{ form.sender|add_class:"form-control"}}
           {% for error in form.sender.errors %}
           <div class="alert alert-danger" role="alert">
             {{error}}
           </div>
           {% endfor %}
-          {{ form.sender.label_tag}}
-          {{ form.sender|add_class:"form-control"}}
         </div>
       </div>
       <div class="form-row">
@@ -102,35 +111,35 @@
       </div>
       <div class="form-row">
         <div class="col-auto">
+          {{ form.date_sending.label_tag}}
+          {{ form.date_sending|add_class:"form-control date"}}
           {% for error in form.date_sending.errors %}
           <div class="alert alert-danger" role="alert">
             {{error}}
           </div>
           {% endfor %}
-          {{ form.date_sending.label_tag}}
-          {{ form.date_sending|add_class:"form-control date"}}
         </div>
       </div>
       <div class="form-row">
         <div class="col-auto">
+          {{ form.amount.label_tag}}
+          {{ form.amount|add_class:"form-control"}}
           {% for error in form.amount.errors %}
           <div class="alert alert-danger" role="alert">
             {{error}}
           </div>
           {% endfor %}
-          {{ form.amount.label_tag}}
-          {{ form.amount|add_class:"form-control"}}
         </div>
       </div>
       <div class="form-row">
         <div class="col-auto">
+          {{ form.cash_incentive_status.label_tag}}
+          {{ form.cash_incentive_status|add_class:"form-control"}}
           {% for error in form.cash_incentive_status.errors %}
           <div class="alert alert-danger" role="alert">
             {{error}}
           </div>
           {% endfor %}
-          {{ form.cash_incentive_status.label_tag}}
-          {{ form.cash_incentive_status|add_class:"form-control"}}
         </div>
       </div>
       <div class="form-row">
@@ -149,13 +158,13 @@
       </div>
       <div class="form-row">
         <div class="col-auto">
+          {{ form.screenshot.label_tag}}
+          {{ form.screenshot|add_class:"form-control"}}
           {% for error in form.screenshot.errors %}
           <div class="alert alert-danger" role="alert">
             {{error}}
           </div>
           {% endfor %}
-          {{ form.screenshot.label_tag}}
-          {{ form.screenshot|add_class:"form-control"}}
         </div>
       </div>
       <input type="submit" class="btn btn-primary element_margin" value="Submit" />
