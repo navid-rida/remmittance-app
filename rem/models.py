@@ -6,6 +6,7 @@ from .validators import validate_neg, validate_post_date, validate_mobile, numer
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 from django.utils import timezone
+import datetime
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
@@ -287,7 +288,7 @@ class Remmit(models.Model):
             return False
 
     def check_unpaid_cash_incentive(self):
-        if self.cash_incentive_status=='U' and self.date_cash_incentive_paid is None:
+        if self.cash_incentive_status=='U' and self.date_cash_incentive_paid is None and self.date_create.date>datetime.date(2019,6,30):
             return True
         else:
             return False
@@ -296,6 +297,7 @@ class Remmit(models.Model):
         if self.check_unpaid_cash_incentive():
             self.cash_incentive_status='P'
             self.date_cash_incentive_paid=timezone.now()
+            self.cash_incentive_amount=self.amount*Decimal(0.02)
             self.save()
             self.refresh_from_db()
             return self
