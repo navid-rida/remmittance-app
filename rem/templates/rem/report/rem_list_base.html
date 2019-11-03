@@ -157,7 +157,7 @@
                 <td>{{entry.requestpay.remittance.date_create|localtime}}</td>
                 <td>{{entry.requestpay.created_by}}</td>
                 <td>{{entry.requestpay.created_by.employee.cell}}</td>
-                <td><a class="btn btn-success btn-sm" href="{% url 'requestpay-detail' entry.requestpay.pk %}"><i class="fas fa-info-square"></i> Details</a></td>
+                <td><a class="btn btn-success btn-sm" href="{% url 'remitt-detail' entry.requestpay.remittance.pk %}"><i class="fas fa-info-square"></i> Details</a></td>
             </tr>
 
             {% endfor %}
