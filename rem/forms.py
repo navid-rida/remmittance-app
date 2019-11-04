@@ -1,7 +1,7 @@
 from .models import Remmit, ExchangeHouse, Branch, Receiver, Requestpay, Country,Booth
 from django.forms import ModelForm
 from django import forms
-#from datetime import date,datetime
+from datetime import date
 from django.utils import timezone
 from .validators import *
 #import floppyforms as floppy
@@ -47,6 +47,14 @@ class RemmitForm(ModelForm):
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
         return cash_incentive_status
+
+    def clean_date_sending(self):
+        date_sending = self.cleaned_data['date_sending']
+        if date_sending < date(2019,7,1):
+            raise ValidationError('Validation error: date is too far away')
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return date_sending
 
     def clean(self):
         cleaned_data = super().clean()
