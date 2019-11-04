@@ -29,7 +29,7 @@ from schedules.models import District, Currency
 class Branch(models.Model):
     name = models.CharField("Name of The branch", max_length=20,default='Principal')
     code = models.CharField("Branch Code", validators=[numeric], max_length=4,default='0101')
-    ad_fi_code = models.CharField("AD Code", validators=[numeric], max_length=4, null=True)
+    ad_fi_code = models.CharField("AD Code", validators=[numeric], max_length=4, null=True, blank=True)
     district = models.ForeignKey(District, on_delete=models.CASCADE, verbose_name='District', null=True)
     address = models.TextField("Address of the branch")
 
