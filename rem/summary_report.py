@@ -51,8 +51,10 @@ def cash_incentive_bb_statement(qset,start_date, end_date, cash_incentive_status
     cash_incentive_amount=[]
     date_remittance_paid=[]
     remarks=[]
+    reference=[]
+    branch=[]
     for r in q:
-        ben_name_address.append(r.receiver.name+' , '+r.receiver.address)
+        ben_name_address.append(r.receiver.name)
         ben_id.append(r.receiver.idno)
         ben_acc.append(r.receiver.ac_no)
         bank_name.append("NRB Commercial Bank")
@@ -63,10 +65,12 @@ def cash_incentive_bb_statement(qset,start_date, end_date, cash_incentive_status
         fc_amount.append(None)
         exchange_rate.append(None)
         lc_amount.append(r.amount)
-        trn_type.append('MFS')
+        trn_type.append('Cash Pick-up')
         cash_incentive_amount.append(r.cash_incentive_amount)
         date_remittance_paid.append(r.date_cash_incentive_settlement)
         remarks.append('')
+        reference.append(r.reference)
+        branch.append(r.branch.name)
     dct = {"Benificiary Name & Address": ben_name_address,
             "Identification": ben_id,
             "Benificiary Account": ben_acc,
@@ -81,7 +85,9 @@ def cash_incentive_bb_statement(qset,start_date, end_date, cash_incentive_status
             "Type":trn_type,
             "Incentive Amount": cash_incentive_amount,
             "Date of Payment": date_remittance_paid,
-            "Remrks": remarks
+            "Remrks": remarks,
+            "Reference": reference,
+            "Branch": branch,
             }
     df = pd.DataFrame(dct)
     return df
