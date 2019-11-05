@@ -34,7 +34,7 @@ def exchange_housewise_remittance_summary(list, year=None, month=None, start_dat
     #total_df = branch_total_list
     return branch_booth_total_list
 
-def cash_incentive_bb_statement(qset,start_date, end_date, cash_incentive_status='P', cash_incentive_settlement_done=True):
+def cash_incentive_bb_statement(qset):
     q = qset
     ben_name_address=[]
     ben_id=[]
