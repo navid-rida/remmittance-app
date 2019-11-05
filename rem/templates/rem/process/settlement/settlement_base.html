@@ -1,0 +1,39 @@
+{% extends "rem/base.html" %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block js %}
+
+
+{% endblock %}
+{% block title %} Remittance Settlement {% endblock %}
+{% block content %}
+
+<br>
+<form enctype="multipart/form-data" method="post">
+  {% csrf_token %}
+  {% for field in form %}
+  <div class='form-row'>
+    <div class="col-auto">
+      {% for error in field.errors %}
+      <div class="alert alert-danger" role="alert">{{ error}}</div>
+      {% endfor %}
+      {{field.label_tag}}
+      {{field|add_class:"form-control"}}
+    </div>
+  </div>
+  {% endfor %}
+  <div class='form-row'>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary btn-sm mb-2 element_margin" value="submit" name="_download">Download</button>
+    </div>
+  </div>
+</form>
+</br>
+
+{% if list %}
+  {%for reference in list%}
+    {{ reference }}
+  {% endfor %}
+{% endif %}
+{% block error %}{% endblock %}
+{% endblock %}

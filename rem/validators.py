@@ -6,6 +6,7 @@ from django.core.validators import RegexValidator,_lazy_re_compile
 from django.conf import settings
 ################# models ##############################
 
+###################### Regular Expressiosions ################################################
 
 western_union = RegexValidator(
     _lazy_re_compile(r'^[0-9]{10}$'),

@@ -13,6 +13,7 @@ urlpatterns = [
     path('show/select-entry', views.select_rem_list, name='select_rem_list'),
     path('show/select-cash-incentive', views.select_cash_incentive_list, name='select-cash-incentive'),
     path('show/mark-settle', views.mark_rem_list, name='mark_rem_list'),
+    path('mark-settle', views.mark_settle_all, name='mark_settle_all'),
     path('show/cash-incentive-mark-settle', views.mark_cash_incentive_list, name='mark_cash_incentive_list'),
     #path('download/daily-remmittance-csv', views.download_bb_excel, name='download_csv'),
     path('download/daily-remmittance-exc', views.download_selected_excel, name='download_exc'),

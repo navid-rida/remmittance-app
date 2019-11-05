@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect, get_object_or_404#, render_to_response
 from django.http import HttpResponse
-from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm
+from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm, SettlementForm
 from django.contrib.auth.decorators import login_required,user_passes_test
 from .models import Remmit, Requestpay, Payment, Receiver,Employee, ReceiverUpdateHistory,RemittanceUpdateHistory, Branch, Booth
 import datetime
@@ -234,6 +234,7 @@ def select_rem_list(request):
 
     return render(request, 'rem/report/download_excel.html', context)
 
+
 @login_required
 @user_passes_test(check_headoffice)
 def select_cash_incentive_list(request):
@@ -451,6 +452,45 @@ def mark_settle(request):
         context = {'done_list': done_list, 'form':form}
         return render(request, 'rem/report/mark_settle.html', context)
     #return redirect('mark_rem_list')
+
+@login_required
+@user_passes_test(check_headoffice)
+@transaction.atomic
+def mark_settle_all(request):
+    context={}
+    if request.method == 'POST':
+        form = SettlementForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES.get('batchfile')
+            settlement_type = request.POST['settlemnt_type']
+            df = pd.read_csv(file,names=['date', 'branch_code', 'ac_no', 'type', 'amount', 'narrations', 'flags'],sep='\t')
+            lst = get_reference_no_list_from_df(df)
+            if settlement_type=='remittance':
+                q = Payment.objects.filter(requestpay__remittance__reference__in=lst)
+                for item in q:
+                    ref = item.requestpay.remittance.reference
+                    item = item.settle_remittance(user=request.user)
+                    if item:
+                        item.save()
+                        messages.success(request, ref+" Successfully Settled")
+                    else:
+                        messages.error(request, ref+' Cannot be settled')
+            elif settlement_type=='cash_incentive':
+                q = Remmit.objects.filter(reference__in=lst)
+                for item in q:
+                    ref = item.reference
+                    item = item.settle_cash_incentive()
+                    if item:
+                        item.save()
+                        messages.success(request, ref+" Cash Incentive Successfully Settled")
+                    else:
+                        messages.error(request, ref+' Cash Incentive Cannot be settled')
+
+            context = {'list': lst, 'form':form}
+    else:
+        form = SettlementForm()
+        context = {'form':form}
+    return render(request, 'rem/process/settlement/settlement_base.html', context)
 
 @login_required
 @user_passes_test(check_headoffice)
@@ -765,8 +805,8 @@ def summary_report(request):
         context = {'form':form}
         return render(request, 'rem/report/summary/summary_base.html', context)
 
-#@login_required
-#@permission_required('rem.view_ho_br_booth_reports')
+@login_required
+@permission_required('rem.view_ho_br_booth_reports')
 def monthly_cash_incentive_bb_statement(request):
     if request.method == "POST":
         form = SearchForm(request.POST)
@@ -775,8 +815,9 @@ def monthly_cash_incentive_bb_statement(request):
             date_from = form.cleaned_data['date_from']
             date_to = form.cleaned_data['date_to']
             query_set = Remmit.objects.all()
-            q = filter_remittance(query_set, start_date=date_from, end_date= date_to, cash_incentive_status='P', cash_incentive_settlement_done=True)
-            statement = cash_incentive_bb_statement(qset=q, start_date=date_from, end_date= date_to, cash_incentive_status='P', cash_incentive_settlement_done=True)
+            #q = filter_remittance(query_set, start_date=date_from, end_date= date_to, cash_incentive_status='P', cash_incentive_settlement_done=True)
+            q = query_set.filter(date_cash_incentive_settlement__range=(date_from,date_to),cash_incentive_status='P',date_cash_incentive_settlement__isnull=False)
+            statement = cash_incentive_bb_statement(qset=q)
             if '_show' in request.POST:
                 context = {'form':form, 'df': statement, }
                 return render(request, 'rem/report/cash_incentive_bb_statement/cash_incentive_base.html', context)

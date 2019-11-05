@@ -53,8 +53,9 @@
             {% if can_settle %}
             <a class="dropdown-item" href="{% url 'select_rem_list'%}">Remmittance Excel Download</a>
             <a class="dropdown-item" href="{% url 'select-cash-incentive'%}">Cash Incentive Excel Download</a>
-            <a class="dropdown-item" href="{% url 'mark_rem_list'%}">Mark Settled</a>
+            <a class="dropdown-item" href="{% url 'mark_rem_list'%}">Remittance Mark Settled</a>
             <a class="dropdown-item" href="{% url 'mark_cash_incentive_list'%}">Cash Incentive Mark Settled</a>
+            <a class="dropdown-item" href="{% url 'mark_settle_all'%}">Mark Settle (All)</a>
             {% endif %}
             {% comment %}<div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#">Export Import Summary</a>{% endcomment %}

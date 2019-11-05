@@ -3,6 +3,8 @@ import pandas as pd
 from datetime import datetime, date,timedelta
 import io
 from django.db.models import IntegerField, F, Value
+from .validators import validate_western_code,validate_ria,validate_placid, validate_xpress,validate_moneygram
+from django.core.exceptions import ValidationError
 #from rem.models import *
 ####################### fuzzywuzzy imports ##################################
 from fuzzywuzzy import fuzz
@@ -236,3 +238,23 @@ def filter_remittance(query_set, start_date=None, end_date= None, branch= None, 
     if cash_incentive_settlement_done==True:
         r = r.filter(date_cash_incentive_settlement__isnull=False)
     return r.order_by('exchange','-date_create','branch__code')
+
+def get_reference_no_from_narration(narration,validatorlist=[validate_western_code,validate_ria,validate_placid, validate_xpress,validate_moneygram]):
+    """gets all reference number from a narration. returns list"""
+    ref_list = []
+    for e in narration.split():
+        for fn in validatorlist:
+            try:
+                fn(e)
+                if e not in ref_list:
+                    ref_list.append(e)
+            except ValidationError:
+                pass
+    return ref_list
+
+def get_reference_no_list_from_df(df):
+    ref_list= []
+    for index,row in df.iterrows():
+        lst = get_reference_no_from_narration(row['narrations'])
+        ref_list=ref_list+lst
+    return ref_list
