@@ -53,6 +53,8 @@ def cash_incentive_bb_statement(qset,start_date, end_date, cash_incentive_status
     remarks=[]
     reference=[]
     branch=[]
+    dealing_offical=[]
+    dealing_cell=[]
     for r in q:
         ben_name_address.append(r.receiver.name)
         ben_id.append(r.receiver.idno)
@@ -71,6 +73,8 @@ def cash_incentive_bb_statement(qset,start_date, end_date, cash_incentive_status
         remarks.append('')
         reference.append(r.reference)
         branch.append(r.branch.name)
+        dealing_offical.append(r.created_by.first_name+" "+r.created_by.last_name)
+        dealing_cell.append(r.created_by.employee.cell)
     dct = {"Benificiary Name & Address": ben_name_address,
             "Identification": ben_id,
             "Benificiary Account": ben_acc,
@@ -88,6 +92,8 @@ def cash_incentive_bb_statement(qset,start_date, end_date, cash_incentive_status
             "Remrks": remarks,
             "Reference": reference,
             "Branch": branch,
+            "Dealing Official": dealing_offical,
+            "Cell Phone": dealing_cell,
             }
     df = pd.DataFrame(dct)
     return df
