@@ -1,7 +1,7 @@
 from .models import Remmit, ExchangeHouse, Branch, Receiver, Requestpay, Country,Booth
 from django.forms import ModelForm
 from django import forms
-from datetime import date
+from datetime import date, timedelta
 from django.utils import timezone
 from .validators import *
 #import floppyforms as floppy
@@ -50,8 +50,10 @@ class RemmitForm(ModelForm):
 
     def clean_date_sending(self):
         date_sending = self.cleaned_data['date_sending']
-        if date_sending < date(2019,7,1):
+        if date_sending < timezone.now().date() - timedelta(days=90):
             raise ValidationError('Validation error: date is too far away')
+        if date_sending > timezone.now().date():
+            raise ValidationError('Date Sending cannot be a future date')
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
         return date_sending
@@ -127,6 +129,11 @@ class ReceiverForm(ModelForm):
 class ReceiverSearchForm(forms.Form):
     #cell = forms.CharField(label="Enter Customer's Cell No.", validators=[validate_mobile])
     identification = forms.CharField(label="Enter NID/Passport/ Birth Certificate No.")
+
+class SettlementForm(forms.Form):
+    SETTLE_CHOICES= (('remittance','Remittance Settlement'),('cash_incentive','Cash Incentive Settlement'))
+    settlemnt_type = forms.ChoiceField(label="Settlement Type",choices=SETTLE_CHOICES, required=True)
+    batchfile = forms.FileField(label="Upload Batch File", required=True)
 
 class SearchForm(forms.Form):
     #date_from = forms.DateField(label="Starting Date", initial=timezone.now, required=False, input_formats=['%d/%m/%Y','%d/%m/%y','%d-%m-%Y','%d-%m-%y','%Y-%m-%d','%Y/%m/%d'])

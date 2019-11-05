@@ -101,6 +101,9 @@
         <div class="col-auto">
           {{ form.sender_occupation.label_tag}}
           {{ form.sender_occupation|add_class:"form-control"}}
+          {% if form.sender_occupation.help_text %}
+            <small style="color: grey">{{ form.sender_occupation.help_text|safe }}</small>
+          {% endif %}
           {% for error in form.sender_occupation.errors %}
           <div class="alert alert-danger" role="alert">
             {{error}}

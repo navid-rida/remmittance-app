@@ -237,7 +237,7 @@ class Remmit(models.Model):
     currency = models.ForeignKey(Currency,on_delete=models.CASCADE, verbose_name='Currency of Remittance', default=Currency.objects.get(name='BANGLADESHI TAKA').id)
     rem_country = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Remitting Country')
     sender = models.CharField("Name of Remitter", validators=[name], max_length=50)
-    sender_occupation = models.CharField("Occupation of Remitter", validators=[alpha], max_length=50, null=True, blank=True)
+    sender_occupation = models.CharField("Occupation of Remitter", help_text="Service/ Business etc.",validators=[alpha], max_length=50, null=True, blank=True)
     relationship = models.CharField("Relationship to Sender",max_length=50, null=True)
     purpose = models.CharField("Purpose of Transaction",max_length=50, null=True)
     PAID= 'P'
@@ -304,6 +304,22 @@ class Remmit(models.Model):
         else:
             return False
 
+    def cash_incentive_is_settled(self):
+        """Checks whether the payment cash incentive is settled.
+            Returns True if settled else False"""
+        if self.cash_incentive_status=='P' and self.date_cash_incentive_paid and self.date_cash_incentive_settlement:
+            return True
+        else:
+            return False
+
+    def settle_cash_incentive(self):
+        """Checks and settles a cash incentive and return the remittance object. returns false if already settled"""
+        if not self.cash_incentive_is_settled():
+            self.date_cash_incentive_settlement = timezone.now().date()
+            return self
+        else:
+            return False
+
 class RemittanceUpdateHistory(models.Model):
     remittance=models.ForeignKey(Remmit, on_delete=models.CASCADE, verbose_name= "Remittance Entry")
     datecreate = models.DateTimeField("Date of Editing", auto_now_add=True)
@@ -352,3 +368,21 @@ class Payment(models.Model):
 
     def __str__(self):
         return self.requestpay.remittance.reference+" on "+self.requestpay.remittance.branch.name
+
+    def is_settled(self):
+        """Checks whether the payment remittance is settled.
+            Returns True if settled else False"""
+        if self.status=='S' and self.settled_by and self.date_settle:
+            return True
+        else:
+            return False
+
+    def settle_remittance(self,user):
+        """Checks and settles a Payment and return the payment object. returns false if already settled"""
+        if not self.is_settled():
+            self.status = 'S'
+            self.date_settle = timezone.now()
+            self.settled_by=user
+            return self
+        else:
+            return False
