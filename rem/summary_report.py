@@ -56,24 +56,24 @@ def cash_incentive_bb_statement(qset):
     dealing_offical=[]
     dealing_cell=[]
     for r in q:
-        ben_name_address.append(r.receiver.name)
+        ben_name_address.append(r.receiver.name.upper())
         ben_id.append(r.receiver.idno)
         ben_acc.append(r.receiver.ac_no)
-        bank_name.append("NRB Commercial Bank")
-        sender_name.append(r.sender)
-        sender_occupation.append(r.sender_occupation)
+        bank_name.append("NRBC BANK")
+        sender_name.append(r.sender.upper())
+        sender_occupation.append(r.sender_occupation.upper() if r.sender_occupation else None)
         exchange_house.append(r.exchange.name)
         date_sending_remittance.append(r.date_sending)
         fc_amount.append(None)
         exchange_rate.append(None)
         lc_amount.append(r.amount)
-        trn_type.append('Cash Pick-up')
+        trn_type.append('CASH PICKUP')
         cash_incentive_amount.append(r.cash_incentive_amount)
         date_remittance_paid.append(r.date_cash_incentive_settlement)
         remarks.append('')
         reference.append(r.reference)
-        branch.append(r.branch.name)
-        dealing_offical.append(r.created_by.first_name+" "+r.created_by.last_name)
+        branch.append(r.branch.name.upper())
+        dealing_offical.append(r.created_by.first_name.upper()+" "+r.created_by.last_name.upper())
         dealing_cell.append(r.created_by.employee.cell)
     dct = {"Benificiary Name & Address": ben_name_address,
             "Identification": ben_id,
