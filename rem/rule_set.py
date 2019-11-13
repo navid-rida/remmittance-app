@@ -1,4 +1,6 @@
 import rules
+from django.utils import timezone
+from datetime import time
 from rem.DataModels import get_client_ip, get_branch_from_ip
 
 @rules.predicate
@@ -12,6 +14,10 @@ def is_same_branch_user(user,remittance):
 @rules.predicate
 def is_same_branch_user(user,remittance):
     return remittance.branch == user.employee.branch
+
+@rules.predicate
+def is_transaction_hour(user):
+    return time(9,59)<timezone.localtime().time()<time(16,16)
 
 #is_branch_report_user = rules.is_group_member('branch user')
 is_branch_remittance_user = rules.is_group_member('Branch Remittance Info Submission User')
@@ -40,3 +46,4 @@ rules.add_perm('rem.can_settle_remitts_cash_incentive', is_ho_settlement_user)
 #---------------------------------------------------------------------------------
 
 rules.add_perm('rem.change_reciver', is_entry_creator | rules.is_superuser )
+rules.add_perm('rem.allow_if_transaction_hour', is_transaction_hour )

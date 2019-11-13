@@ -42,15 +42,13 @@ MAXIMUM_AllOWWED_USER_PER_BRANCH = settings.MAXIMUM_USER_PER_BRANCH
         return True"""
 
 @method_decorator([login_required,transaction.atomic], name='dispatch')
-class RemmitCreate(SuccessMessageMixin, CreateView):
+class RemmitCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     model = Remmit
     form_class = RemmitForm
+    permission_required = ['rem.add_remmit','rem.allow_if_transaction_hour']
     template_name = 'rem/forms/remmit_create_form.html'
     success_message = "Remittance request was submitted successfully"
     success_url = reverse_lazy('index')
-
-    """def get_success_url(self):
-        return reverse('add_req', kwargs={'pk': self.object.id})"""
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -65,10 +63,12 @@ class RemmitCreate(SuccessMessageMixin, CreateView):
         return super().form_valid(form)
 
 @method_decorator([login_required,transaction.atomic], name='dispatch')
-class RemmitUpdate(UpdateView):
+class RemmitUpdate(PermissionRequiredMixin, SuccessMessageMixin,UpdateView):
     model = Remmit
     form_class = RemmitForm
+    permission_required = ['rem.change_remmit','rem.allow_if_transaction_hour']
     template_name = 'rem/forms/remmit_update_form.html'
+    success_message = "Remittance request was updated successfully"
     success_url = reverse_lazy('show_rem')
 
     def form_valid(self, form):
@@ -318,7 +318,7 @@ def mark_cash_incentive_list(request):
 
 
 @login_required
-@permission_required('rem.add_remmit')
+@permission_required(['rem.add_remmit','rem.allow_if_transaction_hour'])
 #@user_passes_test(check_branch)
 #@user_passes_test(check_headoffice)
 def search_receiver(request):
@@ -343,9 +343,10 @@ def search_receiver(request):
 
 
 @method_decorator([login_required,transaction.atomic],name='dispatch')
-class ReceiverCreate(SuccessMessageMixin, CreateView):
+class ReceiverCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
     model = Receiver
     form_class = ReceiverForm
+    permission_required = ['rem.allow_if_transaction_hour','rem.add_remmit']
     template_name = 'rem/forms/receiver_create_form.html'
     success_message = "Customer was created successfully"
     #success_url = reverse_lazy('remmit-create',args=(self.object.id,))
@@ -367,11 +368,12 @@ class ReceiverCreate(SuccessMessageMixin, CreateView):
         return context"""
 
 @method_decorator([login_required,transaction.atomic],name='dispatch')
-class ReceiverUpdate(PermissionRequiredMixin, UpdateView):
+class ReceiverUpdate(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Receiver
-    permission_required = 'rem.change_reciver'
+    permission_required = ['rem.change_reciver','rem.allow_if_transaction_hour']
     form_class = ReceiverForm
     template_name = 'rem/forms/receiver_edit_form.html'
+    success_message = "Customer was updated successfully"
     #success_url = reverse_lazy('remmit-create',args=(self.object.id,))
 
     """def test_func(self):
@@ -681,9 +683,9 @@ class UserRegistrationView(RegistrationView):
 ############################################# Only information Update #########################################################
 
 @method_decorator([login_required,transaction.atomic], name='dispatch')
-class RemmitInfoCreate(SuccessMessageMixin, CreateView):
+class RemmitInfoCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
     model = Remmit
-    #permission_required = 'rem.add_remmit'
+    permission_required = ['rem.add_remmit','rem.allow_if_transaction_hour']
     form_class = RemittInfoForm
     template_name = 'rem/forms/remmit_info_form.html'
     success_message = "Remittance information was submitted successfully"
@@ -713,7 +715,7 @@ class RemmitInfoCreate(SuccessMessageMixin, CreateView):
         return super().form_valid(form)
 
 @method_decorator([login_required,transaction.atomic], name='dispatch')
-class RemmitInfoUpdate(PermissionRequiredMixin, UpdateView):
+class RemmitInfoUpdate(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
 
     """def test_func(self):
         id = int(self.kwargs['pk'])
@@ -725,10 +727,11 @@ class RemmitInfoUpdate(PermissionRequiredMixin, UpdateView):
             return False"""
 
     model = Remmit
-    permission_required = 'rem.change_remmit'
+    permission_required = ['rem.change_remmit','rem.allow_if_transaction_hour']
     form_class = RemittInfoForm
     template_name = 'rem/forms/remmit_info_update_form.html'
     success_url = reverse_lazy('show_rem')
+    success_message = "Remittance information was updated successfully"
 
     def form_valid(self, form):
         form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.02)
@@ -748,7 +751,7 @@ class RemmitInfoUpdate(PermissionRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 @login_required
-@permission_required('rem.change_remmit', fn=objectgetter(Remmit, 'pk'))
+@permission_required(['rem.change_remmit','rem.allow_if_transaction_hour'], fn=objectgetter(Remmit, 'pk'))
 @transaction.atomic
 def pay_unpaid_incentive(request, pk):
     rem = Remmit.objects.get(pk=pk)
