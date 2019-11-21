@@ -15,6 +15,9 @@ class UserAdmin(BaseUserAdmin):
 class RemmitAdmin(admin.ModelAdmin):
     search_fields = ('reference',)
 
+class PaymentAdmin(admin.ModelAdmin):
+    search_fields = ('requestpay__remittance__reference',)
+
 class ReceiverAdmin(admin.ModelAdmin):
     search_fields = ('idno','name','cell')
 
