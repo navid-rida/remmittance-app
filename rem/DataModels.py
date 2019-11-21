@@ -7,6 +7,7 @@ from .validators import validate_western_code,validate_ria,validate_placid, vali
 from django.core.exceptions import ValidationError
 #from rem.models import *
 ####################### fuzzywuzzy imports ##################################
+from .search import remittance_search
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
@@ -223,7 +224,7 @@ def get_branch_from_ip(ip):
     return branch
 
 ################################# Remittance list Search ########################################
-def filter_remittance(query_set, start_date=None, end_date= None, branch= None, booth= None, exchange_house=None, cash_incentive_status=None, cash_incentive_settlement_done=None):
+def filter_remittance(query_set, start_date=None, end_date= None, branch= None, booth= None, exchange_house=None, cash_incentive_status=None, cash_incentive_settlement_done=None,keyword=None):
     r = query_set
     if start_date and end_date:
         r = r.filter(date_create__date__range=(start_date,end_date))
@@ -233,6 +234,8 @@ def filter_remittance(query_set, start_date=None, end_date= None, branch= None, 
         r = r.filter(booth=booth)
     if exchange_house:
         r = r.filter(exchange=exchange_house)
+    if keyword:
+        r=remittance_search(keyword,r)
     if cash_incentive_status:
         r = r.filter(cash_incentive_status=cash_incentive_status)
     if cash_incentive_settlement_done==True:

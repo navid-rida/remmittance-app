@@ -53,7 +53,7 @@
             {% if can_settle %}
             <a class="dropdown-item" href="{% url 'select_rem_list'%}">Remmittance Excel Download</a>
             <a class="dropdown-item" href="{% url 'select-cash-incentive'%}">Cash Incentive Excel Download</a>
-            
+
             <a class="dropdown-item" href="{% url 'mark_settle_all'%}">Mark Settle (All)</a>
             {% endif %}
             {% comment %}<div class="dropdown-divider"></div>
@@ -69,6 +69,9 @@
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             {% comment %}<a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Request</a>{% endcomment %}
             <a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Information</a>
+            {% if can_view_summary_report_menu %}
+              <a class="dropdown-item" href="{% url 'search_remittance'%}">Search Remittance</a>
+            {% endif %}
             {% comment %}<a class="dropdown-item" href="{% url 'remmit-create'%}">Remmittance Entry</a>
             <a class="dropdown-item" href="#">Quarterly Meeting minutes</a>
             <div class="dropdown-divider"></div>

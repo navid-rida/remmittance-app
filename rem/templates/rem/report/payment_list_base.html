@@ -3,6 +3,7 @@
 {% load humanize %}
 {% block js %}
 {% load l10n %}
+{% load rules %}
 
 {% endblock %}
 {% block title %} Remittance List {% endblock %}
@@ -32,6 +33,9 @@
             {{form.exchange.label_tag}}
             {{form.exchange|add_class:"form-control"}}
         </div>
+        {% has_perm 'rem.view_branch_remitt' user as branch_user %}
+        {% has_perm 'rem.view_ho_br_booth_reports' user as ho_user %}
+        {% if branch_user or ho_user %}
         <div class="col-auto">
             {% for error in form.booth.errors %}
               <div class="alert alert-danger" role="alert">{{ error}}</div>
@@ -39,7 +43,15 @@
             {{form.booth.label_tag}}
             {{form.booth|add_class:"form-control"}}
         </div>
+        {% endif %}
         {% block branch_dropdown %} {% endblock %}
+        <div class="col-auto">
+            {% for error in form.keyword.errors %}
+              <div class="alert alert-danger" role="alert">{{ error}}</div>
+            {% endfor %}
+            {{form.keyword.label_tag}}
+            {{form.keyword|add_class:"form-control"}}
+        </div>
     </div>
     <div class='form-row'>
       <div class="col-auto">

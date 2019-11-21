@@ -114,6 +114,17 @@ def validate_placid(value):
 def validate_moneygram(value):
     return moneygram_re(value)
 
+def validate_ref_no(value):
+    validator_list=[western_union,placid_re,ria_re,xpress_re,moneygram_re]
+    for validator in validator_list:
+        try:
+            validator(value)
+            return True
+        except ValidationError:
+            pass
+    raise ValidationError('This is not a valid reference/MTCN')
+
+
 def validate_mobile(value):
     return mobile_re(value)
 

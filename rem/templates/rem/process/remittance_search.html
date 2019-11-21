@@ -1,0 +1,58 @@
+{% extends "rem/base.html" %}
+{% load widget_tweaks %}
+{% block title %} Search Remittance {% endblock %}
+{% block content %}
+<br>
+<h4>Search Remittance</h4>
+<p>Please enter your receiver's Photo ID No. (NID, Passport, Birth Certificate)</p>
+<form method="post" class="form-inline">
+    {% csrf_token %}
+    <div class='form-row'>
+        <div class="col-auto">
+            <i class="fa fa-search" aria-hidden="true"></i>{{form.keyword}}
+            {{form.keyword.errors}}
+
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary btn-md mb-2">Find</button>
+        </div>
+    </div>
+</form>
+</br>
+{% if rem_list %}
+<table id="table_search_results" class='table table-hover table-sm'>
+    <thead>
+        <tr>
+            <th scope="col">Sl</th>
+            <th scope="col">Branch</th>
+            <th scope="col">Country</th>
+            <th scope="col">Ref. No</th>
+            <th scope="col">Status</th>
+            <th scope="col">Sender</th>
+            <th scope="col">Benificiary</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Date Paid</th>
+            <th scope="col">Posting Date</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    {% for entry in rem_list %}
+    <tbody>
+        <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{entry.branch}}</td>
+            <td>{{entry.rem_country}}</td>
+            <td>{{entry.reference}}</td>
+            <td>{{entry.status_verbose}}</td>
+            <td>{{entry.sender.title}}</td>
+            <td>{{entry.reciever.title}}</td>
+            <td>{{entry.amount}}</td>
+            <td>{{entry.date}}</td>
+            <td>{{entry.date_create}}</td>
+            <td><a class="btn btn-success btn-sm" href="{% url 'remitt-detail' entry.pk %}"><i class="fas fa-info-square"></i> Details</a></td>
+        </tr>
+    </tbody>
+  {% endfor %}
+{% endif %}
+
+{% endblock %}

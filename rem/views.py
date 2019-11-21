@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect, get_object_or_404#, render_to_response
 from django.http import HttpResponse
-from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm, SettlementForm
+from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm, SettlementForm, MultipleSearchForm
 from django.contrib.auth.decorators import login_required,user_passes_test
 from .models import Remmit, Requestpay, Payment, Receiver,Employee, ReceiverUpdateHistory,RemittanceUpdateHistory, Branch, Booth
 import datetime
@@ -29,6 +29,8 @@ from .summary_report import exchange_housewise_remittance_summary, cash_incentiv
 from rules.contrib.views import PermissionRequiredMixin, permission_required, objectgetter
 #from rules.contrib.views import permission_required
 import rem.rule_set
+##################### Searching#########################
+from rem.search import remittance_search
 # Create your views here.
 
 MAXIMUM_AllOWWED_USER_PER_BRANCH = settings.MAXIMUM_USER_PER_BRANCH
@@ -138,9 +140,10 @@ def show_rem(request):
             #filt['status'] = 'PD'
             branch = form.cleaned_data['branch']
             booth = form.cleaned_data['booth']
+            keyword = form.cleaned_data['keyword']
             #filt['resubmit_flag'] = False
             #filter_args = {k:v for k,v in filt.items() if v is not None}
-            req_list = request.user.employee.get_related_remittance(start_date=date_from, end_date= date_to, branch= branch, booth= booth, exchange_house=exchange_house)
+            req_list = request.user.employee.get_related_remittance(start_date=date_from, end_date= date_to, branch= branch, booth= booth, exchange_house=exchange_house, keyword=keyword)
             context = {'pay_list': req_list, 'form':form}
             if check_headoffice(request.user):
                 return render(request, 'rem/report/payment_list_ho.html', context)
@@ -341,6 +344,25 @@ def search_receiver(request):
         context = {'form':form}
     return render(request, 'rem/process/receive_search.html', context)
 
+@login_required
+#@user_passes_test(check_branch)
+#@user_passes_test(check_headoffice)
+def search_remittance(request):
+    context={}
+    if request.method == "POST":
+        form = MultipleSearchForm(request.POST)
+        if form.is_valid():
+            keyword = form.cleaned_data['keyword']
+            q = Remmit.objects.all()
+            q = remittance_search(keyword,q)
+            context = {'form':form,'rem_list':q}
+            return render(request, 'rem/process/remittance_search.html', context)
+        else:
+            context = {'form':form}
+    else:
+        form = MultipleSearchForm()
+        context = {'form':form}
+    return render(request, 'rem/process/remittance_search.html', context)
 
 @method_decorator([login_required,transaction.atomic],name='dispatch')
 class ReceiverCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):

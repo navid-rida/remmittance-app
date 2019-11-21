@@ -143,21 +143,21 @@ class Employee(models.Model):
         else:
             return False
 
-    def get_related_remittance(self, start_date=None, end_date= None, branch= None, booth= None, exchange_house=None):
+    def get_related_remittance(self, start_date=None, end_date= None, branch= None, booth= None, exchange_house=None, keyword=None):
         query_set = Remmit.objects.all()
         if self.user.has_perm('rem.view_all_remitt'):
-            rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, branch= branch, booth= booth, exchange_house=exchange_house)
+            rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, branch= branch, booth= booth, exchange_house=exchange_house,keyword=keyword)
         elif self.user.has_perm('rem.view_branch_remitt'):
-            rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, branch= self.branch, booth= booth, exchange_house=exchange_house)
+            rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, branch= self.branch, booth= booth, exchange_house=exchange_house,keyword=keyword)
         elif self.user.has_perm('rem.view_booth_remitt'):
-            rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, booth= self.booth, exchange_house=exchange_house)
+            rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, booth= self.booth, exchange_house=exchange_house,keyword=keyword)
         else:
             if self.booth:
                 query_set = self.user.remmit_set.filter(booth=self.booth)
-                rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, exchange_house=exchange_house)
+                rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, exchange_house=exchange_house,keyword=keyword)
             else:
                 query_set = self.user.remmit_set.filter(branch=self.branch)
-                rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, booth= booth, exchange_house=exchange_house)
+                rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, booth= booth, exchange_house=exchange_house,keyword=keyword)
         return rem
 
     """def clean(self):

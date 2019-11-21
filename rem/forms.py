@@ -130,6 +130,10 @@ class ReceiverSearchForm(forms.Form):
     #cell = forms.CharField(label="Enter Customer's Cell No.", validators=[validate_mobile])
     identification = forms.CharField(label="Enter NID/Passport/ Birth Certificate No.")
 
+class MultipleSearchForm(forms.Form):
+    #cell = forms.CharField(label="Enter Customer's Cell No.", validators=[validate_mobile])
+    keyword = forms.CharField(label="Enter reference number, name or phone no")
+
 class SettlementForm(forms.Form):
     SETTLE_CHOICES= (('remittance','Remittance Settlement'),('cash_incentive','Cash Incentive Settlement'))
     settlemnt_type = forms.ChoiceField(label="Settlement Type",choices=SETTLE_CHOICES, required=True)
@@ -157,6 +161,7 @@ class SearchForm(forms.Form):
         (PAID, 'Paid'),
         )
     status = forms.ChoiceField(label='Request Status',choices=STATUS_CHOICES,required=False)
+    keyword = forms.CharField(label="Reference/Benificiary Cell", required=False)
 
 class PaymentForm(forms.Form):
     comment = forms.CharField(label="Remarks", widget=forms.Textarea(attrs={'rows':4, 'cols':45}), required=False)
