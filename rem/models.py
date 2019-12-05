@@ -251,7 +251,7 @@ class ExchangeHouse(models.Model):
 
 class Remmit(models.Model):
     exchange = models.ForeignKey(ExchangeHouse,on_delete=models.CASCADE, verbose_name='Channel of Remittance')
-    currency = models.ForeignKey(Currency,on_delete=models.CASCADE, verbose_name='Currency of Remittance', default=Currency.objects.get(name='BANGLADESHI TAKA').id)
+    currency = models.ForeignKey(Currency,on_delete=models.CASCADE, verbose_name='Currency of Remittance')
     rem_country = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Remitting Country')
     sender = models.CharField("Name of Remitter", validators=[name], max_length=50)
     sender_occupation = models.CharField("Occupation of Remitter", help_text="Service/ Business etc.",validators=[alpha], max_length=50, null=True, blank=True)
