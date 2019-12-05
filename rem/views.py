@@ -32,6 +32,7 @@ import rem.rule_set
 ##################### Searching#########################
 from rem.search import remittance_search
 # Create your views here.
+from schedules.data import get_daily_bb_remittance
 
 MAXIMUM_AllOWWED_USER_PER_BRANCH = settings.MAXIMUM_USER_PER_BRANCH
 
@@ -268,7 +269,7 @@ def select_cash_incentive_list(request):
     return render(request, 'rem/report/cash_incentive_excel.html', context)
 
 
-@login_required
+""""@login_required
 @user_passes_test(check_headoffice)
 def mark_rem_list(request):
     if request.method == "POST":
@@ -291,9 +292,9 @@ def mark_rem_list(request):
     else:
         form = SearchForm()
         context = {'form':form}
-    return render(request, 'rem/report/mark_settle.html', context)
+    return render(request, 'rem/report/mark_settle.html', context)"""
 
-@login_required
+"""@login_required
 @user_passes_test(check_headoffice)
 def mark_cash_incentive_list(request):
     if request.method == "POST":
@@ -317,7 +318,7 @@ def mark_cash_incentive_list(request):
     else:
         form = SearchForm()
         context = {'form':form}
-    return render(request, 'rem/report/mark_settle.html', context)
+    return render(request, 'rem/report/mark_settle.html', context)"""
 
 
 @login_required
@@ -671,18 +672,6 @@ class UserRegistrationView(RegistrationView):
     form_class = SignUpForm
     template_name = 'registration/signup.html'
 
-    """def form_valid(self, form):
-        form.instance.created_by = self.request.user
-        form.instance.branch = self.request.user.employee.branch
-        receiver = get_object_or_404(Receiver, pk=self.kwargs['pk'])
-        form.instance.receiver = receiver
-        self.object = form.save(commit=False)
-        # in case you want to modify the object before commit
-        self.object.save()
-        req = Requestpay(remittance=self.object, created_by=self.request.user, ip=get_client_ip(self.request))
-        req.save()
-        return super().form_valid(form)"""
-
     def register(self,form):
         new_user = super(UserRegistrationView,self).create_inactive_user(form)
         new_user.refresh_from_db()
@@ -862,3 +851,39 @@ def monthly_cash_incentive_bb_statement(request):
         form = SearchForm()
         context = {'form':form}
         return render(request, 'rem/report/cash_incentive_bb_statement/cash_incentive_base.html', context)
+
+@login_required
+@permission_required('rem.view_ho_br_booth_reports')
+def daily_remittance_bb_statement(request):
+    if request.method == "POST":
+        form = SearchForm(request.POST)
+        #filt = {}
+        if form.is_valid():
+            date_from = form.cleaned_data['date_from']
+            date_to = form.cleaned_data['date_to']
+            query_set = Payment.objects.all()
+            if date_from and date_to:
+                query_set = query_set.filter(dateresolved__date__range=(date_from,date_to))
+            #q = filter_remittance(query_set,start_date=date_from, end_date= date_to)
+            #q = filter_remittance(query_set, start_date=date_from, end_date= date_to, cash_incentive_status='P', cash_incentive_settlement_done=True)
+            #q = query_set.filter(dateresolved__date__range=(date_from,date_to))
+            statement = get_daily_bb_remittance(qset=query_set)
+            if '_show' in request.POST:
+                context = {'form':form, 'df': statement, 'q':query_set}
+                return render(request, 'rem/report/cash_incentive_bb_statement/daily_remittance_bb_base.html', context)
+            if '_download' in request.POST:
+                #df = pd.DataFrame(summary_list, columns=['code','name','count','sum'])
+                xlsx_data = excel_output(statement)
+                response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                time = str(timezone.now().date())
+                filename = "cash incentive statement "+time+".xlsx"
+                response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+                #writer.save(re)
+                return response
+        else:
+            context = {'form':form }
+            return render(request, 'rem/report/cash_incentive_bb_statement/daily_remittance_bb_base.html', context)
+    else:
+        form = SearchForm()
+        context = {'form':form}
+        return render(request, 'rem/report/cash_incentive_bb_statement/daily_remittance_bb_base.html', context)

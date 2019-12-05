@@ -4,7 +4,7 @@ from pathlib import Path
 import datetime
 
 ###################### paths ###########################################
-""""folder_path = ''
+folder_path = 'F:\\Projects\\Return RIT\\Return RIT_October'
 export_text_file = 'exprecpt.txt'
 import_payment_text_file = 'imppaynt.txt'
 invisible_payment_text_file = 'invpaynt.txt'
@@ -14,7 +14,7 @@ export_text_path = Path(folder_path,export_text_file)
 import_payment_text_path = Path(folder_path,import_payment_text_file)
 invisible_payment_text_path = Path(folder_path,invisible_payment_text_file)
 invisible_receipt_text_path = Path(folder_path,invisible_receipt_text_file)
-wage_remit_text_path = Path(folder_path,wage_remit_text_file)"""
+wage_remit_text_path = Path(folder_path,wage_remit_text_file)
 
 
 ############################ Reference path and DFs #########################################################
@@ -144,10 +144,56 @@ def rit_all_df(exp_rec,imp_pay,inv_pay,inv_rec,wage_remit):
     return df
 
 
-#final_df = rit_all_df(exp_df,imp_pay_df,invisible_pay_df,invisible_rec_df,wage_remit_df)
+final_df = rit_all_df(exp_df,imp_pay_df,invisible_pay_df,invisible_rec_df,wage_remit_df)
 
 
 ########################################### Remittance Reports from DB ########################################
 
-def get_daily_bb_remittance():
-    pass
+def get_daily_bb_remittance(qset):
+    date=[]
+    fi_name=[]
+    sl=[]
+    ad_fi_br=[]
+    report_type=[]
+    schedule_code=[]
+    type_code=[]
+    purpose_code=[]
+    currency=[]
+    country=[]
+    district=[]
+    nid=[]
+    passport=[]
+    amt_fcy=[]
+    i=1
+    for r in qset:
+        date.append(r.dateresolved.date())
+        fi_name.append("NRBC Bank")
+        sl.append(str(i))
+        i=i+1
+        ad_fi_br.append(r.requestpay.remittance.branch.ad_fi_code)
+        report_type.append("WAGE REMITTANCE")
+        schedule_code.append("24")
+        type_code.append("4")
+        purpose_code.append("")
+        currency.append("USD")
+        country.append(r.requestpay.remittance.rem_country)
+        district.append(r.requestpay.remittance.branch.district)
+        nid.append(r.requestpay.remittance.receiver.get_nid())
+        passport.append(r.requestpay.remittance.receiver.get_passport_no())
+        amt_fcy.append(r.requestpay.remittance.amount)
+    dct = {"DATED": date,
+            "FI NAME": fi_name,
+            "SERIAL NO": sl,
+            "AD FI BRANCH": ad_fi_br,
+            "REPORT TYPE": report_type,
+            "SCHEDULE CODE": schedule_code,
+            "TYPE CODE":type_code,
+            "PURPOSE CODE":purpose_code,
+            "CURRENCY":currency,
+            "COUNTRY": country,
+            "NID": nid,
+            "PASSPORT":passport,
+            "AMOUNT FCY": amt_fcy,
+            }
+    df = pd.DataFrame(dct)
+    return df

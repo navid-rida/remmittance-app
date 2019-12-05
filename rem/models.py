@@ -216,6 +216,23 @@ class Receiver(models.Model):
         else:
             return False
 
+    def get_nid(self):
+        """Returns NID number of receiver.
+        Returns False if id is not NID"""
+        if self.idtype=='NID':
+            return self.idno
+        else:
+            return None
+
+    def get_passport_no(self):
+        """Returns Passport number of receiver.
+        Returns False if id is not passport"""
+        if self.idtype=='PASSPORT':
+            return self.idno
+        else:
+            return None
+
+
 class ReceiverUpdateHistory(models.Model):
     receiver=models.ForeignKey(Receiver, on_delete=models.CASCADE, verbose_name= "Receiver")
     datecreate = models.DateTimeField("Date of Editing", auto_now_add=True)
@@ -241,7 +258,7 @@ class Remmit(models.Model):
     relationship = models.CharField("Relationship to Sender",max_length=50, null=True)
     purpose = models.CharField("Purpose of Transaction",max_length=50, null=True)
     PAID= 'P'
-    HELD = 'H'
+    #HELD = 'H'
     UNPAID = 'U'
     CASHINC_CHOICES = (
         (PAID,'Paid'),

@@ -36,4 +36,5 @@ urlpatterns = [
     ############################ report ################################
     path('summary', views.summary_report, name='summary'),
     path('cash_incentive_bb_statement', views.monthly_cash_incentive_bb_statement, name='cash_incentive_bb_statement'),
+    path('daily_remittance_bb_statement', views.daily_remittance_bb_statement, name='daily_remittance_bb'),
 ]

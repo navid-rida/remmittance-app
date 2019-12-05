@@ -98,6 +98,7 @@ def cash_incentive_bb_statement(qset):
     df = pd.DataFrame(dct)
     return df
 
+#def daily_remittance_bb_statement(qset):
 
 #######################################################################################################################
 
