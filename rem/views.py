@@ -876,7 +876,7 @@ def daily_remittance_bb_statement(request):
                 xlsx_data = excel_output(statement)
                 response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
                 time = str(timezone.now().date())
-                filename = "cash incentive statement "+time+".xlsx"
+                filename = "Daily Statement BB "+time+".xlsx"
                 response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
                 #writer.save(re)
                 return response
