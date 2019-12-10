@@ -167,10 +167,10 @@ def get_daily_bb_remittance(qset):
     i=1
     for r in qset:
         date.append(r.dateresolved.date())
-        fi_name.append("NRBC Bank")
+        fi_name.append("NRB COMMERCIAL BANK LTD.")
         sl.append(str(i))
         i=i+1
-        ad_fi_br.append(r.requestpay.remittance.branch.ad_fi_code)
+        ad_fi_br.append("0102")
         report_type.append("WAGE REMITTANCE")
         schedule_code.append("24")
         type_code.append("4")
