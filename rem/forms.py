@@ -58,6 +58,17 @@ class RemmitForm(ModelForm):
         # this method didn't change it.
         return date_sending
 
+    def clean_currency(self):
+        currency = self.cleaned_data['currency']
+        exchange = self.cleaned_data['exchange']
+        exchange_list = ['WESTERN UNION','XPRESS MONEY','RIA MONEY TRANSFER','PLACID EXPRESS','MONEYGRAM']
+        if (exchange.name in exchange_list) and (currency.name!='BANGLADESHI TAKA'):
+            raise ValidationError('Only BDT can be selected for '+exchange.name )
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return currency
+
+
     def clean(self):
         cleaned_data = super().clean()
         exchange = cleaned_data.get("exchange")
