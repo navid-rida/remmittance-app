@@ -305,7 +305,7 @@ class Remmit(models.Model):
             return False
 
     def check_unpaid_cash_incentive(self):
-        if self.cash_incentive_status=='U' and self.date_cash_incentive_paid is None and self.date_create.date()>datetime.date(2019,6,30) and self.amount<150000.00:
+        if self.cash_incentive_status=='U' and self.date_cash_incentive_paid is None and self.date_create.date()>datetime.date(2019,6,30):
             return True
         else:
             return False

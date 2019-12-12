@@ -762,7 +762,7 @@ class RemmitInfoUpdate(PermissionRequiredMixin, SuccessMessageMixin, UpdateView)
         return super().form_valid(form)
 
 @login_required
-@permission_required(['rem.change_remmit','rem.allow_if_transaction_hour'], fn=objectgetter(Remmit, 'pk'))
+@permission_required(['rem.can_mark_paid_remittance','rem.allow_if_transaction_hour'], fn=objectgetter(Remmit, 'pk'))
 @transaction.atomic
 def pay_unpaid_incentive(request, pk):
     rem = Remmit.objects.get(pk=pk)

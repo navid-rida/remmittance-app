@@ -19,6 +19,10 @@ def is_same_branch_user(user,remittance):
 def is_transaction_hour(user):
     return time(9,59)<timezone.localtime().time()<time(16,16)
 
+@rules.predicate
+def remittance_less_than_usd1500(user,remittance):
+    return remittance.amount < 150000
+
 #is_branch_report_user = rules.is_group_member('branch user')
 is_branch_remittance_user = rules.is_group_member('Branch Remittance Info Submission User')
 is_branch_report_observer_user = rules.is_group_member('Branch Report Observer User')
@@ -42,6 +46,7 @@ rules.add_perm('rem.view_booth_remitt', is_booth_report_observer_user)
 rules.add_perm('rem.view_all_remitt', is_ho_report_user)
 rules.add_perm('rem.view_ho_br_booth_reports', is_ho_report_user)
 rules.add_perm('rem.can_settle_remitts_cash_incentive', is_ho_settlement_user)
+rules.add_perm('rem.can_mark_paid_remittance', is_ho_settlement_user | (is_entry_creator & remittance_less_than_usd1500))
 
 #---------------------------------------------------------------------------------
 

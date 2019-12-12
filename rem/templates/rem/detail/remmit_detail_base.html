@@ -1,5 +1,6 @@
 {% extends "rem/base.html" %}
 {% load widget_tweaks %}
+{% load rules %}
 {% load humanize %}
 {% block title %} Payment Details {% endblock %}
 {% block content %}
@@ -107,9 +108,11 @@
   <p>Agent Copy: <br><img src='{{ object.requestpay_set.last.payment.agent_screenshot.url }}' class="img-fluid"><img></p>
 {% endif %}
 
-{% if object.check_unpaid_cash_incentive %}
-<td><a class="btn btn-success" href="{% url 'pay_unpaid_incentive' object.pk %}"><i class="far fa-info-square"></i>Pay Cash Incentive</a></td>
-{% endif %}
+
+{% has_perm 'rem.can_mark_paid_remittance' user object as can_mark_paid %}
+  {% if can_mark_paid and object.check_unpaid_cash_incentive %}
+    <td><a class="btn btn-success" href="{% url 'pay_unpaid_incentive' object.pk %}"><i class="far fa-info-square"></i>Pay Cash Incentive</a></td>
+  {% endif %}
 
 {% block payment_action %}{% endblock %}
 {% endblock %}
