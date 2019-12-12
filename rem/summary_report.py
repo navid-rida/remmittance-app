@@ -59,7 +59,7 @@ def cash_incentive_bb_statement(qset):
         ben_name_address.append(r.receiver.name.upper())
         ben_id.append(r.receiver.idno)
         ben_acc.append(r.receiver.ac_no)
-        bank_name.append("NRBC BANK")
+        bank_name.append("NRB COMMERCIAL BANK LTD.")
         sender_name.append(r.sender.upper())
         sender_occupation.append(r.sender_occupation.upper() if r.sender_occupation else None)
         exchange_house.append(r.exchange.name)

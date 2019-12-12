@@ -4,7 +4,7 @@ from pathlib import Path
 import datetime
 
 ###################### paths ###########################################
-"""folder_path = 'F:\\Projects\\Return RIT\\Return RIT_October'
+"""folder_path = 'F:\\Projects\\Return RIT\\Return RIT_November'
 export_text_file = 'exprecpt.txt'
 import_payment_text_file = 'imppaynt.txt'
 invisible_payment_text_file = 'invpaynt.txt'
@@ -164,6 +164,9 @@ def get_daily_bb_remittance(qset):
     nid=[]
     passport=[]
     amt_fcy=[]
+    ref=[]
+    exchange=[]
+    branch=[]
     i=1
     for r in qset:
         date.append(r.dateresolved.date())
@@ -177,10 +180,13 @@ def get_daily_bb_remittance(qset):
         purpose_code.append("")
         currency.append("USD")
         country.append(r.requestpay.remittance.rem_country)
-        district.append(r.requestpay.remittance.branch.district)
+        district.append(r.requestpay.remittance.branch.district.name)
         nid.append(r.requestpay.remittance.receiver.get_nid())
         passport.append(r.requestpay.remittance.receiver.get_passport_no())
         amt_fcy.append(r.requestpay.remittance.amount)
+        ref.append(r.requestpay.remittance.reference)
+        exchange.append(r.requestpay.remittance.exchange)
+        branch.append(r.requestpay.remittance.branch.name)
     dct = {"DATED": date,
             "FI NAME": fi_name,
             "SERIAL NO": sl,
@@ -191,9 +197,13 @@ def get_daily_bb_remittance(qset):
             "PURPOSE CODE":purpose_code,
             "CURRENCY":currency,
             "COUNTRY": country,
+            "District": district,
             "NID": nid,
             "PASSPORT":passport,
             "AMOUNT FCY": amt_fcy,
+            "Reference": ref,
+            "Exchange": exchange,
+            "Branch": branch,
             }
     df = pd.DataFrame(dct)
     return df
