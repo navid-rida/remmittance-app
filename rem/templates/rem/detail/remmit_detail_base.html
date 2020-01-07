@@ -24,18 +24,8 @@
           <td>Date and time</td>
           <td>: {{ object.date_create|date:'d/m/Y P' }}</td>
         </tr>
-        <tr>
-          <td>Remitting Country</td>
-          <td>: <b>{{ object.rem_country }}</b></td>
-        </tr>
-        <tr>
-          <td>Sender</td>
-          <td>: <b>{{ object.sender }}</b></td>
-        </tr>
-        <tr>
-          <td>Benificiary Name</td>
-          <td>: <b>{{ object.receiver.name }}</b></td>
-        </tr>
+
+
         <tr>
           <td>Benificiary Identification ( {{ object.receiver.idtype }} )</td>
           <td>: {{ object.receiver.idno }} [ <b>Issue Date:</b> {{ object.receiver.idissue }}, <b>Expiry Date:</b> {{ object.remittance.idexpire }}]</td>
@@ -93,8 +83,21 @@
           <td>Reason of Rejection/ Other Comments</td>
           <td class="table-info">: {{ object.comment}}</td>
         </tr>
+
         {% else %}
         {% endif %}
+        <tr>
+          <td>Remitting Country</td>
+          <td>: <b>{{ object.rem_country }}</b></td>
+        </tr>
+        <tr>
+          <td>Sender</td>
+          <td>: <b>{{ object.sender }}</b></td>
+        </tr>
+        <tr>
+          <td>Benificiary Name</td>
+          <td>: <b>{{ object.receiver.name }}</b></td>
+        </tr>
         <tr>
           <td>Value</td>
           <td>:<b class="text-danger"> BDT {{object.amount|intcomma }}</b></td>

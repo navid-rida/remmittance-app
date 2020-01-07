@@ -23,10 +23,7 @@
           <td>Date and time</td>
           <td>: {{ object.datecreate|date:'d/m/Y P' }}</td>
         </tr>
-        <tr>
-          <td>Remitting Country</td>
-          <td>: <b>{{ object.remittance.rem_country }}</b></td>
-        </tr>
+
         <tr>
           <td>Sender</td>
           <td>: <b>{{ object.remittance.sender }}</b></td>
@@ -77,8 +74,13 @@
           <td>Reason of Rejection/ Other Comments</td>
           <td class="table-info">: {{ object.comment}}</td>
         </tr>
+
         {% else %}
         {% endif %}
+        <tr>
+          <td>Remitting Country</td>
+          <td>: <b>{{ object.remittance.rem_country }}</b></td>
+        </tr>
         <tr>
           <td>Value</td>
           <td>:<b class="text-danger"> BDT {{object.remittance.amount|intcomma }}</b></td>
