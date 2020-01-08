@@ -65,6 +65,7 @@ def make_ac_df(list,category,columns,payments):
     #Sl= []
     tr_date = []
     br_code = []
+    booth_code = []
     br_name= []
     ac_no = []
     type = []
@@ -81,9 +82,12 @@ def make_ac_df(list,category,columns,payments):
         #br_code.append(rem.branch.code)
         if category=='gl':
             br_code.append(pay.requestpay.remittance.branch.code)
+            booth = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else '0001'
+            booth_code.append(booth)
             ac_no.append(pay.requestpay.remittance.exchange.gl_no)
         else:
             br_code.append("0101")
+            booth_code.append("0001")
             ac_no.append(pay.requestpay.remittance.exchange.ac_no)
         br_name.append(pay.requestpay.remittance.branch.name)
         type.append(dr_cr)
@@ -103,6 +107,7 @@ def make_ac_df(list,category,columns,payments):
         #'Sl' : Sl,
         'date' : tr_date,
         'branch_code': br_code,
+        'booth_code': booth_code,
         'branch_name': br_name,
         'ac_no' : ac_no,
         'type' : type,
@@ -178,7 +183,7 @@ def make_cash_incentive_df(list,category,columns,payments):
 
 def rem_bb_summary(list, payments):
     payments = payments.filter(id__in=list)
-    columns=['date', 'br_code', 'br_name', 'ac_no', 'type', 'amount', 'narration', 'flag', 'country']
+    columns=['date', 'br_code','booth_code', 'br_name', 'ac_no', 'type', 'amount', 'narration', 'flag', 'country']
     gl_df = make_ac_df(list,'gl',columns, payments)
     ac_df = make_ac_df(list,'br_ac',columns, payments)
     frames = [gl_df, ac_df]
