@@ -488,7 +488,8 @@ def mark_settle_all(request):
         if form.is_valid():
             file = request.FILES.get('batchfile')
             settlement_type = request.POST['settlemnt_type']
-            df = pd.read_csv(file,names=['date', 'branch_code', 'ac_no', 'type', 'amount', 'narrations', 'flags'],sep='\t')
+            df = pd.read_excel(file,names=['date', 'branch_code','booth_code', 'ac_no', 'type', 'amount', 'narrations', 'flags'])
+            df['reference'] = df['narrations'].apply(get_reference_no_from_narration)
             lst = get_reference_no_list_from_df(df)
             if settlement_type=='remittance':
                 q = Payment.objects.filter(requestpay__remittance__reference__in=lst)
