@@ -55,7 +55,10 @@
     </div>
     <div class='form-row'>
       <div class="col-auto">
-          <button type="submit" class="btn btn-primary btn-sm mb-2 element_margin">Search</button>
+        <button type="submit" class="btn btn-primary btn-sm mb-2 element_margin" value="Show" name="_show">Show</button>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm mb-2 element_margin" value="Download" name="_download">Download</button>
       </div>
     </div>
 </form>
@@ -101,7 +104,9 @@
                 <td>{{entry.get_cash_incentive_status_display}}</td>
                 <td>{{entry.date_cash_incentive_settlement}}</td>
                 <td>{{entry.created_by}}</td>
-                {% block button %}{% endblock %}
+                {% block button %}
+
+                {% endblock %}
             </tr>
 
             {% endfor %}

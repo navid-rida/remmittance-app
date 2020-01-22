@@ -24,7 +24,7 @@ def excel_output(df):
     output = io.BytesIO()
     #time = str(date.today())
     #filename = "output "+time+".xlsx"
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    writer = pd.ExcelWriter(output, engine='xlsxwriter', options={'remove_timezone': True})
     #writer.book.filename = io
     df.to_excel(writer,'Sheet1', index=False, header=True)
     writer.save()

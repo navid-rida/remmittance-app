@@ -29,6 +29,7 @@ from .summary_report import exchange_housewise_remittance_summary, cash_incentiv
 from rules.contrib.views import PermissionRequiredMixin, permission_required, objectgetter
 #from rules.contrib.views import permission_required
 import rem.rule_set
+import rules
 ##################### Searching#########################
 from rem.search import remittance_search
 # Create your views here.
@@ -145,11 +146,31 @@ def show_rem(request):
             #filt['resubmit_flag'] = False
             #filter_args = {k:v for k,v in filt.items() if v is not None}
             req_list = request.user.employee.get_related_remittance(start_date=date_from, end_date= date_to, branch= branch, booth= booth, exchange_house=exchange_house, keyword=keyword)
-            context = {'pay_list': req_list, 'form':form}
-            if check_headoffice(request.user):
-                return render(request, 'rem/report/payment_list_ho.html', context)
-            else:
-                return render(request, 'rem/report/payment_list_branch.html', context)
+            if '_show' in request.POST:
+                context = {'pay_list': req_list, 'form':form}
+                """if check_headoffice(request.user):
+                    return render(request, 'rem/report/payment_list_ho.html', context)
+                else:
+                    return render(request, 'rem/report/payment_list_branch.html', context)"""
+                if request.user.has_perm('rem.view_ho_br_booth_reports'):
+                    return render(request, 'rem/report/payment_list_ho.html', context)
+                else:
+                    return render(request, 'rem/report/payment_list_branch.html', context)
+            if '_download' in request.POST:
+                #df = pd.DataFrame(summary_list, columns=['code','name','count','sum'])
+                df = pd.DataFrame(list(req_list.values('branch__name','branch__code','booth__name', \
+                 'booth__code','exchange__name','currency__name','rem_country__name', \
+                 'sender','sender_occupation','relationship','purpose','cash_incentive_status', \
+                 'unpaid_cash_incentive_reason','receiver__name','receiver__idno', \
+                 'amount','cash_incentive_amount','date_sending','date_cash_incentive_paid', \
+                 'date_cash_incentive_settlement','date_create','reference','created_by')))
+                xlsx_data = excel_output(df)
+                response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                time = str(timezone.now().date())
+                filename = "Remittance List "+time+".xlsx"
+                response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+                #writer.save(re)
+                return response
         else:
             context = {'form':form }
             if check_headoffice(request.user):
