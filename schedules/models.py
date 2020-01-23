@@ -9,13 +9,20 @@ class Currency(models.Model):
     cur_code = models.CharField("Currency Code", max_length=3,  validators=[numeric])
     short = models.CharField("Short Code", max_length=3,  validators=[alpha])
 
-
     def __str__(self):
         return self.name
 
 class District(models.Model):
     name = models.CharField("Name of District", max_length=40)
     code= models.CharField("District Code", max_length=3,  validators=[numeric])
+
+    def __str__(self):
+        return self.name
+
+class Bank(models.Model):
+    name = models.CharField("Name of Bank", max_length=60)
+    fi_id= models.CharField("FI ID", max_length=4,  validators=[numeric])
+    type = models.CharField("Type of Institution", max_length=60)
 
     def __str__(self):
         return self.name
