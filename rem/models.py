@@ -21,7 +21,7 @@ from django.utils.translation import gettext_lazy as _
 import rem.rule_set
 import rules
 ################################### Other app models ##################
-from schedules.models import District, Currency
+from schedules.models import District, Currency, Bank
 
 ######################### Custom Managers ###############################
 # Create your models here.
@@ -403,3 +403,34 @@ class Payment(models.Model):
             return self
         else:
             return False
+
+class Claim(models.Model):
+    date_claim = models.DateTimeField("Date of Claim", auto_now_add=True)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+    statement_check = models.BooleanField("Benificary Account Statement checked ?")
+    account_no=models.CharField("Benificary Account number",max_length=15,validators=[nrbc_acc,])
+    account_title=models.CharField("Benificary Account number",max_length=100,validators=[alpha])
+    BEFTN= 'B'
+    RTGS = 'R'
+    CHANNEL_CHOICES = (
+        (BEFTN,'BEFTN'),
+        (RTGS, 'RTGS'),
+        )
+    channel=models.CharField("Channel of remittance",max_length=1, choices=CHANNEL_CHOICES)
+    collecting_bank=models.ForeignKey(Bank, on_delete=models.CASCADE, limit_choices_to={'type': 'PRIVATE COMMERCIAL BANK'})
+    document_check = models.BooleanField("Remitters document checked ?")
+    sender_name=models.CharField("Remitter's Name", max_length=100)
+    NID= 'NID'
+    PASSPORT = 'PASSPORT'
+    BC = 'BC'
+    DL = 'DL'
+    STATUS_CHOICES = (
+        (NID,'National ID'),
+        (PASSPORT, 'Passport'),
+        (BC, 'Birth Regestration Certificate'),
+        (DL, 'Driving License'),
+        )
+    idtype=models.CharField("Type of Identification",max_length=8, choices=STATUS_CHOICES)
+    idno = models.CharField("ID Number", max_length=17, unique=True)
+    issuing_country=models.ForeignKey(Country, on_delete=models.CASCADE)
+    letter_check = models.BooleanField("Beneficiary's Letter of Incentive Claim Received?")

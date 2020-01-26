@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Remmit, Branch,ExchangeHouse, Employee, Country, Receiver, Requestpay,Payment, Booth
+from .models import Remmit, Branch,ExchangeHouse, Employee, Country, Receiver, Requestpay,Payment, Booth,Claim
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 # Register your models here.
@@ -34,3 +34,4 @@ admin.site.register(Payment, PaymentAdmin)
 #admin.site.register(ReceiverUpdateHistory)
 #admin.site.register(RemittanceUpdateHistory)
 admin.site.register(Booth)
+admin.site.register(Claim)
