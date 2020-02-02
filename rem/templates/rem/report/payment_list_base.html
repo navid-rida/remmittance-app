@@ -73,6 +73,11 @@
     {% for payment in payment_list %}
     </br>
     <h4> {{ payment.grouper }} </h4>
+    {% for item in sum_n_count %}
+      {% if item.exchange__name == payment.grouper.name %}
+        <b>Total Amount:</b> {{item.total|intword}}, <b>Total Number</b>: {{item.number}}
+      {% endif%}
+    {% endfor%}
     <table id="table_{{forloop.counter}}" class='table table-hover table-sm'>
         <thead>
             <tr>
@@ -115,5 +120,7 @@
     {% endfor %}
 </fieldset>
 {%endif%}
+{{ sum_n_count }}
+
 {% block error %}{% endblock %}
 {% endblock %}
