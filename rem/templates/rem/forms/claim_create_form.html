@@ -22,7 +22,11 @@
       <div class='form-row'>
         <div class="col-auto ">
           {{field.label_tag}}
-          {{field|add_class:"form-control"}}
+          {% if field.label == 'Date of Account Credit' or field.label == "Expiry Date of Remitter's Passport" or field.label == "Expiry Date of Remitter's Other Document" %}
+            {{field|add_class:"form-control date"}}
+          {% else %}
+            {{field|add_class:"form-control"}}
+          {% endif %}
           {% if field.help_text %}
             <small style="color: red">{{ field.help_text}}</small>
           {% endif %}
