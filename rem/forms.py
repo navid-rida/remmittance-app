@@ -210,7 +210,7 @@ class PaymentForm(forms.Form):
                     "Please confirm or reject the payment"
                 )"""
 
-class SignUpForm(RegistrationForm):
+class SignUpForm(RegistrationFormUniqueEmail):
     branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'),validators=[validate_user_limit])
     booth = forms.ModelChoiceField(queryset=Booth.objects.all().order_by('name'),validators=[validate_booth_user_limit],required=False)
     cell = forms.CharField(label="Mobile No.", validators=[validate_mobile])
@@ -269,6 +269,8 @@ class ClaimForm(ModelForm):
             #'dob': forms.SelectDateWidget,
             'visa_check': forms.Select(choices = NO_VISA_CHOICES),
             'statement_check': forms.Select(choices = CHOICES),
+            'document_check': forms.Select(choices = CHOICES),
+            'letter_check': forms.Select(choices = CHOICES),
             #'address': forms.Textarea(attrs={'rows':4, 'cols':45}),
             #'dob': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
             #'idissue': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
