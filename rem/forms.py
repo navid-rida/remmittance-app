@@ -1,4 +1,4 @@
-from .models import Remmit, ExchangeHouse, Branch, Receiver, Requestpay, Country,Booth
+from .models import Remmit, ExchangeHouse, Branch, Receiver, Requestpay, Country,Booth, Claim
 from django.forms import ModelForm
 from django import forms
 from datetime import date, timedelta
@@ -244,3 +244,95 @@ class SignUpForm(RegistrationForm):
             cleaned_data["branch"] = branch
 
         return cleaned_data"""
+
+NO_VISA_CHOICES = (
+            (None, "Not Applicable"),
+            (True, "Obtained"),
+            (False, "Not Obtained"),
+           )
+
+CHOICES = (
+            (False, "NO"),
+            (True, "YES")
+           )
+
+class ClaimForm(ModelForm):
+    #dob = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="Date of Birth",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
+    #idissue = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="ID Issue Date",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'], required=False)
+    #idexpire = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}),label="ID Expiry date",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'], required=False)
+
+    class Meta:
+        model = Claim
+        #fields = ('name','cell','address','dob','idtype','idno','idissue','idexpire','ac_no')
+        exclude =('branch','created_by','date_forward','date_resolved')
+        widgets = {
+            #'dob': forms.SelectDateWidget,
+            'visa_check': forms.Select(choices = NO_VISA_CHOICES),
+            'statement_check': forms.Select(choices = CHOICES),
+            #'address': forms.Textarea(attrs={'rows':4, 'cols':45}),
+            #'dob': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+            #'idissue': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+            #'idexpire': forms.DateInput(format['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+        }
+
+    def clean_statement_check(self):
+        check = self.cleaned_data['statement_check']
+        if check==True:
+            check = self.cleaned_data['statement_check']
+        else:
+            raise ValidationError('Beneficiary account statement must be checked before submission of cash incentive claim')
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return check
+
+    def clean_letter_check(self):
+        check = self.cleaned_data['letter_check']
+        if check==True:
+            check = self.cleaned_data['letter_check']
+        else:
+            raise ValidationError('Beneficiary\'s Letter of Incentive Claim must be obtained before submission of claim')
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return check
+
+    def clean_document_check(self):
+        check = self.cleaned_data['document_check']
+        if check==True:
+            check = self.cleaned_data['document_check']
+        else:
+            raise ValidationError("Remitter's documents must be checked before submission of cash incentive claim")
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return check
+
+    def clean_doc_type(self):
+        doc_type = self.cleaned_data['doc_type'].upper()
+
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return doc_type
+
+    def clean_account_title(self):
+        account_title = self.cleaned_data['account_title'].upper()
+
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return account_title
+
+    def clean_sender_name(self):
+        sender_name = self.cleaned_data['sender_name'].upper()
+
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return sender_name
+
+
+    def clean(self):
+        cleaned_data = super().clean()
+        passport_issuing_country = cleaned_data.get("passport_issuing_country")
+        visa_check = cleaned_data.get("visa_check")
+        #if 'cash_incentive_status' in form.changed_data:
+        if passport_issuing_country.name != 'BANGLADESH' and (visa_check==False or visa_check==None):
+            raise forms.ValidationError("Claim cannot be submitted without obtaining \"NO Visa Required\" Documents for foreign passport holders")
+        if passport_issuing_country.name == 'BANGLADESH' and visa_check!=None:
+            raise forms.ValidationError(" \"NO Visa Required\" Documents field only required for foreign passport holders")

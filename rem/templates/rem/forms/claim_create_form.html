@@ -1,0 +1,45 @@
+{% extends "rem/base.html" %}
+{% load widget_tweaks %}
+{% block title %} Add Claim {% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-6 offset-3">
+    <h4>Add New Claim</h4>
+    <form method="post" action="{% url 'add_claim'%}">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-auto">
+          <ul>
+            {% for error in form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+              <li>{{error}}</li>
+            </div>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% for field in form %}
+      <div class='form-row'>
+        <div class="col-auto ">
+          {{field.label_tag}}
+          {{field|add_class:"form-control"}}
+          {% if field.help_text %}
+            <small style="color: red">{{ field.help_text}}</small>
+          {% endif %}
+          {% for error in field.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {%endfor%}
+      <div class='form-row'>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-primary btn-sm mb-2">Create</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "rem/base.html" %}
+{% load widget_tweaks %}
+{% load rules %}
+{% load humanize %}
+{% block title %} Payment Details {% endblock %}
+{% block content %}
+
+
+<h4 class="element_margin">Cash Incentive Claim Details (A/C Credit)</h4>
+<div class="row justify-content-md-left">
+  <div class="col-md-auto">
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>Claim Submission Date:</td>
+          <td>: {{object.date_claim|date:'d/m/Y P'}}</td>
+        </tr>
+        <tr>
+          <td>Branch:</td>
+          <td>: {{ object.branch }}</td>
+        </tr>
+        <tr>
+          <td>Booth:</td>
+          <td>: {{ object.booth}}</td>
+        </tr>
+        <tr>
+          <td>Statement Checked?</td>
+          <td>: {{ object.statement_check }}</td>
+        </tr>
+        <tr>
+          <td>Account:</td>
+          <td>: {{ object.account_title}}, Account Number: {{ object.account_no }}</td>
+        </tr>
+        <tr>
+          <td>Date of Account Credit</td>
+          <td>: {{ object.date_account_credit}}</td>
+        </tr>
+        <tr>
+          <td>Channel of Account Credit</td>
+          <td>: {{ object.get_channel_display }}</td>
+        </tr>
+        <tr>
+          <td>Collecting Bank Name</td>
+          <td>: {{ object.collecting_bank }}</td>
+        </tr>
+        <tr>
+          <td>Remitter's Document Checked?</td>
+          <td>: {{ object.document_check }}</td>
+        </tr>
+        <tr>
+          <td>Remitter's Name</td>
+          <td>: {{ object.sender_name }}</td>
+        </tr>
+        <tr>
+          <td>Passport Details:</td>
+          <td>: No: {{ object.passport_no }}, Issuing Country: {{object.passport_issuing_country}}, Expire Date: {{object.passport_expire}}</td>
+        </tr>
+        <tr>
+          <td>No Visa Required Document Obtained?</td>
+          <td>: {{ object.visa_check }}</td>
+        </tr>
+        <tr>
+          <td>Other Document Details</td>
+          <td>
+            : Type: {{object.doc_type}}, Doc Number: {{object.doc_no}}, Issuing Country: {{ object.doc_issuing_country}}
+          </td>
+        </tr>
+        <tr>
+          <td>Letter Obtained?</td>
+          <td>: {{ object.letter_check}}</td>
+        </tr>
+        <tr>
+          <td>Claim Submitted By</td>
+          <td>: {{ object.created_by}}, Cell: {{ object.created_by.employee.cell}}</td>
+        </tr>
+        <tr>
+          <td>Remittance Amount</td>
+          <td>: <b>{{ object.remittance_amount }}</b></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+
+{% has_perm 'rem.can_forward_claim' user object as can_forward_claim %}
+{% has_perm 'rem.change_claim' user object as can_change_claim %}
+  {% if can_forward_claim and object.forward_check %}
+    <td><a class="btn btn-success" href="{% url 'forward_claim' object.pk %}"><i class="far fa-info-square"></i>Forward Claim</a></td>
+  {% endif %}
+  {% if can_change_claim and object.resolve_check %}
+    <td><a class="btn btn-success" href="{% url 'mark_resolved' object.pk %}"><i class="far fa-info-square"></i>Resolve Claim</a></td>
+  {% endif %}
+
+{% block payment_action %}{% endblock %}
+{% endblock %}

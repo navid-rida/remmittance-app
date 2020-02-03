@@ -1,8 +1,9 @@
 from django.shortcuts import render,redirect, get_object_or_404#, render_to_response
 from django.http import HttpResponse
-from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm, SettlementForm, MultipleSearchForm
+from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm, SettlementForm, MultipleSearchForm, ClaimForm
 from django.contrib.auth.decorators import login_required,user_passes_test
-from .models import Remmit, Requestpay, Payment, Receiver,Employee, ReceiverUpdateHistory,RemittanceUpdateHistory, Branch, Booth
+from .models import Remmit, Requestpay, Payment, Receiver,Employee, ReceiverUpdateHistory,RemittanceUpdateHistory, Branch, Booth, Claim
+from django.db.models import Sum, Count
 import datetime
 from .DataModels import *
 from .user_tests import *
@@ -147,7 +148,8 @@ def show_rem(request):
             #filter_args = {k:v for k,v in filt.items() if v is not None}
             req_list = request.user.employee.get_related_remittance(start_date=date_from, end_date= date_to, branch= branch, booth= booth, exchange_house=exchange_house, keyword=keyword)
             if '_show' in request.POST:
-                context = {'pay_list': req_list, 'form':form}
+                sum_n_count = req_list.values('exchange__name').order_by('exchange').annotate(total=Sum('amount')).annotate(number = Count('amount'))
+                context = {'pay_list': req_list, 'form':form, 'sum_n_count':sum_n_count}
                 """if check_headoffice(request.user):
                     return render(request, 'rem/report/payment_list_ho.html', context)
                 else:
@@ -801,6 +803,101 @@ def pay_unpaid_incentive(request, pk):
         messages.warning(request, 'Cannot process the request right now')
         return redirect('show_rem')
     #return render(request,'rem/forms/remmit_resubmit.html',context)
+
+#####################################Claim Create and Update#########################
+@method_decorator([login_required,transaction.atomic], name='dispatch')
+class ClaimCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
+    model = Claim
+    form_class = ClaimForm
+    permission_required = ['rem.add_remmit','rem.allow_if_transaction_hour']
+    template_name = 'rem/forms/claim_create_form.html'
+    success_message = "Claim was submitted successfully"
+    success_url = reverse_lazy('index')
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.branch = self.request.user.employee.branch
+        self.object = form.save(commit=False)
+        # in case you want to modify the object before commit
+        self.object.save()
+        return super().form_valid(form)
+
+@login_required
+def show_claim(request):
+    if request.method == "POST":
+        form = SearchForm(request.POST)
+        #filt = {}
+        if form.is_valid():
+            date_from = form.cleaned_data['date_from']
+            date_to = form.cleaned_data['date_to']
+            """if (date_from != None) and (date_to!= None):
+                filt['datecreate__date__range'] = (date_from,date_to)
+            else:
+                filt['datecreate__date__range'] = None"""
+            #exchange_house = form.cleaned_data['exchange']
+            #filt['status'] = 'PD'
+            branch = form.cleaned_data['branch']
+            booth = form.cleaned_data['booth']
+            #keyword = form.cleaned_data['keyword']
+            #filt['resubmit_flag'] = False
+            #filter_args = {k:v for k,v in filt.items() if v is not None}
+            claim_list = request.user.employee.get_related_claim(start_date=date_from, end_date= date_to, branch= branch, booth= booth)
+            if '_show' in request.POST:
+                context = {'claim_list': claim_list, 'form':form}
+                return render(request, 'rem/report/claim/claim_list_base.html', context)
+            if '_download' in request.POST:
+                #df = pd.DataFrame(summary_list, columns=['code','name','count','sum'])
+                df = pd.DataFrame(list(claim_list.values()))
+                xlsx_data = excel_output(df)
+                response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                time = str(timezone.now().date())
+                filename = "Claim List "+time+".xlsx"
+                response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+                #writer.save(re)
+                return response
+        else:
+            context = {'form':form }
+            return render(request, 'rem/report/claim/claim_list_base.html', context)
+    else:
+        form = SearchForm()
+        context = {'form':form}
+        return render(request, 'rem/report/claim/claim_list_base.html', context)
+
+@method_decorator([login_required,], name='dispatch')
+class ClaimDetailView(DetailView):
+    model = Claim
+    template_name = 'rem/detail/claim_detail_base.html'
+
+    """def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = PaymentForm()
+        return context"""
+
+@login_required
+#@permission_required(['rem.can_mark_paid_remittance','rem.allow_if_transaction_hour'], fn=objectgetter(Remmit, 'pk'))
+@transaction.atomic
+def forward_claim(request, pk):
+    claim = Claim.objects.get(pk=pk)
+    result = claim.forward_claim()
+    if result:
+        messages.success(request, 'Cash incentive claim forwarded')
+        return redirect('show_claim')
+    else:
+        messages.warning(request, 'Claim is either already forwarded or resolved')
+        return redirect('show_claim')
+
+@login_required
+#@permission_required(['rem.can_mark_paid_remittance','rem.allow_if_transaction_hour'], fn=objectgetter(Remmit, 'pk'))
+@transaction.atomic
+def mark_resolved(request, pk):
+    claim = Claim.objects.get(pk=pk)
+    result = claim.mark_resolved()
+    if result:
+        messages.success(request, 'Cash incentive claim marked as realized')
+        return redirect('show_claim')
+    else:
+        messages.warning(request, 'Claim is either NOT forwarded or  already resolved')
+        return redirect('show_claim')
 ################################ Reports ################################
 
 @login_required

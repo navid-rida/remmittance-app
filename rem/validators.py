@@ -96,6 +96,14 @@ def validate_post_date(datetime):
             params={'value': datetime},
         )
 
+def validate_expire_date(date):
+    if date < timezone.now().date():
+        raise ValidationError(
+            _('Document is expired'),
+        )
+
+
+
 def validate_western_code(value):
     return western_union(value)
 

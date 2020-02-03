@@ -6,7 +6,7 @@
 {% load rules %}
 
 {% endblock %}
-{% block title %} Remittance List {% endblock %}
+{% block title %} Claim List {% endblock %}
 {% block content %}
 <br>
 <form method="post">
@@ -26,13 +26,7 @@
             {{form.date_to.label_tag}}
             {{form.date_to|add_class:"form-control date"}}
         </div>
-        <div class="col-auto">
-            {% for error in form.exchange.errors %}
-              <div class="alert alert-danger" role="alert">{{ error}}</div>
-            {% endfor %}
-            {{form.exchange.label_tag}}
-            {{form.exchange|add_class:"form-control"}}
-        </div>
+
         {% has_perm 'rem.view_branch_remitt' user as branch_user %}
         {% has_perm 'rem.view_ho_br_booth_reports' user as ho_user %}
         {% if branch_user or ho_user %}
@@ -44,14 +38,15 @@
             {{form.booth|add_class:"form-control"}}
         </div>
         {% endif %}
-        {% block branch_dropdown %} {% endblock %}
+        {% if ho_user %}
         <div class="col-auto">
-            {% for error in form.keyword.errors %}
+            {% for error in form.branch.errors %}
               <div class="alert alert-danger" role="alert">{{ error}}</div>
             {% endfor %}
-            {{form.keyword.label_tag}}
-            {{form.keyword|add_class:"form-control"}}
+            {{form.branch.label_tag}}
+            {{form.branch|add_class:"form-control"}}
         </div>
+        {% endif %}
     </div>
     <div class='form-row'>
       <div class="col-auto">
@@ -64,53 +59,55 @@
 </form>
 </br>
 
-{%if pay_list %}
-
-{% regroup pay_list by exchange as payment_list %}
-
-<fieldset id="group_1">
-    {% csrf_token %}
-    {% for payment in payment_list %}
+{%if claim_list %}
+    {{ claim}}
     </br>
-    <h4> {{ payment.grouper }} </h4>
-    {% for item in sum_n_count %}
-      {% if item.exchange__name == payment.grouper.name %}
-        <b>Total Amount:</b> {{item.total|intword}}, <b>Total Number</b>: {{item.number}}
-      {% endif%}
-    {% endfor%}
     <table id="table_{{forloop.counter}}" class='table table-hover table-sm'>
         <thead>
             <tr>
-                <th></th>
                 {% block branch_column %}{% endblock %}
-                <th scope="col">Booth</th>
-                <th scope="col">Sender's Country</th>
-                <th scope="col">Ref. No</th>
-                <th scope="col">Sender</th>
-                <th scope="col">Benificiary</th>
-                <th scope="col">Remittance Amount</th>
-                <th scope="col">Cash Incentive Amount</th>
-                <th scope="col">Cash Incentive Status</th>
-                <th scope="col">Cash Incentive Settlement Date</th>
-                <th scope="col">Posted By</th>
+                <th scope="col">Date of Claim</th>
+                <th scope="col">Branch</th>
+                <th scope="col">Account No.</th>
+                <th scope="col">Account Title</th>
+                <th scope="col">Remittance Amount (BDT)</th>
+                <th scope="col">Date of A/C Credit</th>
+                <th scope="col">Channel</th>
+                <th scope="col">Remitter's Name</th>
+                <th scope="col">Remitter's Passport Number</th>
+                <th scope="col">Passport Issuing Country</th>
+                <th scope="col">Passport Expiry Date</th>
+                <th scope="col">Remitter's Other Doc Type</th>
+                <th scope="col">Remitter's Other Doc Number</th>
+                <th scope="col">Remitter's Other Doc Issuing Country</th>
+                <th scope="col">Remitter's Other Doc Expire Date</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
-            {% for entry in payment.list %}
+            {% for entry in claim_list %}
 
             <tr>
-                <td>{{forloop.counter}}</td>
-                {% block branch_value %}{% endblock %}
-                <td>{{entry.booth}}</td>
-                <td>{{entry.rem_country}}</td>
-                <td>{{entry.reference}}</td>
-                <td>{{entry.sender.title}}</td>
-                <td>{{entry.receiver}}</td>
-                <td>{{entry.amount|intcomma}}</td>
-                <td>{{entry.cash_incentive_amount|intcomma}}</td>
-                <td>{{entry.get_cash_incentive_status_display}}</td>
-                <td>{{entry.date_cash_incentive_settlement}}</td>
-                <td>{{entry.created_by}}</td>
+
+                <td>{{entry.date_claim|date:'d/m/Y P'}}</td>
+                <td>{{entry.rem_branch}}</td>
+                <td>{{entry.account_no}}</td>
+                <td>{{entry.account_title}}</td>
+                <td>{{entry.remittance_amount|intcomma}}</td>
+                <td>{{entry.date_account_credit}}</td>
+                <td>{{entry.channel}}</td>
+                <td>{{entry.sender_name}}</td>
+                <td>{{entry.passport_no}}</td>
+                <td>{{entry.passport_issuing_country}}</td>
+                <td>{{entry.passport_expire}}</td>
+                <td>{{entry.doc_type}}</td>
+                <td>{{entry.doc_no}}</td>
+                <td>{{entry.doc_issuing_country}}</td>
+                <td>{{entry.doc_expire}}</td>
+                <td>
+                  <a class="btn btn-success btn-sm" href="{% url 'claim-detail' entry.pk %}"> <i class="fas fa-check-circle"></i> Detils</a></td>
+                </td>
+
                 {% block button %}
 
                 {% endblock %}
@@ -119,10 +116,8 @@
             {% endfor %}
         </tbody>
     </table>
-    {% endfor %}
-</fieldset>
+
+
 {%endif%}
-
-
 {% block error %}{% endblock %}
 {% endblock %}

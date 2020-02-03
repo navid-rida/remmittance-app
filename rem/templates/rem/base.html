@@ -41,6 +41,7 @@
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Reports</a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a class="dropdown-item" href="{% url 'show_rem'%}">Remmittance List</a>
+            <a class="dropdown-item" href="{% url 'show_claim'%}">Cash Incentive Claim List</a>
             {% comment %}<a class="dropdown-item" href="{% url 'show_req'%}">Request List</a>{% endcomment %}
             {% comment %}{% for group in request.user.groups.all %}
             {% if group.name == "HO Settlement User" %}{% endcomment %}
@@ -70,6 +71,7 @@
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             {% comment %}<a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Request</a>{% endcomment %}
             <a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Information</a>
+            <a class="dropdown-item" href="{% url 'add_claim'%}">Submit Incentive Claim (A/C Cr)</a>
             {% if can_view_summary_report_menu %}
               <a class="dropdown-item" href="{% url 'search_remittance'%}">Search Remittance</a>
             {% endif %}

@@ -2,7 +2,7 @@ from django.db import models
 from decimal import Decimal
 #from datetime import date
 from django.core.exceptions import ValidationError
-from .validators import validate_neg, validate_post_date, validate_mobile, numeric, name, alpha, alpha_num, western_union, nrbc_acc
+from .validators import validate_expire_date, validate_neg, validate_post_date, validate_mobile, numeric, name, alpha, alpha_num, western_union, nrbc_acc
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -11,7 +11,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 import pandas as pd
-from rem.DataModels import filter_remittance
+from rem.DataModels import filter_remittance, filter_claim
 ########################## aggregate functions ###############################
 from django.db.models import Sum
 ################# import for validation errrors ##############################
@@ -160,6 +160,23 @@ class Employee(models.Model):
                 rem = filter_remittance(query_set = query_set, start_date=start_date, end_date= end_date, booth= booth, exchange_house=exchange_house,keyword=keyword)
         return rem
 
+    def get_related_claim(self, start_date=None, end_date= None, branch= None, booth=None):
+        query_set = Claim.objects.all()
+        if self.user.has_perm('rem.view_all_remitt'):
+            claims = filter_claim(query_set = query_set, start_date=start_date, end_date= end_date, branch= branch, booth = booth)
+        elif self.user.has_perm('rem.view_branch_remitt'):
+            claims = filter_claim(query_set = query_set, start_date=start_date, end_date= end_date, branch= self.branch)
+        elif self.user.has_perm('rem.view_booth_remitt'):
+            claims = filter_claim(query_set = query_set, start_date=start_date, end_date= end_date, booth= self.booth)
+        else:
+            if self.booth:
+                query_set = self.user.remmit_set.filter(booth=self.booth)
+                claims = filter_claim(query_set = query_set, start_date=start_date, end_date= end_date)
+            else:
+                query_set = self.user.remmit_set.filter(branch=self.branch)
+                claims = filter_claim(query_set = query_set, start_date=start_date, end_date= end_date)
+        return claims
+
     """def clean(self):
         # Don't allow draft entries to have a pub_date.
         if self.id and self.check_user_quota_available() == False:
@@ -265,7 +282,7 @@ class Remmit(models.Model):
         #(HELD, 'Held'),
         (UNPAID, 'Unpaid'),
         )
-    cash_incentive_status = models.CharField("Cash Incentive Status", choices=CASHINC_CHOICES, max_length=1, help_text="Please select 'Held' if required documents not collected and incentive not paid")
+    cash_incentive_status = models.CharField("Cash Incentive Status", choices=CASHINC_CHOICES, max_length=1, )
     unpaid_cash_incentive_reason = models.CharField("Reason for not paying cash incentive", max_length=50, null=True, blank=True, help_text="This field is mandatory if you mark cash incentive as unpaid")
     receiver = models.ForeignKey(Receiver, on_delete=models.PROTECT, verbose_name="Receiver")
     amount = models.DecimalField("Amount of Remittance",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Required documents must be collected and retained for paying inentive against Remittances valuing more than BDT 1,50,000.00")
@@ -405,32 +422,64 @@ class Payment(models.Model):
             return False
 
 class Claim(models.Model):
-    date_claim = models.DateTimeField("Date of Claim", auto_now_add=True)
+    date_claim = models.DateTimeField("Date of Claim", auto_now_add=True, )
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
-    statement_check = models.BooleanField("Benificary Account Statement checked ?")
-    account_no=models.CharField("Benificary Account number",max_length=15,validators=[nrbc_acc,])
-    account_title=models.CharField("Benificary Account number",max_length=100,validators=[alpha])
+    statement_check = models.BooleanField("Benificary Account Statement checked ?", help_text="Beneficiary account statement must be checked before submission of cash incentive claim")
+    account_no=models.CharField("Benificary Account Number",max_length=15,validators=[nrbc_acc,])
+    account_title=models.CharField("Benificary Account Title",max_length=100, validators=[name,])
+    date_account_credit = models.DateField("Date of Account Credit" )
     BEFTN= 'B'
     RTGS = 'R'
     CHANNEL_CHOICES = (
         (BEFTN,'BEFTN'),
         (RTGS, 'RTGS'),
         )
-    channel=models.CharField("Channel of remittance",max_length=1, choices=CHANNEL_CHOICES)
-    collecting_bank=models.ForeignKey(Bank, on_delete=models.CASCADE, limit_choices_to={'type': 'PRIVATE COMMERCIAL BANK'})
-    document_check = models.BooleanField("Remitters document checked ?")
-    sender_name=models.CharField("Remitter's Name", max_length=100)
-    NID= 'NID'
-    PASSPORT = 'PASSPORT'
-    BC = 'BC'
-    DL = 'DL'
-    STATUS_CHOICES = (
-        (NID,'National ID'),
-        (PASSPORT, 'Passport'),
-        (BC, 'Birth Regestration Certificate'),
-        (DL, 'Driving License'),
-        )
-    idtype=models.CharField("Type of Identification",max_length=8, choices=STATUS_CHOICES)
-    idno = models.CharField("ID Number", max_length=17, unique=True)
-    issuing_country=models.ForeignKey(Country, on_delete=models.CASCADE)
-    letter_check = models.BooleanField("Beneficiary's Letter of Incentive Claim Received?")
+    channel=models.CharField("Channel of A/C Credit",max_length=1, choices=CHANNEL_CHOICES)
+    collecting_bank=models.ForeignKey(Bank, on_delete=models.CASCADE, verbose_name='Collecting Bank', limit_choices_to={'type': 'PRIVATE COMMERCIAL BANK'})
+    document_check = models.BooleanField("Remitters Document Checked ?", help_text="Remitter's documents must be checked before submission of cash incentive claim")
+    sender_name=models.CharField("Remitter's Name", max_length=100, validators=[name,])
+    passport_no = models.CharField("Passport Number", max_length=17)
+    passport_issuing_country=models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name="Passport Issuing Country")
+    visa_check = models.BooleanField(" \"NO Visa Required to Travel Bangladesh\" Document Obtained?" , help_text="Applicable & Mandatory to obtain for Foreign Passport Holders only", null=True)
+    passport_expire = models.DateField("Expiry Date of Remitter's Passport", validators=[validate_expire_date,])
+    doc_type=models.CharField("Remitter's Other Document Type", max_length=50)
+    doc_no = models.CharField("Remitter's Other Document Number", max_length=50, validators=[alpha_num,])
+    doc_issuing_country=models.ForeignKey(Country, related_name='doc_issuing_country', on_delete=models.CASCADE, verbose_name="Other Document Issuing Country")
+    doc_expire = models.DateField("Expiry Date of Remitter's Other Document", validators=[validate_expire_date,])
+    letter_check = models.BooleanField("Beneficiary's Letter of Incentive Claim Received?", help_text="Beneficiary's Letter of Incentive Claim must be obtained before submission of claim")
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    remittance_amount = models.DecimalField("Amount of Remittance in BDT",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Required documents must be collected and retained for paying inentive against Remittances valuing more than BDT 1,50,000.00")
+    date_forward = models.DateTimeField("Date of Claim forwarded to collecting Bank", null=True)
+    date_resolved = models.DateTimeField("Date of Claim realized from collecting Bank", null=True)
+
+    def forward_check(self):
+        """Checks if the claim is
+        forwardable"""
+        if self.date_forward or self.date_resolved:
+            return False
+        else:
+            return True
+
+    def forward_claim(self):
+        if self.forward_check():
+            self.date_forward=timezone.now()
+            self.save()
+            return True
+        else:
+            return False
+
+    def resolve_check(self):
+        """Checks if the claim is
+        resolved"""
+        if (not self.date_forward) or self.date_resolved:
+            return False
+        else:
+            return True
+
+    def mark_resolved(self):
+        if self.resolve_check():
+            self.date_resolved=timezone.now()
+            self.save()
+            return True
+        else:
+            return False

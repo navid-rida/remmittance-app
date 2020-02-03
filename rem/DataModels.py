@@ -252,6 +252,17 @@ def filter_remittance(query_set, start_date=None, end_date= None, branch= None, 
         r = r.filter(date_cash_incentive_settlement__isnull=False)
     return r.order_by('exchange','-date_create','branch__code')
 
+def filter_claim(query_set, start_date=None, end_date= None, branch= None, booth=None):
+    claims = query_set
+    if start_date and end_date:
+        claims = claims.filter(date_claim__date__range=(start_date,end_date))
+    if branch:
+        claims = claims.filter(branch=branch)
+    if booth:
+        claims = claims.filter(booth=booth)
+    return claims.order_by('-date_claim','branch__code')
+
+
 def get_reference_no_from_narration(narration,validatorlist=[validate_western_code,validate_ria,validate_placid, validate_xpress,validate_moneygram]):
     """gets all reference number from a narration. returns list"""
     ref_list = []
