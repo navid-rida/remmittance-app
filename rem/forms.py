@@ -121,6 +121,8 @@ class ReceiverForm(ModelForm):
                 validate_old_nid(idno)
         elif idtype=='PASSPORT':
             validate_passport(idno)
+        elif idtype=='DL':
+            validate_alpha_num(idno)
         else:
             validate_bc(idno)
         # Always return a value to use as the new cleaned data, even if
@@ -257,9 +259,9 @@ CHOICES = (
            )
 
 class ClaimForm(ModelForm):
-    #dob = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="Date of Birth",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
-    #idissue = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="ID Issue Date",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'], required=False)
-    #idexpire = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}),label="ID Expiry date",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'], required=False)
+    date_account_credit = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="Date of Account Credit", input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
+    doc_expire = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}),label="Expiry Date of Remitter's Other Document", input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
+    passport_expire = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label= "Expiry Date of Remitter's Passport", input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
 
     class Meta:
         model = Claim
