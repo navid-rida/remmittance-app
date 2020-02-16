@@ -203,7 +203,46 @@ def cash_incentive_df(list, payments):
     frames = [gl_df, ac_df]
     complete_df = pd.concat(frames)
     return complete_df
-
+################################# Claim Related Report ########################
+def make_claim_df(claim_list, columns = ['Sl','Name of Bank','Name of Branch','A/C Number (15 digit)','A/C Title','Amount of Remittance in BDT','Date of A/C Credit','Remittance Received through BEFTN/RTGS','Name of Remittance Collecting/BEFTN Processing Bank','Date of Claim']):
+    """ Accept Claim queryset and returns DatFrame"""
+    sl=[]
+    nrbc_bank = []
+    branch = []
+    ac_no = []
+    ac_title = []
+    amount=[]
+    date_account_credit=[]
+    channel = []
+    other_bank=[]
+    claim_date=[]
+    i=1
+    for claim in claim_list:
+        sl.append(i)
+        i=i+1
+        nrbc_bank.append("NRBC Bank Ltd.")
+        branch.append(claim.branch.name)
+        ac_no.append(claim.account_no)
+        ac_title.append(claim.account_title)
+        amount.append(claim.remittance_amount)
+        date_account_credit.append(claim.date_account_credit)
+        channel.append(claim.get_channel_display())
+        other_bank.append(claim.collecting_bank.name)
+        claim_date.append(claim.date_claim.date())
+    dc = {
+            'SL':sl,
+            'Name of Bank':nrbc_bank,
+            'Name of Branch': branch,
+            'A/C Number': ac_no,
+            'A/C Title': ac_title,
+            'Amount of Remittance in BDT': amount,
+            'Date of A/C Credit': date_account_credit,
+            'Remittance Received Through BEFTN/RTGS': channel,
+            'Name of Remittance Processing Bank': other_bank,
+            'Date of Claim': claim_date
+    }
+    df = pd.DataFrame(dc)
+    return df
 ################################## name search related functions ##################################
 def name_search(search_text, db_txt):
     if fuzz.token_set_ratio(search_text,db_text) > 70:

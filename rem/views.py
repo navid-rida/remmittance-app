@@ -847,7 +847,8 @@ def show_claim(request):
                 return render(request, 'rem/report/claim/claim_list_base.html', context)
             if '_download' in request.POST:
                 #df = pd.DataFrame(summary_list, columns=['code','name','count','sum'])
-                df = pd.DataFrame(list(claim_list.values()))
+                #df = pd.DataFrame(list(claim_list.values()))
+                df = make_claim_df(claim_list)
                 xlsx_data = excel_output(df)
                 response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
                 time = str(timezone.now().date())
