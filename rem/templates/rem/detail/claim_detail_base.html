@@ -25,7 +25,7 @@
         </tr>
         <tr>
           <td>Statement Checked?</td>
-          <td>: {{ object.statement_check }}</td>
+          <td>: {{ object.statement_check|yesno:"YES,NO" }}</td>
         </tr>
         <tr>
           <td>Account:</td>
@@ -45,7 +45,7 @@
         </tr>
         <tr>
           <td>Remitter's Document Checked?</td>
-          <td>: {{ object.document_check }}</td>
+          <td>: {{ object.document_check|yesno:"YES,NO" }}</td>
         </tr>
         <tr>
           <td>Remitter's Name</td>
@@ -57,7 +57,7 @@
         </tr>
         <tr>
           <td>No Visa Required Document Obtained?</td>
-          <td>: {{ object.visa_check }}</td>
+          <td>: {{ object.visa_check|yesno:"YES,NO, Not Applicable" }}</td>
         </tr>
         <tr>
           <td>Other Document Details</td>
@@ -67,7 +67,7 @@
         </tr>
         <tr>
           <td>Letter Obtained?</td>
-          <td>: {{ object.letter_check}}</td>
+          <td>: {{ object.letter_check|yesno:"YES,NO"}}</td>
         </tr>
         <tr>
           <td>Claim Submitted By</td>

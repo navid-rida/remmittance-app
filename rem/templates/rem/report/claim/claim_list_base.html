@@ -90,12 +90,12 @@
             <tr>
 
                 <td>{{entry.date_claim|date:'d/m/Y P'}}</td>
-                <td>{{entry.rem_branch}}</td>
+                <td>{{entry.branch.name}}</td>
                 <td>{{entry.account_no}}</td>
                 <td>{{entry.account_title}}</td>
                 <td>{{entry.remittance_amount|intcomma}}</td>
                 <td>{{entry.date_account_credit}}</td>
-                <td>{{entry.channel}}</td>
+                <td>{{entry.get_channel_display}}</td>
                 <td>{{entry.sender_name}}</td>
                 <td>{{entry.passport_no}}</td>
                 <td>{{entry.passport_issuing_country}}</td>
