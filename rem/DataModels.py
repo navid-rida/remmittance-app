@@ -221,7 +221,7 @@ def make_claim_df(claim_list, columns = ['Sl','Name of Bank','Name of Branch','A
         sl.append(i)
         i=i+1
         nrbc_bank.append("NRBC Bank Ltd.")
-        branch.append(claim.branch.name)
+        branch.append(claim.branch.name.upper())
         ac_no.append(claim.account_no)
         ac_title.append(claim.account_title)
         amount.append(claim.remittance_amount)
@@ -242,7 +242,7 @@ def make_claim_df(claim_list, columns = ['Sl','Name of Bank','Name of Branch','A
             'Date of Claim': claim_date
     }
     df = pd.DataFrame(dc)
-    return df
+    return df.sort_values(by=['Name of Remittance Processing Bank',])
 ################################## name search related functions ##################################
 def name_search(search_text, db_txt):
     if fuzz.token_set_ratio(search_text,db_text) > 70:
