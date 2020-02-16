@@ -449,8 +449,8 @@ class Claim(models.Model):
     letter_check = models.BooleanField("Beneficiary's Letter of Incentive Claim Received?", help_text="Beneficiary's Letter of Incentive Claim must be obtained before submission of claim")
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
     remittance_amount = models.DecimalField("Amount of Remittance in BDT",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Required documents must be collected and retained for paying inentive against Remittances valuing more than BDT 1,50,000.00")
-    date_forward = models.DateTimeField("Date of Claim forwarded to collecting Bank", null=True)
-    date_resolved = models.DateTimeField("Date of Claim realized from collecting Bank", null=True)
+    date_forward = models.DateTimeField("Date of Claim forwarded to collecting Bank", null=True, blank=True)
+    date_resolved = models.DateTimeField("Date of Claim realized from collecting Bank", null=True, blank=True)
 
     def forward_check(self):
         """Checks if the claim is
