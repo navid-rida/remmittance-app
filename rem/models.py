@@ -28,8 +28,8 @@ from schedules.models import District, Currency, Bank
 
 class Branch(models.Model):
     name = models.CharField("Name of The branch", max_length=20,default='Principal')
-    code = models.CharField("Branch Code", validators=[numeric], max_length=4,default='0101')
-    ad_fi_code = models.CharField("AD Code", validators=[numeric], max_length=4, null=True, blank=True)
+    code = models.CharField("Branch Code", validators=[numeric], max_length=4,default='0101', unique=True)
+    ad_fi_code = models.CharField("AD Code", validators=[numeric], max_length=4, null=True, blank=True, unique=True)
     district = models.ForeignKey(District, on_delete=models.CASCADE, verbose_name='District', null=True)
     address = models.TextField("Address of the branch")
 
@@ -73,7 +73,7 @@ class Branch(models.Model):
 
 class Booth(models.Model):
     name = models.CharField("Name of the Booth", max_length=20)
-    code = models.CharField("Booth Code", validators=[numeric], max_length=4)
+    code = models.CharField("Booth Code", validators=[numeric], max_length=4, unique=True)
     address = models.TextField("Address of the Booth")
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, verbose_name='Branch Attached')
 
