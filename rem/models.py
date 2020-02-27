@@ -13,7 +13,7 @@ from django.conf import settings
 import pandas as pd
 from rem.DataModels import filter_remittance, filter_claim
 ########################## aggregate functions ###############################
-from django.db.models import Sum
+from django.db.models import Sum, Q
 ################# import for validation errrors ##############################
 from django.utils.translation import gettext_lazy as _
 
@@ -435,7 +435,7 @@ class Claim(models.Model):
         (RTGS, 'RTGS'),
         )
     channel=models.CharField("Channel of A/C Credit",max_length=1, choices=CHANNEL_CHOICES)
-    collecting_bank=models.ForeignKey(Bank, on_delete=models.CASCADE, verbose_name='Collecting Bank', limit_choices_to={'type': 'PRIVATE COMMERCIAL BANK'})
+    collecting_bank=models.ForeignKey(Bank, on_delete=models.CASCADE, verbose_name='Collecting Bank', limit_choices_to= Q(type='PRIVATE COMMERCIAL BANK') | Q(type='STATE-OWNED COMMERCIAL BANK') | Q(type='FOREIGN COMMERCIAL BANKS'))
     document_check = models.BooleanField("Remitters Document Checked ?", help_text="Remitter's documents must be checked before submission of cash incentive claim")
     sender_name=models.CharField("Remitter's Name", max_length=100, validators=[name,])
     passport_no = models.CharField("Passport Number", max_length=17)
