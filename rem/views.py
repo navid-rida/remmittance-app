@@ -144,9 +144,10 @@ def show_rem(request):
             branch = form.cleaned_data['branch']
             booth = form.cleaned_data['booth']
             keyword = form.cleaned_data['keyword']
+            BranchBooth = form.cleaned_data['BranchBooth']
             #filt['resubmit_flag'] = False
             #filter_args = {k:v for k,v in filt.items() if v is not None}
-            req_list = request.user.employee.get_related_remittance(start_date=date_from, end_date= date_to, branch= branch, booth= booth, exchange_house=exchange_house, keyword=keyword)
+            req_list = request.user.employee.get_related_remittance(start_date=date_from, end_date= date_to, branch= branch, booth= booth, exchange_house=exchange_house, keyword=keyword, BranchBooth=BranchBooth)
             if '_show' in request.POST:
                 sum_n_count = req_list.values('exchange__name').order_by('exchange').annotate(total=Sum('amount')).annotate(number = Count('amount'))
                 context = {'pay_list': req_list, 'form':form, 'sum_n_count':sum_n_count}

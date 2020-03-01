@@ -43,6 +43,13 @@
             {{form.booth.label_tag}}
             {{form.booth|add_class:"form-control"}}
         </div>
+        <div class="col-auto">
+            {% for error in form.BranchBooth.errors %}
+              <div class="alert alert-danger" role="alert">{{ error}}</div>
+            {% endfor %}
+            {{form.BranchBooth.label_tag}}
+            {{form.BranchBooth|add_class:"form-control"}}
+        </div>
         {% endif %}
         {% block branch_dropdown %} {% endblock %}
         <div class="col-auto">
