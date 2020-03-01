@@ -903,7 +903,7 @@ def mark_resolved(request, pk):
 ################################ Reports ################################
 
 @login_required
-@permission_required('rem.view_ho_br_booth_reports')
+#@permission_required('rem.view_ho_br_booth_reports')
 def summary_report(request):
     if request.method == "POST":
         form = SearchForm(request.POST)
@@ -915,10 +915,27 @@ def summary_report(request):
             BranchBooth = form.cleaned_data['BranchBooth']
             lst=Branch.objects.none().order_by('code') # This will contain branch or booth list for summary function
             if BranchBooth=='branch' or BranchBooth=='all':
-                lst = Branch.objects.all().order_by('code')
+                if request.user.has_perm('rem.view_ho_br_booth_reports'):
+                    lst = Branch.objects.all().order_by('code')
+                elif request.user.has_perm('rem.view_branch_remitt'):
+                    lst = Branch.objects.filter(code=request.user.employee.branch.code).order_by('code')
+                else:
+                    lst=Branch.objects.none().order_by('code')
                 #summary_list = branch_remittance_summary(branch_list, start_date=date_from, end_date= date_to, exchange_house= exchange)
             elif BranchBooth=='booth':
-                lst = Booth.objects.all().order_by('code')
+                if request.user.has_perm('rem.view_ho_br_booth_reports'):
+                    lst = Booth.objects.all().order_by('code')
+                elif request.user.has_perm('rem.view_branch_remitt'):
+                    lst = Booth.objects.filter(branch=request.user.employee.branch).order_by('code')
+                elif request.user.has_perm('rem.view_booth_remitt'):
+                    lst = Booth.objects.filter(code=request.user.employee.booth.code).order_by('code')
+                else:
+                    lst=Booth.objects.none().order_by('code')
+            else:
+                if request.user.has_perm('rem.view_booth_remitt') and request.user.employee.booth:
+                    lst = Booth.objects.filter(code=request.user.employee.booth.code).order_by('code')
+                else:
+                    lst=Booth.objects.none().order_by('code')
             summary_list = exchange_housewise_remittance_summary(lst, start_date=date_from, end_date= date_to, exchange_house= exchange, BranchBooth=BranchBooth)
             if '_show' in request.POST:
                 context = {'form':form, 'df': summary_list, }

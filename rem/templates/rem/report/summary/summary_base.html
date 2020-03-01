@@ -2,6 +2,7 @@
 {% load widget_tweaks %}
 {% load humanize %}
 {% block js %}
+{% load rules %}
 
 
 {% endblock %}
@@ -33,7 +34,9 @@
       {{form.exchange.label_tag}}
       {{form.exchange|add_class:"form-control"}}
     </div>
-
+    {% has_perm 'rem.view_branch_remitt' user as branch_user %}
+    {% has_perm 'rem.view_ho_br_booth_reports' user as ho_user %}
+    {% if branch_user or ho_user %}
     <div class="col-auto">
       {% for error in form.BranchBooth.errors %}
       <div class="alert alert-danger" role="alert">{{ error}}</div>
@@ -41,7 +44,7 @@
       {{form.BranchBooth.label_tag}}
       {{form.BranchBooth|add_class:"form-control"}}
     </div>
-
+    {% endif %}
   </div>
   <div class='form-row'>
     <div class="col-auto">

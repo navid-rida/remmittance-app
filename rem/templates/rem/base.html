@@ -42,12 +42,13 @@
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a class="dropdown-item" href="{% url 'show_rem'%}">Remmittance List</a>
             <a class="dropdown-item" href="{% url 'show_claim'%}">Cash Incentive Claim List</a>
+            <a class="dropdown-item" href="{% url 'summary'%}">Exchange House wise Summary Report (Remittance)</a>
             {% comment %}<a class="dropdown-item" href="{% url 'show_req'%}">Request List</a>{% endcomment %}
             {% comment %}{% for group in request.user.groups.all %}
             {% if group.name == "HO Settlement User" %}{% endcomment %}
             {% has_perm 'rem.view_ho_br_booth_reports' user as can_view_summary_report_menu %}
               {% if can_view_summary_report_menu %}
-                <a class="dropdown-item" href="{% url 'summary'%}">Exchange House wise Summary Report</a>
+
                 <a class="dropdown-item" href="{% url 'cash_incentive_bb_statement'%}">Cash Incentive Statemment (BB)</a>
                 <a class="dropdown-item" href="{% url 'daily_remittance_bb'%}">Daily Statemment (BB)</a>
               {% endif %}
