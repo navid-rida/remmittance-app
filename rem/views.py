@@ -805,6 +805,15 @@ def pay_unpaid_incentive(request, pk):
         return redirect('show_rem')
     #return render(request,'rem/forms/remmit_resubmit.html',context)
 
+@login_required
+@permission_required(['rem.view_trm_form'], fn=objectgetter(Remmit, 'pk'))
+@transaction.atomic
+def download_trm(request, pk):
+    rem = Remmit.objects.get(pk=pk)
+    context = {'rem': rem}
+    #result = rem.pay_previously_unpaid_cash_incentive()
+    return render(request, 'rem/detail/trm.html', context)
+
 #####################################Claim Create and Update#########################
 @method_decorator([login_required,transaction.atomic], name='dispatch')
 class ClaimCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):

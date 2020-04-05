@@ -116,6 +116,6 @@
   {% if can_mark_paid and object.check_unpaid_cash_incentive %}
     <td><a class="btn btn-success" href="{% url 'pay_unpaid_incentive' object.pk %}"><i class="far fa-info-square"></i>Pay Cash Incentive</a></td>
   {% endif %}
-
+<td><a class="btn btn-success" href="{% url 'download_trm' object.pk %}"><i class="far fa-info-square"></i>Download TRM Form</a></td>
 {% block payment_action %}{% endblock %}
 {% endblock %}

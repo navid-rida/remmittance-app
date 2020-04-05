@@ -19,6 +19,7 @@ urlpatterns = [
     #path('download/daily-remmittance-csv', views.download_bb_excel, name='download_csv'),
     path('download/daily-remmittance-exc', views.download_selected_excel, name='download_exc'),
     path('download/cash_incentive_excel', views.download_cash_incentive_excel, name='cash_incentive_excel'),
+    path('download/trm/<int:pk>/', views.download_trm, name='download_trm'),
     #path('download/daily-remmittance-mark-settle', views.mark_settle, name='mark_settle'),
     #path('download/daily-cash-incentive-mark-settle', views.cash_incentive_mark_settle, name='cash_incentive_mark_settle'),
     path('search/client', views.search_receiver, name='search_client'),

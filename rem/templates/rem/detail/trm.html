@@ -1,0 +1,17 @@
+{% extends "rem/core_base.html" %}
+{% load humanize %}
+
+{% block content %}
+To<br>
+The Head<br>
+NRB Commercial Bank Limited<br>
+{{ rem.branch }} Branch/Sub-Branch<br>
+<br>
+
+Subject: Inward Wage Earner’s Foreign Remittance amounting Taka {{rem.amount|intcomma}} (In word: Taka ……………) only favoring myself.<br>
+
+<br>Dear Sir,<br>
+
+<br><p>In connection with the above, I furnish hereunder by particulars to effect payment of above remittance by cash. I understand that the particulars have been furnished in compliance of Bangladesh Bank’s instruction regarding provisions of Money Laundering Prevention Act 2012, amended in 2015 and Anti-Terrorism Act 2009, amended in 2013.<p>
+
+{% endblock %}
