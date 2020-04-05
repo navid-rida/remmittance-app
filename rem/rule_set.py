@@ -17,7 +17,7 @@ def is_same_branch_user(user,remittance):
 
 @rules.predicate
 def is_transaction_hour(user):
-    return time(9,59)<timezone.localtime().time()<time(16,16)
+    return time(9,59)<timezone.localtime().time()<time(13,16)
 
 @rules.predicate
 def remittance_less_than_usd1500(user,remittance):
@@ -42,6 +42,7 @@ def is_same_domain_user(user,request):
 rules.add_perm('rem.change_remmit', is_entry_creator & is_same_branch_user)
 rules.add_perm('rem.add_remmit', is_branch_remittance_user | is_booth_remittance_user)
 rules.add_perm('rem.view_branch_remitt', is_branch_report_observer_user)
+rules.add_perm('rem.view_trm_form', (is_branch_remittance_user & is_same_branch_user) | is_ho_report_user | rules.is_superuser)
 rules.add_perm('rem.view_booth_remitt', is_booth_report_observer_user)
 rules.add_perm('rem.view_all_remitt', is_ho_report_user)
 rules.add_perm('rem.view_ho_br_booth_reports', is_ho_report_user)
