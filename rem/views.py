@@ -1,4 +1,7 @@
+from __future__ import unicode_literals
+
 from django.shortcuts import render,redirect, get_object_or_404#, render_to_response
+from django.template.loader import render_to_string
 from django.http import HttpResponse
 from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm, SettlementForm, MultipleSearchForm, ClaimForm
 from django.contrib.auth.decorators import login_required,user_passes_test
@@ -35,6 +38,12 @@ import rules
 from rem.search import remittance_search
 # Create your views here.
 from schedules.data import get_daily_bb_remittance
+
+
+from weasyprint import HTML, CSS
+from weasyprint.fonts import FontConfiguration
+
+from pathlib import Path
 
 MAXIMUM_AllOWWED_USER_PER_BRANCH = settings.MAXIMUM_USER_PER_BRANCH
 
@@ -809,10 +818,22 @@ def pay_unpaid_incentive(request, pk):
 @permission_required(['rem.view_trm_form'], fn=objectgetter(Remmit, 'pk'))
 @transaction.atomic
 def download_trm(request, pk):
-    rem = Remmit.objects.get(pk=pk)
+    rem = get_object_or_404(Remmit, pk=pk)
     context = {'rem': rem}
+    response = HttpResponse(content_type="application/pdf")
+    response['Content-Disposition'] = "inline; filename={date}-{name}-trm form.pdf".format(
+        date=timezone.now(),
+        name=rem.reference,
+    )
+    html = render_to_string("rem/detail/trm.html", context)
     #result = rem.pay_previously_unpaid_cash_incentive()
-    return render(request, 'rem/detail/trm.html', context)
+    #return render(request, 'rem/detail/trm.html', context)
+
+    font_config = FontConfiguration()
+    css_path = Path(settings.STATIC_ROOT,'css/bootstrap/bootstrap.css')
+    css = CSS(css_path)
+    HTML(string=html).write_pdf(response, stylesheets=[css], font_config=font_config)
+    return response
 
 #####################################Claim Create and Update#########################
 @method_decorator([login_required,transaction.atomic], name='dispatch')
