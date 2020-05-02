@@ -194,6 +194,20 @@ def update_user_employee(sender, instance, created, **kwargs):
 
 class Receiver(models.Model):
     name = models.CharField("Name of Receiver", validators=[name], max_length=100)
+    MALE= 'M'
+    FEMALE = 'F'
+    OTHER = 'O'
+    GENDER_CHOICES = (
+        (MALE,'MALE'),
+        (FEMALE, 'FEMALE'),
+        (OTHER, 'Other'),
+        )
+    gender=models.CharField("Gender of Receiver",max_length=1, choices=GENDER_CHOICES)
+    father_name = models.CharField("Father's name of Receiver", max_length=100, null=True, blank=True)
+    mother_name = models.CharField("Mother's of Receiver", max_length=100)
+    spouse_name = models.CharField("Spouse name",  max_length=100, null=True, blank=True)
+    profession = models.CharField("Profession", max_length=100)
+    nationality = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Nationality',  default=Country.objects.get(name='BANGLADESH').id)
     ac_no = models.CharField("Account Number of the receiver (If any)", validators=[nrbc_acc], max_length=15, null=True, blank=True)
     address = models.TextField("Address of Receiver")
     dob = models.DateField("Date of Birth of Receiver")
@@ -248,6 +262,12 @@ class Receiver(models.Model):
             return self.idno
         else:
             return None
+
+    def check_incomplete_info(self):
+        if self.father_name=='N/A' or self.mother_name=='N/A' or self.spouse_name=='N/A' or self.profession == 'N/A' or self.gender=='O':
+            return True
+        else:
+            return False
 
 
 class ReceiverUpdateHistory(models.Model):

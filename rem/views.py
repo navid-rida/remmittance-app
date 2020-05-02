@@ -365,6 +365,9 @@ def search_receiver(request):
             identification = form.cleaned_data['identification']
             try:
                 receiver = Receiver.objects.get(idno=identification)
+                if receiver.check_incomplete_info():
+                    messages.info(request, 'It seems that the customer information is incomplete. Please update the appropriate fields')
+                    return redirect('receiver_update', receiver.id)
                 context = {'receiver': receiver, 'form': form}
             except Receiver.DoesNotExist:
                 form = ReceiverForm()
@@ -442,7 +445,9 @@ class ReceiverUpdate(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
             return False"""
 
     def get_success_url(self):
-        return reverse('remmit-create-with-payment', kwargs={'pk': self.object.id})
+        return reverse('search_client')
+    
+    
 
     def form_valid(self, form):
         update = ReceiverUpdateHistory()
@@ -834,6 +839,29 @@ def download_trm(request, pk):
     css = CSS(css_path)
     HTML(string=html).write_pdf(response, stylesheets=[css], font_config=font_config)
     return response
+
+
+@login_required
+@permission_required(['rem.view_trm_form'], fn=objectgetter(Remmit, 'pk'))
+@transaction.atomic
+def download_voucher(request, pk):
+    rem = get_object_or_404(Remmit, pk=pk)
+    context = {'rem': rem}
+    response = HttpResponse(content_type="application/pdf")
+    response['Content-Disposition'] = "inline; filename={date}-{name}-voucher.pdf".format(
+        date=timezone.now(),
+        name=rem.reference,
+    )
+    html = render_to_string("rem/detail/voucher.html", context)
+    #result = rem.pay_previously_unpaid_cash_incentive()
+    #return render(request, 'rem/detail/trm.html', context)
+
+    font_config = FontConfiguration()
+    css_path = Path(settings.STATIC_ROOT,'css/bootstrap/bootstrap.css')
+    css = CSS(css_path)
+    HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(response, stylesheets=[css], font_config=font_config)
+    return response
+    #return render(request, 'rem/detail/voucher.html', context)
 
 #####################################Claim Create and Update#########################
 @method_decorator([login_required,transaction.atomic], name='dispatch')

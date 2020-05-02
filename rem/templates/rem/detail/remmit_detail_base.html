@@ -1,5 +1,6 @@
 {% extends "rem/base.html" %}
 {% load widget_tweaks %}
+{% load crispy_forms_tags %}
 {% load rules %}
 {% load humanize %}
 {% block title %} Payment Details {% endblock %}
@@ -28,11 +29,13 @@
 
         <tr>
           <td>Benificiary Identification ( {{ object.receiver.idtype }} )</td>
-          <td>: {{ object.receiver.idno }} [ <b>Issue Date:</b> {{ object.receiver.idissue }}, <b>Expiry Date:</b> {{ object.remittance.idexpire }}]</td>
+          <td>: {{ object.receiver.idno }} [ <b>Issue Date:</b> {{ object.receiver.idissue }}, <b>Expiry Date:</b>
+            {{ object.remittance.idexpire }}]</td>
         </tr>
         <tr>
           <td>Requested Posted by</td>
-          <td>: {{ object.created_by }}, Branch: {{object.branch}}, Booth: {{object.booth}}, Cell: {{ object.created_by.employee.cell }}</td>
+          <td>: {{ object.created_by }}, Branch: {{object.branch}}, Booth: {{object.booth}}, Cell:
+            {{ object.created_by.employee.cell }}</td>
         </tr>
         <tr>
           <td>Date of Birth of Benificiary</td>
@@ -63,9 +66,9 @@
           <td>
             : {{ object.get_cash_incentive_status_display }}
             {% if object.date_cash_incentive_settlement %}
-              (Settled on: {{object.date_cash_incentive_settlement}})
+            (Settled on: {{object.date_cash_incentive_settlement}})
             {% else %}
-              (Not Settled)
+            (Not Settled)
             {% endif %}
           </td>
         </tr>
@@ -108,14 +111,21 @@
 </div>
 
 {% if object.requestpay_set.last.payment.agent_screenshot.url != '' %}
-  <p>Agent Copy: <br><img src='{{ object.requestpay_set.last.payment.agent_screenshot.url }}' class="img-fluid"><img></p>
+<p>Agent Copy: <br><img src='{{ object.requestpay_set.last.payment.agent_screenshot.url }}' class="img-fluid"><img></p>
 {% endif %}
 
 
 {% has_perm 'rem.can_mark_paid_remittance' user object as can_mark_paid %}
-  {% if can_mark_paid and object.check_unpaid_cash_incentive %}
-    <td><a class="btn btn-success" href="{% url 'pay_unpaid_incentive' object.pk %}"><i class="far fa-info-square"></i>Pay Cash Incentive</a></td>
-  {% endif %}
-<td><a class="btn btn-success" href="{% url 'download_trm' object.pk %}"><i class="far fa-info-square"></i>Download TRM Form</a></td>
+{% if can_mark_paid and object.check_unpaid_cash_incentive %}
+<td><a class="btn btn-success" href="{% url 'pay_unpaid_incentive' object.pk %}"><i class="far fa-info-square"></i>Pay
+    Cash Incentive</a></td>
+{% endif %}
+<div class="card">
+  <div class="card-header">
+    <a class="btn btn-primary" href="{% url 'download_trm' object.pk %}"> TRM Form </a>
+    <a class="btn btn-primary" href="{% url 'download_voucher' object.pk %}"> Voucher </a>
+  </div>
+</div>
+<br>
 {% block payment_action %}{% endblock %}
 {% endblock %}

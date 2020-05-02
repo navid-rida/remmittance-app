@@ -1,108 +1,13 @@
 {% extends "rem/base.html" %}
 {% load widget_tweaks %}
+{% load crispy_forms_tags %}
 {% block title %} Update Receiver {% endblock %}
 {% block content %}
-
-<form method="post">
-  {% csrf_token %}
-  <div class='form-row'>
-      <div class="col-auto">
-          {{form.name.label_tag}}
-          {{form.name|add_class:"form-control"}}
-          {% for error in form.name.errors %}
-          <div class="alert alert-danger" role="alert">
-              {{error}}
-          </div>
-          {% endfor %}
-      </div>
-      <div class="col-auto">
-          {{form.cell.label_tag}}
-          {{form.cell|add_class:"form-control"}}
-          {% for error in form.cell.errors %}
-          <div class="alert alert-danger" role="alert">
-              {{error}}
-          </div>
-          {% endfor %}
-      </div>
-  </div>
-  <div class='form-row'>
-    <div class="col-auto">
-        {{form.dob.label_tag}}
-        {{form.dob}}
-        {% for error in form.dob.errors %}
-        <div class="alert alert-danger" role="alert">
-            {{error}}
-        </div>
-        {% endfor %}
-    </div>
-  </div>
-  <div class='form-row'>
-    <div class="col-auto">
-      {{form.ac_no.label_tag}}
-      {{form.ac_no|add_class:"form-control"}}
-      {% for error in form.ac_no.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{error}}
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-  <div class='form-row'>
-    <div class="col-auto">
-        {{form.address.label_tag}}
-        {{form.address|add_class:"form-control"}}
-        {% for error in form.address.errors %}
-        <div class="alert alert-danger" role="alert">
-            {{error}}
-        </div>
-        {% endfor %}
-    </div>
-  </div>
-  <div class='form-row'>
-      <div class="col-auto">
-          {{form.idtype.label_tag}}
-          {{form.idtype|add_class:"form-control element_margin"}}
-          {% for error in form.idtype.errors %}
-          <div class="alert alert-danger" role="alert">
-              {{error}}
-          </div>
-          {% endfor %}
-      </div>
-      <div class="col-auto">
-          {{form.idno.label_tag}}
-          {{form.idno|add_class:"form-control element_margin"}}
-          {% for error in form.idno.errors %}
-          <div class="alert alert-danger" role="alert">
-              {{error}}
-          </div>
-          {% endfor %}
-      </div>
-    </div>
-    <div class='form-row'>
-      <div class="col-auto">
-          {{form.idissue.label_tag}}
-          {{form.idissue|add_class:"form-control date element_margin"}}
-          {% for error in form.idissue.errors %}
-          <div class="alert alert-danger" role="alert">
-              {{error}}
-          </div>
-          {% endfor %}
-      </div>
-      <div class="col-auto">
-          {{form.idexpire.label_tag}}
-          {{form.idexpire|add_class:"form-control date element_margin"}}
-          {% for error in form.idexpire.errors %}
-          <div class="alert alert-danger" role="alert">
-              {{error}}
-          </div>
-          {% endfor %}
-      </div>
-    </div>
-  <div class='form-row'>
-      <div class="col-auto">
-          <button type="submit" class="btn btn-primary btn-sm mb-2">Create</button>
-      </div>
-  </div>
-  </form>
-
+<div class="container col-md-6 offset-3">
+    <h4>Update Receiver</h4><br>
+    <form method="post">
+        {% csrf_token %}
+        {% crispy form %}
+    </form>
+</div>
 {% endblock %}

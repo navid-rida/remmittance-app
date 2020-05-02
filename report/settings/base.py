@@ -28,12 +28,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     ########################## Additional Apps###################################
     'widget_tweaks',
-    #'floppyforms',
-    'django.contrib.humanize',
+    #Crsipy forms,
+    'crispy_forms',
     #Rules
     'rules',
+
 ]
 
 MIDDLEWARE = [
@@ -123,3 +125,6 @@ MAXIMUM_USER_HEAD_OFFICE=10
 ############################ django-registration settings ##############################
 
 ACCOUNT_ACTIVATION_DAYS = 2
+
+####################### Crispy Forms #############################
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

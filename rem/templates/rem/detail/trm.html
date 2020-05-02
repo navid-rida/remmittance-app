@@ -2,37 +2,116 @@
 {% load humanize %}
 
 {% block content %}
+Date: {{rem.get_completed_payment.dateresolved.date}}<br><br>
 To<br>
 The Head<br>
 NRB Commercial Bank Limited<br>
-{{ rem.branch }} Branch/Sub-Branch<br>
+{% if rem.booth %}
+{{ rem.booth}} Sub-Branch<br>
+{% else %}
+{{ rem.branch }} Branch<br>
+{% endif %}
 <br>
 
-Subject: Inward Wage Earner’s Foreign Remittance amounting Taka {{rem.amount|intcomma}} (In word: Taka ……………) only favoring myself.<br>
+Subject: Inward Wage Earner’s Foreign Remittance amounting Taka {{rem.amount|intcomma}} (In word: Taka ………………………………………)
+only favoring myself.<br>
 
 <br>Dear Sir,<br>
 
-<p>In connection with the above, I furnish hereunder by particulars to effect payment of above remittance by cash. I understand that the particulars have been furnished in compliance of Bangladesh Bank’s instruction regarding provisions of Money Laundering Prevention Act 2012, amended in 2015 and Anti-Terrorism Act 2009, amended in 2013.<p>
+<p>In connection with the above, I furnish hereunder by particulars to effect payment of above remittance by cash. I
+    understand that the particulars have been furnished in compliance of Bangladesh Bank’s instruction regarding
+    provisions of Money Laundering Prevention Act 2012, amended in 2015 and Anti-Terrorism Act 2009, amended in 2013.<p>
 
-<table class="table table-bordered">
-    <tr><td ><b>Name of Exchange House:</b></td><td>{{rem.exchange.name}} </td></tr>
-    <tr><td>Secret PIN:</td> <td>{{ rem.reference}}</td></tr>
-    <tr><td> BENEFICIARY’S NAME: </td><td>{{ rem.receiver.name }}</td></tr>
-    <tr><td> BENEFICIARY’S DATE OF BIRTH: </td><td>{{rem.receiver.dob}}</td></tr>
-    <tr><td> FATHER/HUSBAND’S NAME OF BENEFICIARY: </td><td>to be updated</td></tr>
-    <tr><td> MOTHER’S NAME OF BENEFICIARY: </td><td>to be updated</td></tr>
-    <tr><td> BENEFICIARY’S PRESENT ADDRESS: </td><td>{{rem.receiver.address}}</td></tr>
-    <tr><td> BENEFICIARY’S NATIONALITY: </td><td>to be updated</td></tr>
-    <tr><td> BENEFICIARY’S RELATIONSHIP WITH SENDER: </td><td>{{rem.relationship}}</td></tr>
-    <tr><td> IDENTIFICATION THROUGH: </td><td>{{rem.receiver.get_idtype_display}} No: {{rem.receiver.idno}}</td></tr>
-    <tr><td>BENEFICIARY’S PROFESSION:  </td><td>to be updated</td></tr>
-    <tr><td> BENEFICIARY’S PHONE NO: </td><td>{{rem.receiver.cell}}</td></tr>
-    <tr><td> AMOUNT (IN FIGURE): </td><td>{{rem.amount}}</td></tr>
-    <tr><td> PURPOSE OF SENDING REMITTANCE: </td><td>{{rem.purpose}}</td></tr>
-    <tr><td> SENDER’S NAME:    </td><td>{{rem.sender}}</td></tr>
-    <tr><td> COUNTRY OF SENDING REMITTANCE: </td><td>{{rem.rem_country}}</td></tr>
-    <tr><td> PROCESSED BY: </td><td>{{rem.created_by}}</td></tr>
-    <tr><td> CASH RECEIVING DATE: PAYMENT DATE </td><td>{{</td></tr>
+        <table class="table table-bordered table-sm">
+            <tr>
+                <td><b>Name of Exchange House:</b></td>
+                <td>{{rem.exchange.name}} </td>
+            </tr>
+            <tr>
+                <td>Secret PIN:</td>
+                <td>{{ rem.reference}}</td>
+            </tr>
+            <tr>
+                <td> BENEFICIARY’S NAME: </td>
+                <td>{{ rem.receiver.name }}</td>
+            </tr>
+            <tr>
+                <td> BENEFICIARY’S DATE OF BIRTH: </td>
+                <td>{{rem.receiver.dob}}</td>
+            </tr>
+            {% if rem.receiver.father_name %}
+            <tr>
+                <td> FATHER'S NAME OF BENEFICIARY: </td>
+                <td>{{rem.receiver.father_name}}</td>
+            </tr>
+            {% endif %}
+            {% if rem.receiver.spouse_name %}
+            <tr>
+                <td> SPOUSE'S NAME OF BENEFICIARY: </td>
+                <td>{{rem.receiver.father_name}}</td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td> MOTHER’S NAME OF BENEFICIARY: </td>
+                <td>{{rem.receiver.mother_name}}</td>
+            </tr>
+            <tr>
+                <td> BENEFICIARY’S PRESENT ADDRESS: </td>
+                <td>{{rem.receiver.address}}</td>
+            </tr>
+            <tr>
+                <td> BENEFICIARY’S NATIONALITY: </td>
+                <td>{{rem.receiver.nationality}}</td>
+            </tr>
+            <tr>
+                <td> BENEFICIARY’S RELATIONSHIP WITH SENDER: </td>
+                <td>{{rem.relationship}}</td>
+            </tr>
+            <tr>
+                <td> IDENTIFICATION THROUGH: </td>
+                <td>{{rem.receiver.get_idtype_display}} No: {{rem.receiver.idno}}</td>
+            </tr>
+            <tr>
+                <td> BENEFICIARY’S PROFESSION: </td>
+                <td>{{rem.receiver.profession}}</td>
+            </tr>
+            <tr>
+                <td> BENEFICIARY’S PHONE NO: </td>
+                <td>{{rem.receiver.cell}}</td>
+            </tr>
+            <tr>
+                <td> AMOUNT (IN FIGURE): </td>
+                <td>{{rem.amount}}</td>
+            </tr>
+            <tr>
+                <td> PURPOSE OF SENDING REMITTANCE: </td>
+                <td>{{rem.purpose}}</td>
+            </tr>
+            <tr>
+                <td> SENDER’S NAME: </td>
+                <td>{{rem.sender}}</td>
+            </tr>
+            <tr>
+                <td> COUNTRY OF SENDING REMITTANCE: </td>
+                <td>{{rem.rem_country}}</td>
+            </tr>
+            <tr>
+                <td> PROCESSED BY: </td>
+                <td>{{rem.created_by}}</td>
+            </tr>
+            <tr>
+                <td> PAYMENT DATE </td>
+                <td>{{rem.get_completed_payment.dateresolved.date}}</td>
+            </tr>
 
-</table>
-{% endblock %}
+        </table>
+
+        <br><br><br><br><br><br><br><br><br><br>
+        <div class="container">
+            <div class="row">
+                <div class="col">______________________________<br> Signature of The Bank Official</div>
+                <div class="col">______________________________<br> Signature of The Benificiary</div>
+            </div>
+        </div>
+
+        {% endblock %}
