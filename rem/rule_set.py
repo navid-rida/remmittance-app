@@ -51,7 +51,7 @@ rules.add_perm('rem.can_mark_paid_remittance', is_ho_settlement_user | (is_entry
 
 #---------------------------------------------------------------------------------
 
-rules.add_perm('rem.change_reciver', is_entry_creator | rules.is_superuser )
+rules.add_perm('rem.change_reciver', is_same_branch_user | rules.is_superuser )
 rules.add_perm('rem.allow_if_transaction_hour', is_transaction_hour )
 
 #---------------------------------------------------------------------------------
