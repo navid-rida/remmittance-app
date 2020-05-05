@@ -429,7 +429,7 @@ class ReceiverCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
 @method_decorator([login_required,transaction.atomic],name='dispatch')
 class ReceiverUpdate(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Receiver
-    permission_required = ['rem.change_reciver','rem.allow_if_transaction_hour']
+    permission_required = ['rem.allow_if_transaction_hour']
     form_class = ReceiverForm
     template_name = 'rem/forms/receiver_edit_form.html'
     success_message = "Customer was updated successfully"
