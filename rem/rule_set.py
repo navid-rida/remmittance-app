@@ -12,12 +12,12 @@ def is_same_branch_user(user,remittance):
     return remittance.branch == user.employee.branch
 
 @rules.predicate
-def is_same_branch_user(user,remittance):
-    return remittance.branch == user.employee.branch
+def is_same_branch_as_creator(user,receiver):
+    return receiver.created_by.employee.branch == user.employee.branch
 
 @rules.predicate
 def is_transaction_hour(user):
-    return time(9,59)<timezone.localtime().time()<time(12,45)
+    return time(9,59)<timezone.localtime().time()<time(15,00)
 
 @rules.predicate
 def remittance_less_than_usd1500(user,remittance):
@@ -51,7 +51,7 @@ rules.add_perm('rem.can_mark_paid_remittance', is_ho_settlement_user | (is_entry
 
 #---------------------------------------------------------------------------------
 
-rules.add_perm('rem.change_reciver', is_entry_creator | rules.is_superuser )
+rules.add_perm('rem.change_reciver', is_same_branch_as_creator | rules.is_superuser )
 rules.add_perm('rem.allow_if_transaction_hour', is_transaction_hour )
 
 #---------------------------------------------------------------------------------

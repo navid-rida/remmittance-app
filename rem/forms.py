@@ -11,6 +11,9 @@ from django.conf import settings
 from django.db import transaction
 ############### imports for django-registration #############################
 from django_registration.forms import RegistrationForm, RegistrationFormUniqueEmail
+################## Crispy forms ########################
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Field, Submit #, Fieldset, ButtonHolder, Submit
 
 
 class RemmitForm(ModelForm):
@@ -102,7 +105,7 @@ class ReceiverForm(ModelForm):
 
     class Meta:
         model = Receiver
-        fields = ('name','cell','address','dob','idtype','idno','idissue','idexpire','ac_no')
+        exclude = ['created_by']
         widgets = {
             #'dob': forms.SelectDateWidget,
             'address': forms.Textarea(attrs={'rows':4, 'cols':45}),
@@ -110,6 +113,28 @@ class ReceiverForm(ModelForm):
             #'idissue': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
             #'idexpire': forms.DateInput(format['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super(ReceiverForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            'name',
+            'gender',
+            'father_name',
+            'mother_name',
+            'spouse_name',
+            'profession',
+            'nationality',
+            'ac_no',
+            'address',
+            Field('dob', css_class="date"),
+            'cell',
+            'idtype',
+            Field('idissue', css_class="date"),
+            Field('idexpire', css_class="date"),
+            'idno',
+            Submit('submit', 'CREATE')
+        )
 
     def clean_idno(self):
         idno = self.cleaned_data['idno']
@@ -138,6 +163,37 @@ class ReceiverForm(ModelForm):
         # this method didn't change it.
         return idissue
 
+    def clean_father_name(self):
+        father = self.cleaned_data["father_name"]
+        gender = self.cleaned_data["gender"]
+        if gender=='M' and father==None:
+            raise ValidationError('Father name is required')
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return father
+
+
+    def clean_nationality(self):
+        country = self.cleaned_data["nationality"]
+        bd = Country.objects.get(name='BANGLADESH')
+        if country!=bd:
+            raise ValidationError('Only bangladeshi citizens are allowed')
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return country
+
+
+    def clean(self):
+        cleaned_data = super().clean()
+        father = cleaned_data.get("father_name")
+        spouse = cleaned_data.get("spouse_name")
+        gender = cleaned_data.get("gender")
+        #unpaid_cash_incentive_reason = cleaned_data.get("unpaid_cash_incentive_reason")
+        #if 'cash_incentive_status' in form.changed_data:
+        if gender=='F' and (father==None and spouse==None):
+             raise forms.ValidationError(
+                    "Either father name or husbands name is required"
+                )
 
 class ReceiverSearchForm(forms.Form):
     #cell = forms.CharField(label="Enter Customer's Cell No.", validators=[validate_mobile])

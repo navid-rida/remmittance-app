@@ -1,0 +1,25 @@
+{% extends "rem/core_base.html" %}
+{% load humanize %}
+{%load static %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row align-items-start">
+        <div class="col border">
+            NRBCB.GB.26 
+        </div>
+        <div class="col">
+            <img src="{% static 'images/voucher-logo.png' %}" class="img-fluid" style="width:250px;height:auto;"><img><br>
+            <div style="text-align:center"><h4>Debit Voucher</h4></div>
+        </div>
+        <div class="col border">
+            AC No: {{rem.exchange.gl_no}}<br>
+            Date: {{rem.get_completed_payment.dateresolved.date}}
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
