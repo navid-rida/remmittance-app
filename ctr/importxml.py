@@ -84,6 +84,16 @@ def rename_file(file_path_old, file_number, year, month):
     except:
         return False
 
+def rename_all_files_in_path(folder_path, year, month):
+    lst = get_file_list(folder_path)
+    for file in lst:
+        number = get_file_number_from_file_name(file)
+        rename = rename_file(file, number, year, month)
+        if not rename:
+            print("File number Cannot be renamed")
+    print("Done")
+        
+
 
 
 """def xml_to_df(xmlfile):
