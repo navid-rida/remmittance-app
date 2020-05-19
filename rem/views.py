@@ -526,7 +526,12 @@ def mark_settle_all(request):
         if form.is_valid():
             file = request.FILES.get('batchfile')
             settlement_type = request.POST['settlemnt_type']
-            df = pd.read_excel(file,names=['date', 'branch_code','booth_code', 'ac_no', 'type', 'amount', 'narrations', 'flags'])
+            df = pd.read_excel(file,names=['date', 'branch_code','booth_code', 'ac_no', 'type', 'amount', 'narrations', 'flags'], header=None)
+            if clean_settlement_df(df):
+                lst = clean_settlement_df(df)
+                for n in lst:
+                    messages.error(request, "Row "+str(n+1)+" have missing element in one or more cells")
+                return redirect('mark_settle_all')
             df['reference'] = df['narrations'].apply(get_reference_no_from_narration)
             lst = get_reference_no_list_from_df(df)
             if settlement_type=='remittance':
@@ -846,7 +851,8 @@ def download_trm(request, pk):
 @transaction.atomic
 def download_voucher(request, pk):
     rem = get_object_or_404(Remmit, pk=pk)
-    context = {'rem': rem}
+    taka, ps = (int(rem.amount//1), int(Decimal(rem.amount%1)*100))
+    context = {'rem': rem, 'taka':taka, 'ps':ps, 'user':request.user}
     response = HttpResponse(content_type="application/pdf")
     response['Content-Disposition'] = "inline; filename={date}-{name}-voucher.pdf".format(
         date=timezone.now(),
@@ -862,6 +868,27 @@ def download_voucher(request, pk):
     HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(response, stylesheets=[css], font_config=font_config)
     return response
     #return render(request, 'rem/detail/voucher.html', context)
+
+@login_required
+@permission_required(['rem.view_trm_form'], fn=objectgetter(Remmit, 'pk'))
+@transaction.atomic
+def download_undertaking(request, pk):
+    rem = get_object_or_404(Remmit, pk=pk)
+    context = {'rem': rem}
+    response = HttpResponse(content_type="application/pdf")
+    response['Content-Disposition'] = "inline; filename={date}-{name}-undertaking.pdf".format(
+        date=timezone.now(),
+        name=rem.reference,
+    )
+    html = render_to_string("rem/detail/undertaking.html", context)
+    #result = rem.pay_previously_unpaid_cash_incentive()
+    #return render(request, 'rem/detail/trm.html', context)
+
+    font_config = FontConfiguration()
+    css_path = Path(settings.STATIC_ROOT,'css/bootstrap/bootstrap.css')
+    css = CSS(css_path)
+    HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(response, stylesheets=[css], font_config=font_config)
+    return response
 
 #####################################Claim Create and Update#########################
 @method_decorator([login_required,transaction.atomic], name='dispatch')

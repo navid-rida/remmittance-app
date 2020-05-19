@@ -21,6 +21,7 @@ urlpatterns = [
     path('download/cash_incentive_excel', views.download_cash_incentive_excel, name='cash_incentive_excel'),
     path('download/trm/<int:pk>/', views.download_trm, name='download_trm'),
     path('download/voucher/<int:pk>/', views.download_voucher, name='download_voucher'),
+    path('download/undertaking/<int:pk>/', views.download_undertaking, name='download_undertaking'),
     #path('download/daily-remmittance-mark-settle', views.mark_settle, name='mark_settle'),
     #path('download/daily-cash-incentive-mark-settle', views.cash_incentive_mark_settle, name='cash_incentive_mark_settle'),
     path('search/client', views.search_receiver, name='search_client'),

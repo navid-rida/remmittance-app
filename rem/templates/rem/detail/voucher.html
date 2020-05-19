@@ -4,22 +4,134 @@
 
 {% block content %}
 
-<div class="container">
+<div class="container border">
     <div class="row align-items-start">
         <div class="col border">
-            NRBCB.GB.26 
+            NRBCB.GB.26
         </div>
         <div class="col">
-            <img src="{% static 'images/voucher-logo.png' %}" class="img-fluid" style="width:250px;height:auto;"><img><br>
-            <div style="text-align:center"><h4>Debit Voucher</h4></div>
+            <img src="{% static 'images/voucher-logo.png' %}" class="img-fluid"
+                style="width:250px;height:auto;"><img><br>
+            <div style="text-align:center">
+                <h4>Debit Voucher</h4>
+            </div>
         </div>
         <div class="col border">
             AC No: {{rem.exchange.gl_no}}<br>
             Date: {{rem.get_completed_payment.dateresolved.date}}
         </div>
     </div>
+    <div class="row border">
+
+        DEBIT {{rem.exchange.name}} FOR BDT {{rem.amount}}
+
+    </div>
+    <div class="row">
+        <table class="table table-bordered">
+            <tbody>
+                <tr>
+                    <td rowspan="5">
+                        <p>THE AMOUNT PAID TO BENEFICIARY’S NAME AS CASH AGAINST EXCHANGE HOUSE NAME PAYMENT NO.
+                            REFERENCE NO</p>
+                    </td>
+                    <td>Taka</td>
+                    <td>PS</td>
+                </tr>
+                <tr>
+                    <td>{{taka}}</td>
+                    <td>{{ps}}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align:right">Total</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="3">TOTAL (in Words) Taka ………………..……………………………………&amp; Ps. ……… Only</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
 </div>
+<p><small>This is a system generated voucher generated on {% now "d/m/Y h:i A" %} by {{ user }}(branch:{{user.employee.branch}}) at {{rem.branch}} Branch</small></p>
+<br>
+<i class="fas fa-cut"></i>-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------<br>
+<br>
+<div class="container border">
+    <div class="row align-items-start">
+        <div class="col border">
+            NRBCB.GB.26
+        </div>
+        <div class="col">
+            <img src="{% static 'images/voucher-logo.png' %}" class="img-fluid"
+                style="width:250px;height:auto;"><img><br>
+            <div style="text-align:center">
+                <h4>Debit Voucher</h4>
+            </div>
+        </div>
+        <div class="col border">
+            AC No: {{rem.exchange.gl_no}}<br>
+            Date: {{rem.get_completed_payment.dateresolved.date}}
+        </div>
+    </div>
+    <div class="row border">
 
+        DEBIT {{rem.exchange.name}} FOR BDT {{rem.amount}}
 
+    </div>
+    <div class="row">
+        <table class="table table-bordered">
+            <tbody>
+                <tr>
+                    <td rowspan="5">
+                        <p>THE AMOUNT PAID TO BENEFICIARY’S NAME AS CASH AGAINST EXCHANGE HOUSE NAME PAYMENT NO.
+                            REFERENCE NO</p>
+                    </td>
+                    <td>Taka</td>
+                    <td>PS</td>
+                </tr>
+                <tr>
+                    <td>{{taka}}</td>
+                    <td>{{ps}}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align:right">Total</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="3">TOTAL (in Words) Taka ………………..……………………………………&amp; Ps. ……… Only</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<p><small>This is a system generated voucher generated on {% now "d/m/Y h:i A" %} by {{ user }}(branch:{{user.employee.branch}}) at {{rem.branch}} Branch</small></p>
 
 {% endblock %}

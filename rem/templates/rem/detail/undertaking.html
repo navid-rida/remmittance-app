@@ -1,0 +1,34 @@
+{% extends "rem/core_base.html" %}
+{% load humanize %}
+
+{% block content %}
+Date: {% now "d/m/Y"%}<br><br>
+
+The Head<br>
+{% if rem.booth %}
+{{ rem.booth}} Sub-Branch<br>
+{% else %}
+{{ rem.branch }} Branch<br>
+{% endif %}
+NRB Commercial Bank Limited<br>
+<br>
+
+Subject: Letter of Undertaking <br>
+
+<br>Dear Sir,<br><br>
+
+<p>As per FE Circular No-31 dated 06 August, 2019 circulated by Foreign Exchange Policy Department of Bangladesh Bank,
+    I, the undersigned, have received BDT {{rem.cash_incentive_amount}} as 2% Cash Incentive against Wage Earner Remittance
+    Amount BDT {{rem.amount}} Remittance Reference No. {{rem.reference}}. through {{rem.exchange.name}} from your branch. Legal action may be
+    taken if there is any irregularity found against my receipt of the above mentioned amount of Cash Incentive. In that
+    case, I will be bound to return the full amount of Cash Incentive received. Besides, I am bound to return excess
+    amount of Cash Incentive if found any.</p>
+
+    <br>Thank you.<br>
+    <br>Sincerely yours,
+
+<br><br><br><br>
+Signature: ________________________<br>
+{{rem.receiver.name}}
+
+{% endblock %}

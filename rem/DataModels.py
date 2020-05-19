@@ -325,3 +325,12 @@ def get_reference_no_list_from_df(df):
         lst = get_reference_no_from_narration(row['narrations'])
         ref_list=ref_list+lst
     return ref_list
+
+
+############################################## view specific functions ##################################################
+
+def clean_settlement_df(df):
+    df['nc'] = df.isna().any(axis=1)
+    return list(df[df['nc']==True].index) if len(list(df[df['nc']==True].index)) else None
+
+
