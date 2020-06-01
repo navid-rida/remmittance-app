@@ -282,6 +282,7 @@ class ExchangeHouse(models.Model):
     gl_no = models.CharField("GL Head of Exchange House", max_length=15,  validators=[numeric])
     gl_key = models.CharField("GL Key of Exchange House", max_length=11,  validators=[numeric])
     cash_incentive_gl_no = models.CharField("GL Head of Cash Incentive distribution", max_length=15,  validators=[numeric])
+    cash_incentive_gl_key = models.CharField("GL Key of Cash Incentive", max_length=11,  validators=[numeric])
     ac_no = models.CharField("Account no. of Exchange House", max_length=11,  validators=[numeric])
 
     def __str__(self):
