@@ -446,8 +446,8 @@ class ReceiverUpdate(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('search_client')
-    
-    
+
+
 
     def form_valid(self, form):
         update = ReceiverUpdateHistory()
@@ -852,7 +852,8 @@ def download_trm(request, pk):
 def download_voucher(request, pk):
     rem = get_object_or_404(Remmit, pk=pk)
     taka, ps = (int(rem.amount//1), int(Decimal(rem.amount%1)*100))
-    context = {'rem': rem, 'taka':taka, 'ps':ps, 'user':request.user}
+    cash_incentive_taka, cash_incentive_ps = (int(rem.cash_incentive_amount//1), int(Decimal(rem.cash_incentive_amount%1)*100))
+    context = {'rem': rem, 'taka':taka, 'ps':ps, 'cash_incentive_taka': cash_incentive_taka, 'cash_incentive_ps': cash_incentive_ps, 'user':request.user}
     response = HttpResponse(content_type="application/pdf")
     response['Content-Disposition'] = "inline; filename={date}-{name}-voucher.pdf".format(
         date=timezone.now(),
