@@ -92,7 +92,7 @@ def make_ac_df(list,category,columns,payments):
         br_name.append(pay.requestpay.remittance.branch.name)
         type.append(dr_cr)
         amount.append(pay.requestpay.remittance.amount)
-        br_sub_br = pay.requestpay.remittance.booth.name+" Sub Branch,"+" Code: "+pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.name+" Branch,"+" Code: "+pay.requestpay.remittance.branch.code
+        br_sub_br = pay.requestpay.remittance.booth.name+" Sub Branch"+" Code: "+pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.name+" Branch"+" Code: "+pay.requestpay.remittance.branch.code
         if dr_cr == 'C':
             narration = "Adj for "+ pay.requestpay.remittance.exchange.name +" Cash payment at "+br_sub_br+" on "+pay.dateresolved.strftime('%d/%m/%Y')
         else:
@@ -164,7 +164,7 @@ def make_cash_incentive_df(list,category,columns,payments):
         if dr_cr == 'C':
             narration = "Adj for Incentive against "+ pay.requestpay.remittance.reference +" at "+br_sub_br+" on "+pay.dateresolved.strftime('%d/%m/%Y')
         else:
-            br_sub_br = pay.requestpay.remittance.booth.name+" Sub Branch,"+" Code: "+pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.name+" Branch,"+" Code: "+pay.requestpay.remittance.branch.code
+            br_sub_br = pay.requestpay.remittance.booth.name+" Sub Branch"+" Code: "+pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.name+" Branch"+" Code: "+pay.requestpay.remittance.branch.code
             narration = "Agt "+ pay.requestpay.remittance.exchange.name+" Pmt "+pay.requestpay.remittance.reference +" fvg "+br_sub_br+" on "+pay.dateresolved.strftime('%d/%m/%Y')
         narrations.append(narration)
         if category=='br_ac' and dr_cr == 'D':
