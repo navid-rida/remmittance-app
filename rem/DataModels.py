@@ -92,8 +92,9 @@ def make_ac_df(list,category,columns,payments):
         br_name.append(pay.requestpay.remittance.branch.name)
         type.append(dr_cr)
         amount.append(pay.requestpay.remittance.amount)
+        br_sub_br = pay.requestpay.remittance.booth.name+" Sub Branch"+" Code: "+pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.name+" Branch"+" Code: "+pay.requestpay.remittance.branch.code
         if dr_cr == 'C':
-            narration = "Adj for "+ pay.requestpay.remittance.exchange.name +" Cash payment on "+pay.dateresolved.strftime('%d/%m/%Y')
+            narration = "Adj for "+ pay.requestpay.remittance.exchange.name +" Cash payment at "+br_sub_br+" on "+pay.dateresolved.strftime('%d/%m/%Y')
         else:
             narration = pay.requestpay.remittance.reference +" pmt fvg "+pay.requestpay.remittance.branch.code+" on "+pay.dateresolved.strftime('%d/%m/%Y')
         narrations.append(narration)
@@ -157,8 +158,9 @@ def make_cash_incentive_df(list,category,columns,payments):
         #br_name.append(pay.requestpay.remittance.branch.name)
         type.append(dr_cr)
         amount.append(pay.requestpay.remittance.cash_incentive_amount)
+        br_sub_br = pay.requestpay.remittance.booth.name+" Sub Branch"+" Code: "+pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.name+" Branch"+" Code: "+pay.requestpay.remittance.branch.code
         if dr_cr == 'C':
-            narration = "Adj for Incentive against "+ pay.requestpay.remittance.reference +" on "+pay.dateresolved.strftime('%d/%m/%Y')
+            narration = "Adj for Incentive against "+ pay.requestpay.remittance.reference +" at "+br_sub_br+" on "+pay.dateresolved.strftime('%d/%m/%Y')
         else:
             narration = "Agt "+ pay.requestpay.remittance.exchange.name+" Pmt "+pay.requestpay.remittance.reference +" fvg "+pay.requestpay.remittance.branch.code+" on "+pay.dateresolved.strftime('%d/%m/%Y')
         narrations.append(narration)
@@ -332,5 +334,3 @@ def get_reference_no_list_from_df(df):
 def clean_settlement_df(df):
     df['nc'] = df.isna().any(axis=1)
     return list(df[df['nc']==True].index) if len(list(df[df['nc']==True].index)) else None
-
-
