@@ -83,6 +83,9 @@
 <br>
 <i class="fas fa-cut"></i>----------------------------------------------------------------------------------------------------------------<br>
 <br>
+{% if rem.check_unpaid_cash_incentive %}
+  Cash incentive not paid, voucher unavailable
+{% else %}
 <div class="container border">
   <div class="row align-items-start">
     <div class="col border">
@@ -110,11 +113,11 @@
         <tr>
           <td rowspan="5">
             <p>THE AMOUNT PAID TO {{rem.receiver.name|upper}} AS CASH FOR 2% CASH INCENTIVE AGAINST {{rem.exchange.name|upper}} PAYMENT NO. {{rem.reference}} AT
-            {% if rem.booth %}
-            {{ rem.booth|upper}} SUB-BRANCH<br>
-            {% else %}
-            {{ rem.branch|upper }} BRANCH<br>
-            {% endif %}</p>
+              {% if rem.booth %}
+              {{ rem.booth|upper}} SUB-BRANCH<br>
+              {% else %}
+              {{ rem.branch|upper }} BRANCH<br>
+              {% endif %}</p>
           </td>
           <td>Taka</td>
           <td>PS</td>
@@ -159,4 +162,5 @@
 <br><br>
 <p><small>This is a system generated voucher generated on {% now "d/m/Y h:i A" %} by {{ user }}(branch:{{user.employee.branch}}) at {{rem.branch}} Branch</small></p>
 <br>
+{% endif %}
 {% endblock %}
