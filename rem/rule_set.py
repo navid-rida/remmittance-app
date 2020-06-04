@@ -12,6 +12,10 @@ def is_same_branch_user(user,remittance):
     return remittance.branch == user.employee.branch
 
 @rules.predicate
+def is_same_booth_user(user,remittance):
+    return remittance.booth == user.employee.booth
+
+@rules.predicate
 def is_same_branch_as_creator(user,receiver):
     return receiver.created_by.employee.branch == user.employee.branch
 
@@ -42,7 +46,7 @@ def is_same_domain_user(user,request):
 rules.add_perm('rem.change_remmit', is_entry_creator & is_same_branch_user)
 rules.add_perm('rem.add_remmit', is_branch_remittance_user | is_booth_remittance_user)
 rules.add_perm('rem.view_branch_remitt', is_branch_report_observer_user)
-rules.add_perm('rem.view_trm_form', (is_branch_remittance_user & is_same_branch_user) | is_ho_report_user | rules.is_superuser)
+rules.add_perm('rem.view_trm_form', (is_branch_remittance_user & is_same_branch_user)| (is_booth_remittance_user & is_same_booth_user) | is_ho_report_user | rules.is_superuser)
 rules.add_perm('rem.view_booth_remitt', is_booth_report_observer_user)
 rules.add_perm('rem.view_all_remitt', is_ho_report_user)
 rules.add_perm('rem.view_ho_br_booth_reports', is_ho_report_user)
