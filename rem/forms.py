@@ -113,7 +113,7 @@ class ReceiverForm(ModelForm):
             #'idissue': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
             #'idexpire': forms.DateInput(format['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
         }
-    
+
     def __init__(self, *args, **kwargs):
         super(ReceiverForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -216,9 +216,9 @@ class SearchForm(forms.Form):
     date_to = forms.DateField(label="Ending Date", initial= timezone.now,  required=False, input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'], localize=True)
     exchange = forms.ModelChoiceField(queryset=ExchangeHouse.objects.all(),required=False)
     branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'),required=False)
-    booth = forms.ModelChoiceField(queryset=Booth.objects.all().order_by('name'),required=False)
-    BRANCH_BOOTH_CHOICES= (('all','All'),('branch','Only Branch'),('booth','Only Booth'))
-    BranchBooth = forms.ChoiceField(label="Branch/ Booth",choices=BRANCH_BOOTH_CHOICES, required=False)
+    booth = forms.ModelChoiceField(label='Sub-branch',queryset=Booth.objects.all().order_by('name'),required=False)
+    BRANCH_BOOTH_CHOICES= (('all','All'),('branch','Only Branch'),('booth','Only Sub-branch'))
+    BranchBooth = forms.ChoiceField(label="Branch/ Sub-branch",choices=BRANCH_BOOTH_CHOICES, required=False)
     REVIEW= 'RV'
     REJECTED = 'RJ'
     PAID = 'PD'
@@ -270,7 +270,7 @@ class PaymentForm(forms.Form):
 
 class SignUpForm(RegistrationFormUniqueEmail):
     branch = forms.ModelChoiceField(queryset=Branch.objects.all().order_by('name'),validators=[validate_user_limit])
-    booth = forms.ModelChoiceField(queryset=Booth.objects.all().order_by('name'),validators=[validate_booth_user_limit],required=False)
+    booth = forms.ModelChoiceField(label='Sub-branch',queryset=Booth.objects.all().order_by('name'),validators=[validate_booth_user_limit],required=False)
     cell = forms.CharField(label="Mobile No.", validators=[validate_mobile])
     email = forms.EmailField(max_length=254, help_text='Input your official Email address',validators=[validate_nrbc_mail])
 
@@ -284,7 +284,7 @@ class SignUpForm(RegistrationFormUniqueEmail):
             branch = self.cleaned_data['branch']
         #idtype = self.cleaned_data['idtype']
             if branch != booth.branch:
-                raise ValidationError('BRANCH-BOOTH MISMATCH')
+                raise ValidationError('BRANCH-SUB_BRANCH MISMATCH')
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
         return booth

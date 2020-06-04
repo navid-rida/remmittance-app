@@ -72,9 +72,9 @@ class Branch(models.Model):
     #def branch_total(year=None,month=None,date=None,exchan_house=None,start_date=None,end_date=None):
 
 class Booth(models.Model):
-    name = models.CharField("Name of the Booth", max_length=20)
-    code = models.CharField("Booth Code", validators=[numeric], max_length=4, unique=True)
-    address = models.TextField("Address of the Booth")
+    name = models.CharField("Name of the Sub-branch", max_length=20)
+    code = models.CharField("Sub-branch Code", validators=[numeric], max_length=4, unique=True)
+    address = models.TextField("Address of the Sub-branch")
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, verbose_name='Branch Attached')
 
     def __str__(self):
@@ -121,7 +121,7 @@ class Country(models.Model):
 class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, verbose_name='Branch of the Employee')
-    booth = models.ForeignKey(Booth, on_delete=models.CASCADE, verbose_name='Booth of the Employee', null=True, blank=True)
+    booth = models.ForeignKey(Booth, on_delete=models.CASCADE, verbose_name='Sub-branch of the Employee', null=True, blank=True)
     cell = models.CharField("Cell number of Employee", validators=[validate_mobile], max_length=14)
     def __str__(self):
         return self.user.get_full_name()
