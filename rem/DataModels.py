@@ -81,7 +81,8 @@ def make_ac_df(list,category,columns,payments):
         tr_date.append(date.today().strftime('%d/%m/%Y'))
         #br_code.append(rem.branch.code)
         if category=='gl':
-            br_code.append(pay.requestpay.remittance.branch.code)
+            branch = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.code
+            br_code.append(branch)
             booth = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else '0001'
             booth_code.append(booth)
             ac_no.append(pay.requestpay.remittance.exchange.gl_no)
@@ -148,7 +149,8 @@ def make_cash_incentive_df(list,category,columns,payments):
         tr_date.append(date.today().strftime('%d/%m/%Y'))
         #br_code.append(rem.branch.code)
         if category=='gl':
-            br_code.append(pay.requestpay.remittance.branch.code)
+            branch = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.code
+            br_code.append(branch)
             booth = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else '0001'
             booth_code.append(booth)
             ac_no.append(pay.requestpay.remittance.exchange.cash_incentive_gl_no)
