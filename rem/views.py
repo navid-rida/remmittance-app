@@ -526,7 +526,7 @@ def mark_settle_all(request):
         if form.is_valid():
             file = request.FILES.get('batchfile')
             settlement_type = request.POST['settlemnt_type']
-            df = pd.read_excel(file,names=['date', 'branch_code','booth_code', 'ac_no', 'type', 'amount', 'narrations', 'flags'], header=None)
+            df = pd.read_excel(file,names=['date', 'branch_code', 'ac_no', 'type', 'amount', 'narrations', 'flags'], header=None)
             if clean_settlement_df(df):
                 lst = clean_settlement_df(df)
                 for n in lst:
