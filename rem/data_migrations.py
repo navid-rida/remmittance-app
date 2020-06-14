@@ -4,7 +4,7 @@ import pandas as pdb
 from pathlib import Path
 
 
-df = pd.read_excel('cdcng.xlsx'), dtype=object)
+df = pd.read_excel(('cdcng.xlsx'), dtype=object)
 
 def change_sub_branch_code(booth, df):
     for i,r in df.iterrows():
