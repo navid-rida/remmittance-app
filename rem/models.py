@@ -445,6 +445,17 @@ class Payment(models.Model):
         else:
             return False
 
+
+    def unsettle_remittance(self):
+        """Checks and UNsettles a Payment and return the payment object. returns false if not settled"""
+        if self.is_settled():
+            self.status = UNSETTLED
+            self.date_settle = None
+            self.settled_by=None
+            return self
+        else:
+            return False
+
 class Claim(models.Model):
     date_claim = models.DateTimeField("Date of Claim", auto_now_add=True, )
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
