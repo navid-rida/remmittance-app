@@ -445,11 +445,10 @@ class Payment(models.Model):
         else:
             return False
 
-
     def unsettle_remittance(self):
         """Checks and UNsettles a Payment and return the payment object. returns false if not settled"""
         if self.is_settled():
-            self.status = UNSETTLED
+            self.status = 'U'
             self.date_settle = None
             self.settled_by=None
             return self
