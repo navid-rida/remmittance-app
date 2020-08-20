@@ -51,7 +51,7 @@ rules.add_perm('rem.view_booth_remitt', is_booth_report_observer_user)
 rules.add_perm('rem.view_all_remitt', is_ho_report_user)
 rules.add_perm('rem.view_ho_br_booth_reports', is_ho_report_user)
 rules.add_perm('rem.can_settle_remitts_cash_incentive', is_ho_settlement_user)
-rules.add_perm('rem.can_mark_paid_remittance', is_ho_settlement_user | (is_entry_creator & remittance_less_than_usd1500))
+rules.add_perm('rem.can_mark_paid_remittance', rules.is_superuser) #is_ho_settlement_user | (is_entry_creator & remittance_less_than_usd1500))
 
 #---------------------------------------------------------------------------------
 
