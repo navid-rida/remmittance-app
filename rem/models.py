@@ -309,7 +309,7 @@ class Remmit(models.Model):
     cash_incentive_status = models.CharField("Cash Incentive Status", choices=CASHINC_CHOICES, max_length=1, )
     unpaid_cash_incentive_reason = models.CharField("Reason for not paying cash incentive", max_length=50, null=True, blank=True, help_text="This field is mandatory if you mark cash incentive as unpaid")
     receiver = models.ForeignKey(Receiver, on_delete=models.PROTECT, verbose_name="Receiver")
-    amount = models.DecimalField("Amount of Remittance",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Required documents must be collected and retained for paying inentive against Remittances valuing more than BDT 1,50,000.00")
+    amount = models.DecimalField("Amount of Remittance",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Required documents must be collected and retained for paying inentive against Remittances valuing more than BDT 5,00,000.00")
     cash_incentive_amount = models.DecimalField("Amount of Cash Incentive",max_digits=20,decimal_places=2, validators=[validate_neg])
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, null=True, blank=True)
@@ -482,7 +482,7 @@ class Claim(models.Model):
     doc_expire = models.DateField("Expiry Date of Remitter's Other Document", validators=[validate_expire_date,])
     letter_check = models.BooleanField("Beneficiary's Letter of Incentive Claim Received?", help_text="Beneficiary's Letter of Incentive Claim must be obtained before submission of claim")
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
-    remittance_amount = models.DecimalField("Amount of Remittance in BDT",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Required documents must be collected and retained for paying inentive against Remittances valuing more than BDT 1,50,000.00")
+    remittance_amount = models.DecimalField("Amount of Remittance in BDT",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Required documents must be collected and retained for paying inentive against Remittances valuing more than BDT 5,00,000.00")
     date_forward = models.DateTimeField("Date of Claim forwarded to collecting Bank", null=True, blank=True)
     date_resolved = models.DateTimeField("Date of Claim realized from collecting Bank", null=True, blank=True)
 
