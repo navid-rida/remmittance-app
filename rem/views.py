@@ -871,7 +871,7 @@ def download_voucher(request, pk):
     #return render(request, 'rem/detail/voucher.html', context)
 
 @login_required
-@permission_required(['rem.view_trm_form'], fn=objectgetter(Remmit, 'pk'))
+@permission_required(['rem.view_trm_form', 'rem.can_view_cash_incentive_undertaking'], fn=objectgetter(Remmit, 'pk'), raise_exception=True)
 @transaction.atomic
 def download_undertaking(request, pk):
     rem = get_object_or_404(Remmit, pk=pk)
