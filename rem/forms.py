@@ -98,6 +98,25 @@ class RemmitForm(ModelForm):
 class RemittInfoForm(RemmitForm):
     screenshot = forms.ImageField(required=True)
 
+    def __init__(self, *args, **kwargs):
+        super(RemittInfoForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        #self.helper.render_unmentioned_fields= True
+        self.helper.layout = Layout(
+            'exchange',
+            'rem_country',
+            'reference',
+            'sender','amount',
+            'relationship', 
+            'purpose',
+            Field('date_sending', css_class="date"),
+            'unpaid_cash_incentive_reason', 
+            'cash_incentive_status','sender_occupation',
+            'currency',
+            'screenshot',
+            Submit('submit', 'CREATE')
+        )
+
 class ReceiverForm(ModelForm):
     dob = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="Date of Birth",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
     idissue = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="ID Issue Date",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'], required=False)
