@@ -21,7 +21,7 @@ class RemmitForm(ModelForm):
 
     class Meta:
         model = Remmit
-        fields = ('exchange','rem_country','reference','sender','amount','relationship', 'purpose','date_sending','unpaid_cash_incentive_reason', 'cash_incentive_status','sender_occupation','currency')
+        fields = ('exchange','rem_country','reference','sender','amount','relationship', 'purpose','date_sending','unpaid_cash_incentive_reason', 'cash_incentive_status','sender_occupation')
         widgets = {
             #'dob': forms.SelectDateWidget,
             #'cash_incentive_status': forms.RadioSelect,
@@ -111,8 +111,8 @@ class RemittInfoForm(RemmitForm):
             'purpose',
             Field('date_sending', css_class="date"),
             'unpaid_cash_incentive_reason', 
-            'cash_incentive_status','sender_occupation',
-            'currency',
+            'cash_incentive_status',
+            'sender_occupation',
             'screenshot',
             Submit('submit', 'CREATE')
         )
