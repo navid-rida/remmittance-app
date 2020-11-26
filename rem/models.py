@@ -285,7 +285,7 @@ class ExchangeHouse(models.Model):
     cash_incentive_gl_no = models.CharField("GL Head of Cash Incentive distribution", max_length=15,  validators=[numeric])
     cash_incentive_gl_key = models.CharField("GL Key of Cash Incentive", max_length=11,  validators=[numeric])
     cash_incentive_gl_key_name = models.CharField("Name of Cash incentive GL Key Head", max_length=50)
-    ac_no = models.CharField("Account no. of Exchange House", max_length=11,  validators=[numeric])
+    ac_no = models.CharField("Account no. of Exchange House", max_length=15,  validators=[numeric])
 
     def __str__(self):
         return self.name
@@ -321,9 +321,9 @@ class Remmit(models.Model):
     reference = models.CharField("Referene No./PIN/MTCN", max_length=16, unique=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
     edited_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, related_name='editors')
-    REVIEW= 'RV'
-    REJECTED = 'RJ'
-    PAID = 'PD'
+    #REVIEW= 'RV'
+    #REJECTED = 'RJ'
+    #PAID = 'PD'
     """STATUS_CHOICES = (
         (REVIEW,'Request to be Processed'),
         (REJECTED, 'Request Rejected'),
@@ -405,6 +405,26 @@ class Requestpay(models.Model):
 
     def __str__(self):
         return self.remittance.reference+" on "+self.remittance.branch.name
+    
+    def is_in_review(self):
+        return True if self.status=='RV' else False
+
+    def is_rejected(self):
+        return True if self.status=='RJ' else False
+    
+    def is_accepted_for_settlement(self):
+        return True if self.status=='PD' else False
+
+    def mark_rejected(self):
+        if not (self.is_rejected() or self.is_accepted_for_settlement()):
+            self.status = 'RJ'
+            return self
+
+    def accept_for_settlement(self):
+        if self.is_in_review():
+            self.status = 'PD'
+            return self
+
 
 class Payment(models.Model):
     requestpay = models.OneToOneField(Requestpay, on_delete=models.PROTECT)
