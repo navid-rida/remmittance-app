@@ -67,10 +67,15 @@ class RemmitCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         form.instance.branch = self.request.user.employee.branch
+        if self.request.user.employee.booth:
+            form.instance.booth = self.request.user.employee.booth
         receiver = get_object_or_404(Receiver, pk=self.kwargs['pk'])
         form.instance.receiver = receiver
+        form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.02)
         self.object = form.save(commit=False)
         # in case you want to modify the object before commit
+        if self.object.cash_incentive_status=='P':
+            self.object.date_cash_incentive_paid=timezone.now()
         self.object.save()
         req = Requestpay(remittance=self.object, created_by=self.request.user, ip=get_client_ip(self.request))
         req.save()
@@ -95,46 +100,6 @@ def index(request):
     context = {'latest_question_list': latest_question_list}
     return render(request, 'rem/base.html', context)
 
-"""@login_required
-def show_rem(request):
-    if request.method == "POST":
-        form = SearchForm(request.POST)
-        filt = {}
-        if form.is_valid():
-            date_from = form.cleaned_data['date_from']
-            date_to = form.cleaned_data['date_to']
-            if (date_from != None) and (date_to!= None):
-                filt['datecreate__date__range'] = (date_from,date_to)
-            else:
-                filt['datecreate__date__range'] = None
-            filt['remittance__exchange'] = form.cleaned_data['exchange']
-            filt['status'] = 'PD'
-            filt['remittance__branch'] = form.cleaned_data['branch']
-            filt['resubmit_flag'] = False
-            if check_headoffice(request.user):
-                filter_args = {k:v for k,v in filt.items() if v is not None}
-                req_list = Requestpay.objects.filter(**filter_args).order_by('remittance__exchange','-datecreate','remittance__branch__code')
-                context = {'pay_list': req_list, 'form':form}
-                return render(request, 'rem/report/payment_list_ho.html', context)
-            else:
-                filt['remittance__branch'] = request.user.employee.branch
-                filter_args = {k:v for k,v in filt.items() if v is not None}
-                req_list = Requestpay.objects.filter(**filter_args).order_by('remittance__exchange','-datecreate','remittance__branch__code')
-                context = {'pay_list': req_list, 'form':form}
-                return render(request, 'rem/report/payment_list_branch.html', context)
-        else:
-            context = {'form':form }
-            if check_headoffice(request.user):
-                return render(request, 'rem/report/payment_list_ho.html', context)
-            else:
-                return render(request, 'rem/report/payment_list_branch.html', context)
-    else:
-        form = SearchForm()
-        context = {'form':form}
-        if check_headoffice(request.user):
-            return render(request, 'rem/report/payment_list_ho.html', context)
-        else:
-            return render(request, 'rem/report/payment_list_branch.html', context)"""
 
 @login_required
 def show_rem(request):
@@ -165,9 +130,9 @@ def show_rem(request):
                 else:
                     return render(request, 'rem/report/payment_list_branch.html', context)"""
                 if request.user.has_perm('rem.view_ho_br_booth_reports'):
-                    return render(request, 'rem/report/payment_list_ho.html', context)
+                    return render(request, 'rem/report/payments/payment_list_ho.html', context)
                 else:
-                    return render(request, 'rem/report/payment_list_branch.html', context)
+                    return render(request, 'rem/report/payments/payment_list_branch.html', context)
             if '_download' in request.POST:
                 #df = pd.DataFrame(summary_list, columns=['code','name','count','sum'])
                 df = pd.DataFrame(list(req_list.values('branch__name','branch__code','booth__name', \
@@ -186,16 +151,16 @@ def show_rem(request):
         else:
             context = {'form':form }
             if check_headoffice(request.user):
-                return render(request, 'rem/report/payment_list_ho.html', context)
+                return render(request, 'rem/report/payments/payment_list_ho.html', context)
             else:
-                return render(request, 'rem/report/payment_list_branch.html', context)
+                return render(request, 'rem/report/payments/payment_list_branch.html', context)
     else:
         form = SearchForm()
         context = {'form':form}
         if check_headoffice(request.user):
-            return render(request, 'rem/report/payment_list_ho.html', context)
+            return render(request, 'rem/report/payments/payment_list_ho.html', context)
         else:
-            return render(request, 'rem/report/payment_list_branch.html', context)
+            return render(request, 'rem/report/payments/payment_list_branch.html', context)
 
 
 @login_required
@@ -435,19 +400,9 @@ class ReceiverUpdate(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
     success_message = "Customer was updated successfully"
     #success_url = reverse_lazy('remmit-create',args=(self.object.id,))
 
-    """def test_func(self):
-        id = int(self.kwargs['pk'])
-        receiver = Receiver.objects.get(pk=id)
-        user = receiver.created_by
-        if self.request.user == user:
-            return True
-        else:
-            return False"""
 
     def get_success_url(self):
         return reverse('search_client')
-
-
 
     def form_valid(self, form):
         update = ReceiverUpdateHistory()
