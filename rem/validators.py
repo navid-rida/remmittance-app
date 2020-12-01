@@ -38,6 +38,13 @@ moneygram_re = RegexValidator(
     code='invalid_moneygram',
 )
 
+prabhu_re = RegexValidator(
+    _lazy_re_compile(r'(11|21|36|40)[0-9]{10}$'),
+    message=_('Please enter a valid Prabhu Money Transfer Reference No.'),
+    code='invalid_prabhu_ref',
+)
+
+
 mobile_re = RegexValidator(
     _lazy_re_compile(r'^(\+8801|8801|01)[3456789][0-9]{8}$'),
     message=_('Please enter a valid Mobile phone number'),
@@ -122,8 +129,11 @@ def validate_placid(value):
 def validate_moneygram(value):
     return moneygram_re(value)
 
+def validate_prabhu_ref(value):
+    return prabhu_re(value)
+
 def validate_ref_no(value):
-    validator_list=[western_union,placid_re,ria_re,xpress_re,moneygram_re]
+    validator_list=[western_union,placid_re,ria_re,xpress_re,moneygram_re, prabhu_re ]
     for validator in validator_list:
         try:
             validator(value)

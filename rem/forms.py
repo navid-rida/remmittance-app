@@ -80,23 +80,42 @@ class RemmitForm(ModelForm):
         unpaid_cash_incentive_reason = cleaned_data.get("unpaid_cash_incentive_reason")
         #if 'cash_incentive_status' in form.changed_data:
         if exchange.name == 'WESTERN UNION':
-            validate_western_code(reference)
+            try:
+                validate_western_code(reference)
+            except ValidationError as err:
+                self.add_error('reference',err)
         elif exchange.name == 'XPRESS MONEY':
-            validate_xpress(reference)
+            try:
+                validate_xpress(reference)
+            except ValidationError as err:
+                self.add_error('reference',err)
         elif exchange.name == 'RIA MONEY TRANSFER':
-            validate_ria(reference)
+            try:
+                validate_ria(reference)
+            except ValidationError as err:
+                self.add_error('reference',err)
         elif exchange.name == 'PLACID EXPRESS':
-            validate_placid(reference)
+            try:
+                validate_placid(reference)
+            except ValidationError as err:
+                self.add_error('reference',err)
         elif exchange.name == 'MONEYGRAM':
-            validate_moneygram(reference)
+            try:
+                validate_moneygram(reference)
+            except ValidationError as err:
+                self.add_error('reference',err)
+        elif exchange.name == 'Prabhu Money Transfer':
+            try:
+                prabhu_re(reference)
+            except ValidationError as err:
+                self.add_error('reference',err)
         else:
-            raise forms.ValidationError(
-                    "The reference number does not match with any known third party remittance services "
-                )
+            self.add_error('reference',"The reference number does not match with any known third party remittance services ")
+        #form.add_error('reference', err)
 
 
 class RemittInfoForm(RemmitForm):
-    screenshot = forms.ImageField(required=True)
+    screenshot = forms.ImageField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(RemittInfoForm, self).__init__(*args, **kwargs)
