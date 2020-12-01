@@ -285,7 +285,8 @@ class ExchangeHouse(models.Model):
     cash_incentive_gl_no = models.CharField("GL Head of Cash Incentive distribution", max_length=15,  validators=[numeric])
     cash_incentive_gl_key = models.CharField("GL Key of Cash Incentive", max_length=11,  validators=[numeric])
     cash_incentive_gl_key_name = models.CharField("Name of Cash incentive GL Key Head", max_length=50)
-    ac_no = models.CharField("Account no. of Exchange House", max_length=15,  validators=[numeric])
+    ac_no = models.CharField("Account no./ GL No. of Exchange House", max_length=15,  validators=[numeric])
+    ac_no_branch = models.ForeignKey(Branch,on_delete=models.CASCADE, verbose_name="Branch of CD Account/ GL")
 
     def __str__(self):
         return self.name
