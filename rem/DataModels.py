@@ -13,8 +13,8 @@ from fuzzywuzzy import process
 
 
 ############################# Variables and Lists ######################################
-gl = ['901130537010101','901130539010101','901130537010103','901130537010105','901130537010108']
-cd = ['33300000414','33300000616','33300000670','33300000741','33300000848']
+gl = ['901130537010101','901130539010101','901130537010103','901130537010105','901130537010108', '901130537010110']
+cd = ['33300000414','33300000616','33300000670','33300000741','33300000848', '902010301062901']
 ac_list = gl + cd
 
 ####################### common functions#################################################
@@ -65,76 +65,8 @@ def make_ac_df(list,category,columns,payments):
     #Sl= []
     tr_date = []
     br_code = []
-    booth_code = []
-    br_name= []
-    ac_no = []
-    type = []
-    amount = []
-    narrations = []
-    flags = []
-    country = []
-    i = 1
-    for pay in payments:
-        #Sl.append(i)
-        #i = i + 1
-        dr_cr = 'C' if category=='gl' else 'D'
-        tr_date.append(date.today().strftime('%d/%m/%Y'))
-        #br_code.append(rem.branch.code)
-        if category=='gl':
-            branch = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.code
-            br_code.append(branch)
-            booth = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else '0001'
-            booth_code.append(booth)
-            ac_no.append(pay.requestpay.remittance.exchange.gl_no)
-        else:
-            br_code.append("0101")
-            booth_code.append("0001")
-            ac_no.append(pay.requestpay.remittance.exchange.ac_no)
-        br_name.append(pay.requestpay.remittance.branch.name)
-        type.append(dr_cr)
-        amount.append(pay.requestpay.remittance.amount)
-
-        if dr_cr == 'C':
-            br_sub_br = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.code
-            narration = "Adj for "+ pay.requestpay.remittance.exchange.name +" Cash payment at "+br_sub_br+" on "+pay.dateresolved.strftime('%d/%m/%Y')
-        else:
-
-            br_sub_br = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.code
-            narration = pay.requestpay.remittance.reference +" pmt fvg "+br_sub_br+" on "+pay.dateresolved.strftime('%d/%m/%Y')
-        narrations.append(narration)
-        if category=='br_ac' and dr_cr == 'D':
-            flag=1
-        else:
-            flag=0
-        flags.append(flag)
-        country.append(pay.requestpay.remittance.rem_country.name)
-        dict ={
-        #'Sl' : Sl,
-        'date' : tr_date,
-        'branch_code': br_code,
-        'booth_code': booth_code,
-        'branch_name': br_name,
-        'ac_no' : ac_no,
-        'type' : type,
-        'amount' : amount,
-        'narrations' : narrations,
-        'flags' : flags,
-        'country' : country
-        }
-    df = pd.DataFrame(dict)
-    df['ac_no'] = pd.Categorical(df['ac_no'], ac_list)
-    #df = df.sort_values(by=['ac_no','branch_code'])
-    return df
-
-def make_cash_incentive_df(list,category,columns,payments):
-    #day = date.strftime('%Y-%m-%d')
-    dict = {}
-    #payments = Payment.objects.filter(id__in=list).order_by('requestpay__remittance__exchange','dateresolved','requestpay__remittance__branch__code')
-    #Sl= []
-    tr_date = []
-    br_code = []
-    br_name= []
-    booth_code= []
+    #booth_code = []
+    #br_name= []
     ac_no = []
     type = []
     amount = []
@@ -151,15 +83,83 @@ def make_cash_incentive_df(list,category,columns,payments):
         if category=='gl':
             branch = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.code
             br_code.append(branch)
-            booth = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else '0001'
-            booth_code.append(booth)
+            #booth = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else '0001'
+            #booth_code.append(booth)
+            ac_no.append(pay.requestpay.remittance.exchange.gl_no)
+        else:
+            br_code.append(pay.requestpay.remittance.exchange.ac_no_branch.code)
+            #booth_code.append("0001")
+            ac_no.append(pay.requestpay.remittance.exchange.ac_no)
+        #br_name.append(pay.requestpay.remittance.branch.name)
+        type.append(dr_cr)
+        amount.append(pay.requestpay.remittance.amount)
+
+        if dr_cr == 'C':
+            br_sub_br = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.code
+            narration = "Adj for "+ pay.requestpay.remittance.exchange.name +" Cash payment at "+br_sub_br+" on "+pay.dateresolved.strftime('%d/%m/%Y')
+        else:
+
+            br_sub_br = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.code
+            narration = pay.requestpay.remittance.reference +" pmt fvg "+br_sub_br+" on "+pay.dateresolved.strftime('%d/%m/%Y')
+        narrations.append(narration)
+        if category =='gl':
+            flag= 0
+        else:
+            flag= 0 if pay.requestpay.remittance.exchange.ac_no[0]=='9' else 1
+        flags.append(flag)
+        #country.append(pay.requestpay.remittance.rem_country.name)
+        dict ={
+        #'Sl' : Sl,
+        'date' : tr_date,
+        'branch_code': br_code,
+        #'booth_code': booth_code,
+        #'branch_name': br_name,
+        'ac_no' : ac_no,
+        'type' : type,
+        'amount' : amount,
+        'narrations' : narrations,
+        'flags' : flags,
+        #'country' : country
+        }
+    df = pd.DataFrame(dict)
+    df['ac_no'] = pd.Categorical(df['ac_no'], ac_list)
+    #df = df.sort_values(by=['ac_no','branch_code'])
+    return df
+
+def make_cash_incentive_df(list,category,columns,payments):
+    #day = date.strftime('%Y-%m-%d')
+    dict = {}
+    #payments = Payment.objects.filter(id__in=list).order_by('requestpay__remittance__exchange','dateresolved','requestpay__remittance__branch__code')
+    #Sl= []
+    tr_date = []
+    br_code = []
+    #br_name= []
+    #booth_code= []
+    ac_no = []
+    type = []
+    amount = []
+    narrations = []
+    flags = []
+    #country = []
+    i = 1
+    for pay in payments:
+        #Sl.append(i)
+        #i = i + 1
+        dr_cr = 'C' if category=='gl' else 'D'
+        tr_date.append(date.today().strftime('%d/%m/%Y'))
+        #br_code.append(rem.branch.code)
+        if category=='gl':
+            branch = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.code
+            br_code.append(branch)
+            #booth = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else '0001'
+            #booth_code.append(booth)
             ac_no.append(pay.requestpay.remittance.exchange.cash_incentive_gl_no)
-            br_name.append(pay.requestpay.remittance.branch.name)
+            #br_name.append(pay.requestpay.remittance.branch.name)
         else:
             br_code.append("0100")
-            booth_code.append('0001')
+            #booth_code.append('0001')
             ac_no.append("902010301063511")
-            br_name.append("Head Office")
+            #br_name.append("Head Office")
         #br_name.append(pay.requestpay.remittance.branch.name)
         type.append(dr_cr)
         amount.append(pay.requestpay.remittance.cash_incentive_amount)
@@ -181,8 +181,8 @@ def make_cash_incentive_df(list,category,columns,payments):
         #'Sl' : Sl,
         'date' : tr_date,
         'branch_code': br_code,
-        'branch_name': br_name,
-        'booth_code': booth_code,
+        #'branch_name': br_name,
+        #'booth_code': booth_code,
         'ac_no' : ac_no,
         'type' : type,
         'amount' : amount,
@@ -197,7 +197,7 @@ def make_cash_incentive_df(list,category,columns,payments):
 
 def rem_bb_summary(list, payments):
     payments = payments.filter(id__in=list)
-    columns=['date', 'br_code','booth_code', 'br_name', 'ac_no', 'type', 'amount', 'narration', 'flag', 'country']
+    columns=['date', 'br_code', 'ac_no', 'type', 'amount', 'narration', 'flag']
     gl_df = make_ac_df(list,'gl',columns, payments)
     ac_df = make_ac_df(list,'br_ac',columns, payments)
     frames = [gl_df, ac_df]
