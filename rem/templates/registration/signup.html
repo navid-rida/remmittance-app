@@ -1,8 +1,9 @@
 {% extends "rem/core_base.html" %}
+{% load crispy_forms_tags %}
 {% load widget_tweaks %}
 {% block content %}
 
-<div class="row">
+{% comment %} <div class="row">
   <div class="col-md-10 offset-3">
     <h2>Sign up</h2>
     <form method="post">
@@ -39,7 +40,24 @@
       {% endfor %}
       <button type="submit" class="btn btn-primary btn-sm mb-2">Sign up</button>
     </form>
-    {% endblock %}
+
 
   </div>
+</div>{% endcomment %}
+<div class="row justify-content-center">
+  <form enctype="multipart/form-data" method="post">
+    <div class="col">
+      <div class="card">
+        <h5 class="card-header">Create a New User in CFRD</h5>
+        <div class="card-body">
+          {% csrf_token %}
+
+          {% crispy form %}
+        </div>
+
+
+      </div>
+    </div>
+  </form>
 </div>
+{% endblock %}
