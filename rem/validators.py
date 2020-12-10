@@ -39,11 +39,16 @@ moneygram_re = RegexValidator(
 )
 
 prabhu_re = RegexValidator(
-    _lazy_re_compile(r'(11|21|36|40)[0-9]{10}$'),
+    _lazy_re_compile(r'^(11|21|36|40)[0-9]{10}$'),
     message=_('Please enter a valid Prabhu Money Transfer Reference No.'),
     code='invalid_prabhu_ref',
 )
 
+merchantrade_re = RegexValidator(
+    _lazy_re_compile(r'^[0-9]{14}$'),
+    message=_('Please enter a valid Merchant Trade Reference No.'),
+    code='invalid_merchantrade_ref',
+)
 
 mobile_re = RegexValidator(
     _lazy_re_compile(r'^(\+8801|8801|01)[3456789][0-9]{8}$'),
@@ -131,6 +136,15 @@ def validate_moneygram(value):
 
 def validate_prabhu_ref(value):
     return prabhu_re(value)
+
+def validate_merchantrade_ref(value):
+    year = str(timezone.now().year)
+    if year[-2:]!=value[:2]:
+        raise ValidationError(
+            _('%(year)s is not a valid initial sequence for Merchantrade reference'),
+            params={'year': value[:2]},
+        )
+
 
 def validate_ref_no(value):
     validator_list=[western_union,placid_re,ria_re,xpress_re,moneygram_re, prabhu_re ]

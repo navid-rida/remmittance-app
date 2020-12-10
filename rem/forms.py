@@ -109,6 +109,12 @@ class RemmitForm(ModelForm):
                 prabhu_re(reference)
             except ValidationError as err:
                 self.add_error('reference',err)
+        elif exchange.name == 'MERCHANTRADE':
+            try:
+                merchantrade_re(reference)
+                validate_merchantrade_ref(reference)
+            except ValidationError as err:
+                self.add_error('reference',err)
         else:
             self.add_error('reference',"The reference number does not match with any known third party remittance services ")
         #form.add_error('reference', err)
@@ -312,10 +318,17 @@ class SignUpForm(RegistrationFormUniqueEmail):
     cell = forms.CharField(label="Mobile No.", validators=[validate_mobile])
     email = forms.EmailField(max_length=254, help_text='Input your official Email address',validators=[validate_nrbc_mail])
 
+    
+
     class Meta:
         model = User
         fields=('username', 'first_name', 'last_name','branch','booth', 'cell', 'email', 'password1', 'password2',)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.add_input(Submit('submit', 'Submit'))
+        
     def clean_booth(self):
         booth = self.cleaned_data['booth']
         if booth:
