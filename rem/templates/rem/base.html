@@ -15,14 +15,15 @@
   <link rel="stylesheet" href="{% static "css/style.css" %}">
   <link rel="stylesheet" href="{% static "css/jquery-ui.css" %}">
   <style type="text/css">
-    body { background: #C2C2C2 !important; } /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
+    {% comment %} #body { background: #C2C2C2 !important; } /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */{% endcomment %}
+    body { background-image: "url({% get_media_prefix %}images/background.jpg" !important; } /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
     .container { background: #FFFFFF !important; } /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
   </style>
 
   <title>{% block title %}Welcome to Central Foreign Remittance Database{% endblock %}</title>
 </head>
 
-<body>
+<body style="background-image:url({% get_media_prefix %}images/background.jpg)">
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#">NRBCB Central Foreign Remittance Database</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,7 +99,7 @@
   </nav>
 
   <div id="content">
-    <div class="container" bgcolor="#FFFFFF">
+    <div class="container">
       {% if messages %}
       <ul class="messages">
         {% for message in messages %}
@@ -109,6 +110,7 @@
       </ul>
       {% endif %}
       {% block content %}
+      
       {% endblock %}
     </div>
   </div>
