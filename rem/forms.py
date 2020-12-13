@@ -104,7 +104,7 @@ class RemmitForm(ModelForm):
                 validate_moneygram(reference)
             except ValidationError as err:
                 self.add_error('reference',err)
-        elif exchange.name == 'Prabhu Money Transfer':
+        elif exchange.name == 'PRABHU MONEY TRANSFER':
             try:
                 prabhu_re(reference)
             except ValidationError as err:
@@ -121,7 +121,7 @@ class RemmitForm(ModelForm):
 
 
 class RemittInfoForm(RemmitForm):
-    screenshot = forms.ImageField(required=True)
+    screenshot = forms.ImageField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(RemittInfoForm, self).__init__(*args, **kwargs)
