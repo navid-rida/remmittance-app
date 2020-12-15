@@ -126,7 +126,7 @@ class RemmitForm(ModelForm):
 
 
 class RemittInfoForm(RemmitForm):
-    screenshot = forms.ImageField(required=False)
+    screenshot = forms.ImageField(required=True)
 
     def __init__(self, *args, **kwargs):
         super(RemittInfoForm, self).__init__(*args, **kwargs)
