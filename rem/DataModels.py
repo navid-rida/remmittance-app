@@ -122,7 +122,7 @@ def make_ac_df(list,category,columns,payments):
         #'country' : country
         }
     df = pd.DataFrame(dict)
-    df['ac_no'] = pd.Categorical(df['ac_no'], ac_list)
+    df['ac_no'] = pd.Categorical(df['ac_no'], ordered= True)
     #df = df.sort_values(by=['ac_no','branch_code'])
     return df
 
