@@ -39,7 +39,7 @@ moneygram_re = RegexValidator(
 )
 
 prabhu_re = RegexValidator(
-    _lazy_re_compile(r'^(11|21|36|40)[0-9]{10}$'),
+    _lazy_re_compile(r'^[0-9]{12}$'),
     message=_('Please enter a valid Prabhu Money Transfer Reference No.'),
     code='invalid_prabhu_ref',
 )
