@@ -298,10 +298,10 @@ def filter_remittance(query_set, start_date=None, end_date= None, branch= None, 
         r = r.filter(cash_incentive_status=cash_incentive_status)
     if cash_incentive_settlement_done==True:
         r = r.filter(date_cash_incentive_settlement__isnull=False)
-    if BranchBooth=='branch' and branch:
-        r = r.filter(branch=branch, booth=None)
-    if BranchBooth=='booth' and booth:
-        r = r.filter(booth=booth)
+    if BranchBooth=='branch':
+        r = r.filter(booth=None)
+    if BranchBooth=='booth':
+        r = r.filter(booth__isnull=False)
     return r.order_by('exchange','-date_create','branch__code')
 
 def filter_claim(query_set, start_date=None, end_date= None, branch= None, booth=None):
