@@ -1,5 +1,6 @@
 {% extends "rem/core_base.html" %}
 {% load humanize %}
+{% load number_filters %}
 
 {% block content %}
 Date: {{rem.get_completed_payment.dateresolved.date}}<br><br>
@@ -13,7 +14,7 @@ NRB Commercial Bank Limited<br>
 {% endif %}
 <br>
 
-Subject: Inward Wage Earner’s Foreign Remittance amounting Taka {{rem.amount|intcomma}} (In word: Taka ………………………………………)
+Subject: Inward Wage Earner’s Foreign Remittance amounting Taka {{rem.amount|comma_seperated_bangla}} (In word: Taka {{rem.amount|number_to_word_bangla_style}})
 only favoring myself.<br>
 
 <br>Dear Sir,<br>
@@ -81,7 +82,7 @@ only favoring myself.<br>
             </tr>
             <tr>
                 <td> AMOUNT (IN FIGURE): </td>
-                <td>{{rem.amount}}</td>
+                <td>{{rem.amount|comma_seperated_bangla}}</td>
             </tr>
             <tr>
                 <td> PURPOSE OF SENDING REMITTANCE: </td>

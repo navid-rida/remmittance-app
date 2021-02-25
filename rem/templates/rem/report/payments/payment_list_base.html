@@ -4,6 +4,8 @@
 {% block js %}
 {% load l10n %}
 {% load rules %}
+{% load number_filters %}
+
 
 {% endblock %}
 {% block title %} Remittance List {% endblock %}
@@ -113,8 +115,8 @@
                 <td>{{entry.reference}}</td>
                 <td>{{entry.sender.title}}</td>
                 <td>{{entry.receiver}}</td>
-                <td>{{entry.amount|intcomma}}</td>
-                <td>{{entry.cash_incentive_amount|intcomma}}</td>
+                <td>{{entry.amount|comma_seperated_bangla}}</td>
+                <td>{{entry.cash_incentive_amount|comma_seperated_bangla}}</td>
                 <td>{{entry.get_cash_incentive_status_display}}</td>
                 <td>{{entry.date_cash_incentive_settlement}}</td>
                 <td>{{entry.created_by}}</td>

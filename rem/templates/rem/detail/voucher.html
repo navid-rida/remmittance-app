@@ -1,6 +1,7 @@
 {% extends "rem/core_base.html" %}
 {% load humanize %}
 {%load static %}
+{% load number_filters %}
 
 {% block content %}
 
@@ -42,7 +43,7 @@
           <td>PS</td>
         </tr>
         <tr>
-          <td>{{taka}}</td>
+          <td>{{taka|comma_seperated_bangla}}</td>
           <td>{{ps}}</td>
         </tr>
         <tr>
@@ -59,11 +60,11 @@
         </tr>
         <tr>
           <td style="text-align:right">Total</td>
-          <td>{{taka}}</td>
+          <td>{{taka|comma_seperated_bangla}}</td>
           <td>{{ps}}</td>
         </tr>
         <tr>
-          <td colspan="3">TOTAL (in Words) Taka ………………..……………………………………&amp; Ps. .......……… Only</td>
+          <td colspan="3">TOTAL (in Words) Taka {{rem.amount|number_to_word_bangla_style}} Only</td>
         </tr>
 
       </tbody>
@@ -123,7 +124,7 @@
           <td>PS</td>
         </tr>
         <tr>
-          <td>{{cash_incentive_taka}}</td>
+          <td>{{cash_incentive_taka|comma_seperated_bangla}}</td>
           <td>{{cash_incentive_ps}}</td>
         </tr>
         <tr>
@@ -140,11 +141,11 @@
         </tr>
         <tr>
           <td style="text-align:right">Total</td>
-          <td>{{cash_incentive_taka}}</td>
+          <td>{{cash_incentive_taka|comma_seperated_bangla}}</td>
           <td>{{cash_incentive_ps}}</td>
         </tr>
         <tr>
-          <td colspan="3">TOTAL (in Words) Taka ………………..……………………………………&amp; Ps. .......……… Only</td>
+          <td colspan="3">TOTAL (in Words) Taka {{rem.cash_incentive_amount|number_to_word_bangla_style}} Only</td>
         </tr>
 
       </tbody>
