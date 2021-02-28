@@ -7,7 +7,9 @@ register = template.Library()
 def comma_seperated_bangla(value):
     s = str(value)
     dec_right = s.split('.')[1] if len(s.split('.'))>1 else '' #Number after decimal point
-    dec_left = s.split('.')[0] #Number of the left side of decimal 
+    dec_left = s.split('.')[0] #Number of the left side of decimal
+    if len(dec_left)>=3:
+        return s
     left_s = dec_left[0:len(dec_left)-3]
     right_s = dec_left[-3:]
     s2 = [left_s[-2-i:len(left_s)-i] for i in range(0, len(left_s),2)]
