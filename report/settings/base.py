@@ -90,13 +90,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+#LANGUAGE_CODE = 'en-us'
+
+#USE_THOUSAND_SEPARATOR = True
+#NUMBER_GROUPING = (3, 2, 0)
 
 TIME_ZONE = 'Asia/Dhaka'
 
 #USE_I18N = True
 
-USE_L10N = True
+#USE_L10N = True
 
 USE_TZ = True
 
@@ -104,6 +107,9 @@ DATE_FORMAT = 'd/m/Y'
 
 SHORT_DATETIME_FORMAT = 'm/d/Y P'
 #DATETIME_FORMAT= '%Y-%m-%d %H:%M:%S'
+
+
+
 
 
 #User registration and Authentication

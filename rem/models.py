@@ -269,6 +269,12 @@ class Receiver(models.Model):
         else:
             return False
 
+    def check_fc_account(self):
+        if self.ac_no[0] == '2':
+            return True
+        else:
+            False
+
 
 class ReceiverUpdateHistory(models.Model):
     receiver=models.ForeignKey(Receiver, on_delete=models.CASCADE, verbose_name= "Receiver")
@@ -291,12 +297,25 @@ class ExchangeHouse(models.Model):
     def __str__(self):
         return self.name
 
+['amount', 'booth_id', 'branch_id', 'cash_incentive_amount',
+       'cash_incentive_status', 'date_cash_incentive_paid', 'date_cash_incentive_settlement',
+       'reference',]
+
 class Remmit(models.Model):
     exchange = models.ForeignKey(ExchangeHouse,on_delete=models.CASCADE, verbose_name='Channel of Remittance')
     currency = models.ForeignKey(Currency,on_delete=models.CASCADE, verbose_name='Currency of Remittance', default=Currency.objects.get(name='BANGLADESHI TAKA').id)
     rem_country = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Remitting Country')
     sender = models.CharField("Name of Remitter", validators=[name], max_length=50)
     sender_occupation = models.CharField("Occupation of Remitter", help_text="Service/ Business etc.",validators=[alpha], max_length=50, null=True, blank=True)
+    MALE= 'M'
+    FEMALE = 'F'
+    OTHER = 'O'
+    GENDER_CHOICES = (
+        (MALE,'MALE'),
+        (FEMALE, 'FEMALE'),
+        (OTHER, 'Other'),
+        )
+    sender_gender=models.CharField("Gender of the Remitter",max_length=1, choices=GENDER_CHOICES)
     relationship = models.CharField("Relationship to Sender",max_length=50, null=True)
     purpose = models.CharField("Purpose of Transaction",max_length=50, null=True)
     PAID= 'P'
@@ -347,13 +366,24 @@ class Remmit(models.Model):
             return False
 
     def check_unpaid_cash_incentive(self):
+        #This one checks the cash incentive in remmit table
         if self.cash_incentive_status=='U' and self.date_cash_incentive_paid is None and self.date_create.date()>datetime.date(2019,6,30):
             return True
         else:
             return False
 
+    def check_if_cash_incentive_paid(self):
+        #This one checks the cash incentive in seperate CashIncentive Table
+        q = self.cashincentive_set.all()
+        for c in q:
+            if c.check_if_paid():
+                return True
+        return False
+
+
     def pay_previously_unpaid_cash_incentive(self):
         if self.check_unpaid_cash_incentive():
+            self._entry_cat='P'
             self.cash_incentive_status='P'
             self.date_cash_incentive_paid=timezone.now()
             self.cash_incentive_amount=self.amount*Decimal(0.02)
@@ -379,11 +409,86 @@ class Remmit(models.Model):
         else:
             return False
 
+    def calculate_cash_incentive(self):
+        return self.amount*Decimal(0.02)
+
 class RemittanceUpdateHistory(models.Model):
     remittance=models.ForeignKey(Remmit, on_delete=models.CASCADE, verbose_name= "Remittance Entry")
     datecreate = models.DateTimeField("Date of Editing", auto_now_add=True)
     createdby = models.ForeignKey(User, on_delete=models.PROTECT)
     ip = models.GenericIPAddressField("User IP Address")
+
+    
+
+
+
+class CashIncentive(models.Model):
+    remittance = models.ForeignKey(Remmit, on_delete=models.CASCADE,)
+    cash_incentive_amount = models.DecimalField("Amount of Cash Incentive",max_digits=20,decimal_places=2, validators=[validate_neg])
+    date_cash_incentive_paid = models.DateTimeField("Date of Cash Incentive payment", null=True, blank= True)
+    date_cash_incentive_settlement = models.DateField("Date of Cash Incentive Settlement", null=True, blank= True)
+    unpaid_cash_incentive_reason = models.CharField("Reason for not paying cash incentive", max_length=50, null=True, blank=True, help_text="This field is mandatory if you mark cash incentive as unpaid")
+    PAYMENT= 'P'
+    NONPAYMENT = 'U'
+    NOTAPPLICABLE = 'NA'
+    ENTRYCAT_CHOICES = (
+        (PAYMENT,'Payment'),
+        (NONPAYMENT, 'Non Payment'),
+        (NOTAPPLICABLE, 'Cash Incentive Not Applicable'),
+        )
+    entry_category = models.CharField("Entry Category", choices=ENTRYCAT_CHOICES, max_length=1, )
+
+    def __str__(self):
+        return self.remittance.reference +" "+ self.entry_category
+
+    def check_if_paid(self):
+        if self.entry_category=='P':
+            return True
+        else:
+            return False
+
+    
+
+
+    def create_entry_from_remittance(self, remitt):
+        if remitt.check_unpaid_cash_incentive():
+            try:
+                self.remittance=remitt
+                self.cash_incentive_amount=0
+                self.date_cash_incentive_paid=None
+                self.date_cash_incentive_settlement=None
+                self.unpaid_cash_incentive_reason=remitt.unpaid_cash_incentive_reason
+                self.entry_category = 'U'
+                self.save()
+                return True
+            except Exception as e:
+                print(e , remitt)
+
+        elif not remitt.date_create.date()>datetime.date(2019,6,30):
+            try:
+                self.remittance=remitt
+                self.cash_incentive_amount=0
+                self.date_cash_incentive_paid=None
+                self.date_cash_incentive_settlement=None
+                self.unpaid_cash_incentive_reason=remitt.unpaid_cash_incentive_reason
+                self.entry_category = 'NA'
+                self.save()
+                return True
+            except Exception as e:
+                print(e , remitt)
+        else:
+            try:
+                self.remittance=remitt
+                self.cash_incentive_amount= remitt.cash_incentive_amount
+                self.date_cash_incentive_paid= remitt.date_cash_incentive_paid
+                self.date_cash_incentive_settlement= remitt.date_cash_incentive_settlement
+                self.unpaid_cash_incentive_reason=remitt.unpaid_cash_incentive_reason + " - Solved and paid" if remitt.unpaid_cash_incentive_reason else None
+                self.entry_category = 'P'
+                self.save()
+                return True
+            except Exception as e:
+                print(e, remitt)
+    
 
 
 class Requestpay(models.Model):

@@ -21,7 +21,7 @@ class RemmitForm(ModelForm):
 
     class Meta:
         model = Remmit
-        fields = ('exchange','rem_country','reference','sender','amount','relationship', 'purpose','date_sending','unpaid_cash_incentive_reason', 'cash_incentive_status','sender_occupation')
+        fields = ('exchange','rem_country','reference','sender','sender_gender','amount','relationship', 'purpose','date_sending','sender_occupation')
         widgets = {
             #'dob': forms.SelectDateWidget,
             #'cash_incentive_status': forms.RadioSelect,
@@ -124,9 +124,22 @@ class RemmitForm(ModelForm):
             self.add_error('reference',"The reference number does not match with any known third party remittance services ")
         #form.add_error('reference', err)
 
+        return cleaned_data
+
 
 class RemittInfoForm(RemmitForm):
     screenshot = forms.ImageField(required=True)
+    reason_a = forms.CharField(label='Reason for not paying cash incentive', required=False)
+    PAYMENT= 'P'
+    NONPAYMENT = 'U'
+    NOTAPPLICABLE = 'NA'
+    ENTRYCAT_CHOICES = (
+        ('', '-----------'),
+        (PAYMENT,'Payment'),
+        (NONPAYMENT, 'Non Payment'),
+        (NOTAPPLICABLE, 'Cash Incentive Not Applicable'),
+        )
+    entry_category = forms.ChoiceField(label='Cash Incentive Payment Status',choices=ENTRYCAT_CHOICES, required=True)
 
     def __init__(self, *args, **kwargs):
         super(RemittInfoForm, self).__init__(*args, **kwargs)
@@ -136,16 +149,62 @@ class RemittInfoForm(RemmitForm):
             'exchange',
             'rem_country',
             'reference',
-            'sender','amount',
+            'sender',
+            'sender_gender',
+            'amount',
             'relationship', 
             'purpose',
             Field('date_sending', css_class="date"),
-            'unpaid_cash_incentive_reason', 
-            'cash_incentive_status',
+            #'unpaid_cash_incentive_reason', 
+            #'cash_incentive_status',
             'sender_occupation',
             'screenshot',
+            'reason_a',
+            'entry_category',
             Submit('submit', 'CREATE')
         )
+
+    """def clean_reason_a(self):
+        unpaid_cash_incentive_reason = self.cleaned_data['reason_a']
+        cash_incentive_status = self.cleaned_data['entry_category']
+        if cash_incentive_status == 'U' and unpaid_cash_incentive_reason==None:
+            raise ValidationError('Reason is required if cash incentive status is unpaid')
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return unpaid_cash_incentive_reason"""
+
+    def clean_entry_category(self):
+        cash_incentive_status = self.cleaned_data['entry_category']
+        if 'entry_category' in self.changed_data and cash_incentive_status=='U' and self.fields['entry_category'].initial=="":
+            raise ValidationError('Validation error: A remittance cannot be marked unpaid once it is paid')
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return cash_incentive_status
+
+    def clean(self):
+        cleaned_data = super().clean()
+        #exchange = cleaned_data.get("exchange")
+        #reference = cleaned_data.get("reference")
+        cash_incentive_status = cleaned_data.get("entry_category")
+        unpaid_cash_incentive_reason = cleaned_data.get("reason_a")
+        #if 'cash_incentive_status' in form.changed_data:
+        if cash_incentive_status == 'U' and unpaid_cash_incentive_reason=="":
+            msg = 'Reason is required if cash incentive status is unpaid'
+            self.add_error('reason_a', msg)
+        
+    
+    def save(self, commit=True):
+        remit = super(RemittInfoForm, self).save(commit=False)
+        #set some other attrs on user here ...
+        remit._reason_a = self.cleaned_data['reason_a']
+        remit.unpaid_cash_incentive_reason = self.cleaned_data['reason_a']
+        remit._entry_cat = self.cleaned_data['entry_category']
+        remit.cash_incentive_status = self.cleaned_data['entry_category']
+        #user._other = 'other'
+        if commit:
+          remit.save()
+
+        return remit
 
 class ReceiverForm(ModelForm):
     dob = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="Date of Birth",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
