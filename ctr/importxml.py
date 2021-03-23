@@ -76,7 +76,7 @@ def rename_file(file_path_old, file_number, year, month):
     """ Rename XML file for upload.
     Use the file_number as serial for new file name
     and includes month and date"""
-    new_name = "NRBCB-"+month+"-"+year+"-"+str(file_number)+".xml"
+    new_name = "NRBCB-CTR-"+month+"-"+year+"-"+str(file_number)+".xml"
     target_path = file_path_old.with_name(new_name)
     try:
         file_path_old.rename(target_path)
@@ -92,7 +92,7 @@ def rename_all_files_in_path(folder_path, year, month):
         if not rename:
             print("File number Cannot be renamed")
     print("Done")
-        
+
 
 
 
