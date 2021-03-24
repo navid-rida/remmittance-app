@@ -1,0 +1,17 @@
+{% extends "rem/base.html" %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} Add New Rate {% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-6 offset-3">
+    <h4>Add New Rate</h4>
+    <form method="post" action="{% url 'add_rate'%}">
+      {% csrf_token %}
+
+      {% crispy form %}
+      
+    </form>
+  </div>
+</div>
+{% endblock %}
