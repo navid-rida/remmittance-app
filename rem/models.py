@@ -380,6 +380,9 @@ class Remmit(models.Model):
                 return True
         return False
 
+    def get_paid_cash_incentives(self):
+        return self.cashincentive_set.filter(entry_category='P').last()
+
 
     def pay_previously_unpaid_cash_incentive(self):
         if self.check_unpaid_cash_incentive():
@@ -412,6 +415,10 @@ class Remmit(models.Model):
     def calculate_cash_incentive(self):
         return self.amount*Decimal(0.02)
 
+    def get_ci_trn_type(self):
+        #returns cash incentive transaction type for RIT
+        return "CASH-PICKUP(OTC)"
+
 class RemittanceUpdateHistory(models.Model):
     remittance=models.ForeignKey(Remmit, on_delete=models.CASCADE, verbose_name= "Remittance Entry")
     datecreate = models.DateTimeField("Date of Editing", auto_now_add=True)
@@ -432,11 +439,11 @@ class CashIncentive(models.Model):
     NONPAYMENT = 'U'
     NOTAPPLICABLE = 'NA'
     ENTRYCAT_CHOICES = (
-        (PAYMENT,'Payment'),
-        (NONPAYMENT, 'Non Payment'),
-        (NOTAPPLICABLE, 'Cash Incentive Not Applicable'),
+        (PAYMENT,'Paid'),
+        (NONPAYMENT, 'Not Paid'),
+        (NOTAPPLICABLE, 'Not Applicable'),
         )
-    entry_category = models.CharField("Entry Category", choices=ENTRYCAT_CHOICES, max_length=1, )
+    entry_category = models.CharField("Payment Status", choices=ENTRYCAT_CHOICES, max_length=1, )
 
     def __str__(self):
         return self.remittance.reference +" "+ self.entry_category
@@ -446,8 +453,6 @@ class CashIncentive(models.Model):
             return True
         else:
             return False
-
-    
 
 
     def create_entry_from_remittance(self, remitt):
