@@ -21,7 +21,7 @@ class RemmitForm(ModelForm):
 
     class Meta:
         model = Remmit
-        fields = ('exchange','rem_country','reference','sender','sender_gender','amount','relationship', 'purpose','date_sending','sender_occupation')
+        fields = ('exchange','rem_country','reference','sender','sender_gender','amount', 'currency','relationship', 'purpose','date_sending','sender_occupation')
         widgets = {
             #'dob': forms.SelectDateWidget,
             #'cash_incentive_status': forms.RadioSelect,
@@ -128,16 +128,16 @@ class RemmitForm(ModelForm):
 
 
 class RemittInfoForm(RemmitForm):
-    screenshot = forms.ImageField(required=True)
+    screenshot = forms.ImageField(required=False)
     reason_a = forms.CharField(label='Reason for not paying cash incentive', required=False)
     PAYMENT= 'P'
     NONPAYMENT = 'U'
     NOTAPPLICABLE = 'NA'
     ENTRYCAT_CHOICES = (
         ('', '-----------'),
-        (PAYMENT,'Payment'),
-        (NONPAYMENT, 'Non Payment'),
-        (NOTAPPLICABLE, 'Cash Incentive Not Applicable'),
+        (PAYMENT,'Paid'),
+        (NONPAYMENT, 'Not Paid'),
+        (NOTAPPLICABLE, 'Not Applicable'),
         )
     entry_category = forms.ChoiceField(label='Cash Incentive Payment Status',choices=ENTRYCAT_CHOICES, required=True)
 
@@ -152,6 +152,7 @@ class RemittInfoForm(RemmitForm):
             'sender',
             'sender_gender',
             'amount',
+            'currency',
             'relationship', 
             'purpose',
             Field('date_sending', css_class="date"),
@@ -159,8 +160,8 @@ class RemittInfoForm(RemmitForm):
             #'cash_incentive_status',
             'sender_occupation',
             'screenshot',
-            'reason_a',
             'entry_category',
+            'reason_a',
             Submit('submit', 'CREATE')
         )
 
