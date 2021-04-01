@@ -490,7 +490,7 @@ class CashIncentive(models.Model):
                 self.cash_incentive_amount= remitt.cash_incentive_amount
                 self.date_cash_incentive_paid= remitt.date_cash_incentive_paid
                 self.date_cash_incentive_settlement= remitt.date_cash_incentive_settlement
-                self.unpaid_cash_incentive_reason=remitt.unpaid_cash_incentive_reason + " - Solved and paid" if remitt.unpaid_cash_incentive_reason else None
+                self.unpaid_cash_incentive_reason=remitt.unpaid_cash_incentive_reason + "-SP" if remitt.unpaid_cash_incentive_reason else None
                 self.entry_category = 'P'
                 self.save()
                 return True
