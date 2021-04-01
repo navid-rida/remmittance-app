@@ -444,7 +444,7 @@ class CashIncentive(models.Model):
         (NONPAYMENT, 'Not Paid'),
         (NOTAPPLICABLE, 'Not Applicable'),
         )
-    entry_category = models.CharField("Payment Status", choices=ENTRYCAT_CHOICES, max_length=1, )
+    entry_category = models.CharField("Payment Status", choices=ENTRYCAT_CHOICES, max_length=2, )
     partial_payment_status = models.BooleanField("Partial Cash Incentive Payment?", default=False)
 
     def __str__(self):
