@@ -293,13 +293,11 @@ class ExchangeHouse(models.Model):
     cash_incentive_gl_key_name = models.CharField("Name of Cash incentive GL Key Head", max_length=50)
     ac_no = models.CharField("Account no./ GL No. of Exchange House", max_length=15,  validators=[numeric])
     ac_no_branch = models.ForeignKey(Branch,on_delete=models.CASCADE, verbose_name="Branch of CD Account/ GL")
+    verbose_name = models.CharField("Full Name of the Exchangehouse", max_length= 50)
 
     def __str__(self):
         return self.name
 
-['amount', 'booth_id', 'branch_id', 'cash_incentive_amount',
-       'cash_incentive_status', 'date_cash_incentive_paid', 'date_cash_incentive_settlement',
-       'reference',]
 
 class Remmit(models.Model):
     exchange = models.ForeignKey(ExchangeHouse,on_delete=models.CASCADE, verbose_name='Channel of Remittance')
@@ -419,6 +417,9 @@ class Remmit(models.Model):
         #returns cash incentive transaction type for RIT
         return "CASH-PICKUP(OTC)"
 
+    def get_exchange_rate(self):
+        return self.currency.get_latest_rate(self.date_create)
+
 class RemittanceUpdateHistory(models.Model):
     remittance=models.ForeignKey(Remmit, on_delete=models.CASCADE, verbose_name= "Remittance Entry")
     datecreate = models.DateTimeField("Date of Editing", auto_now_add=True)
@@ -444,6 +445,7 @@ class CashIncentive(models.Model):
         (NOTAPPLICABLE, 'Not Applicable'),
         )
     entry_category = models.CharField("Payment Status", choices=ENTRYCAT_CHOICES, max_length=1, )
+    partial_payment_status = models.BooleanField("Partial Cash Incentive Payment?", default=False)
 
     def __str__(self):
         return self.remittance.reference +" "+ self.entry_category
@@ -464,6 +466,7 @@ class CashIncentive(models.Model):
                 self.date_cash_incentive_settlement=None
                 self.unpaid_cash_incentive_reason=remitt.unpaid_cash_incentive_reason
                 self.entry_category = 'U'
+                #self.partial_payment_status = True
                 self.save()
                 return True
             except Exception as e:
