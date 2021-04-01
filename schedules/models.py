@@ -1,6 +1,6 @@
 from django.db import models
 from rem.validators import validate_neg, validate_post_date, validate_mobile, numeric, name, alpha, alpha_num, western_union, nrbc_acc
-
+from django.utils import timezone
 # Create your models here.
 
 class Currency(models.Model):
@@ -11,6 +11,10 @@ class Currency(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def get_latest_rate(self,date=timezone.now().date()):
+        return self.rate_set.filter(date__lte=date).last()
+
 
 class District(models.Model):
     name = models.CharField("Name of District", max_length=40)
@@ -38,3 +42,6 @@ class Rate(models.Model):
     rate_type = models.CharField("Type of Exchange Rate", choices=RATE_TYPE_CHOICES, max_length=3)
     date = models.DateField("Date of Entry")
     rate = models.DecimalField("Exchange Rate in BDT", max_digits=7,decimal_places=2, validators=[validate_neg],)
+
+    def __str__(self):
+        return self.currency.name

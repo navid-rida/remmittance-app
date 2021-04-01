@@ -1,0 +1,74 @@
+{% extends "rem/base.html" %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block js %}
+
+
+{% endblock %}
+{% block title %} Cash Incentive RIT {% endblock %}
+{% block content %}
+
+<br>
+<form method="post">
+  {% csrf_token %}
+  <div class='form-row'>
+    <div class="col-auto">
+      {% for error in form.date_from.errors %}
+      <div class="alert alert-danger" role="alert">{{ error}}</div>
+      {% endfor %}
+      {{form.date_from.label_tag}}
+      {{form.date_from|add_class:"form-control date"}}
+    </div>
+    <div class="col-auto">
+      {% for error in form.date_to.errors %}
+      <div class="alert alert-danger" role="alert">{{ error}}</div>
+      {% endfor %}
+      {{form.date_to.label_tag}}
+      {{form.date_to|add_class:"form-control date"}}
+    </div>
+
+  </div>
+  <div class='form-row'>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary btn-sm mb-2 element_margin" value="Show" name="_show">Show</button>
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary btn-sm mb-2 element_margin" value="Download" name="_download">Download</button>
+    </div>
+  </div>
+</form>
+</br>
+{{ df|safe}}
+
+{% if df.empty %}
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+      <th scope="col">Date</th>
+      <th scope="col">Bank</th>
+      <th scope="col">SL.</th>
+      <th scope="col">AD FI CODE</th>
+      <th scope="col">REPORT_TYPE</th>
+      <th scope="col">SCHEDULE</th>
+      <th scope="col">TYPE</th>
+      <th scope="col">PURPOSE</th>
+      <th scope="col">CURRENCY</th>
+      <th scope="col">COUNTRY</th>
+      <th scope="col">NID</th>
+      <th scope="col">PASSPORT</th>
+      <th scope="col">AMOUNT FCY</th>
+    </tr>
+  </thead>
+  {% for k,v in df.iterrows%}
+  <tr>
+    {% for key, value in v.items%}
+      <td>{% if value %}{{value}}{% else%} {% endif%}</td>
+    {% endfor %}
+  </tr>
+  {% endfor%}
+</table>
+{% endif%}
+
+
+{% block error %}{% endblock %}
+{% endblock %}
