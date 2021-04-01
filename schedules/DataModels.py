@@ -60,6 +60,7 @@ def remittance_rit(qset):
     df['amt_usd'] = df['amt_bdt']/df['rate_usd']
     df['amount'] = df.apply(lambda x:x['amt_usd'] if x['short']=='BDT' else x['amount'], axis=1)
     df['date_cash_incentive_paid_cashin'] = pd.to_datetime(df['date_cash_incentive_paid_cashin']).dt.strftime("%d-%b-%Y").str.upper()
+    df['date_sending'] = pd.to_datetime(df['date_sending']).dt.strftime("%d-%b-%Y").str.upper()
     return df[['reference','name','receiver_gender','idtype','idno', 'bank','trn_type', 'sender', 'sender_gender','sender_occupation', 'name_country','name_exchange', 'date_sending', 'amount','currency_short_name', 'rate', 'amt_bdt','amt_usd','cash_incentive_amount_cashin', 'date_cash_incentive_paid_cashin']]
 
     """name= []
