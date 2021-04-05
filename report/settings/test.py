@@ -47,3 +47,7 @@ EMAIL_PORT = 25
 DEFAULT_FROM_EMAIL='no-reply@cfrdsnrbc.com'
 ADMINS=[('Navid', 'kazinavidanzum@nrbcommercialbank.com'), ('Chakibbai', 'nazmussaqib@nrbcommercialbank.com')]
 MANAGERS=[('Navid', 'kazinavidanzum@nrbcommercialbank.com'), ('Chakibbai', 'nazmussaqib@nrbcommercialbank.com')]
+
+
+################################ Configurations #########################################
+IMAGE_UPLOAD_REQUIRED = True

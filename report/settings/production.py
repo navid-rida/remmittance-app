@@ -47,3 +47,7 @@ MAXIMUM_USER_PER_BRANCH=2
 ############################ django-registration settings ##############################
 
 ACCOUNT_ACTIVATION_DAYS = 2
+
+
+################################ Configurations #########################################
+IMAGE_UPLOAD_REQUIRED = True
