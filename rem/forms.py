@@ -14,7 +14,8 @@ from django_registration.forms import RegistrationForm, RegistrationFormUniqueEm
 ################## Crispy forms ########################
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Submit #, Fieldset, ButtonHolder, Submit
-
+###### Configuration ##################
+from django.conf.settings import IMAGE_UPLOAD_REQUIRED
 
 class RemmitForm(ModelForm):
     date_sending = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
@@ -128,7 +129,7 @@ class RemmitForm(ModelForm):
 
 
 class RemittInfoForm(RemmitForm):
-    screenshot = forms.ImageField(required=False)
+    screenshot = forms.ImageField(required=IMAGE_UPLOAD_REQUIRED)
     reason_a = forms.CharField(label='Reason for not paying cash incentive', required=False)
     PAYMENT= 'P'
     NONPAYMENT = 'U'
