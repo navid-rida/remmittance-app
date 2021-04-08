@@ -1,173 +1,17 @@
 {% extends "rem/base.html" %}
+{% load crispy_forms_tags %}
 {% load widget_tweaks %}
 
 {% block title %} Remittance Entry {% endblock %}
 {% block content %}
 
 <div class="row">
-  <div class="col-md-10 offset-3">
-    <h4 class="element_margin">Remittance information Update</h4>
+  <div class="col-md-6 offset-3">
+    <h4 class="element_margin">Update Remmittance details</h4>
     <form enctype="multipart/form-data" method="post">
       {% csrf_token %}
-      <div class="row">
-        <div class="col-auto">
-          <ul>
-            {% for error in form.non_field_errors %}
-            <div class="alert alert-danger" role="alert">
-              <li>{{error}}</li>
-            </div>
-            {% endfor %}
-          </ul>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="col-auto">
-          {{ form.exchange.label_tag}}
-          {{ form.exchange|add_class:"form-control"}}
-          {% for error in form.exchange.errors %}
-          <div class="alert alert-danger" role="alert">
-            {{error}}
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="col-auto">
-          {{ form.currency.label_tag}}
-          {{ form.currency|add_class:"form-control"}}
-          {% for error in form.currency.errors %}
-          <div class="alert alert-danger" role="alert">
-            {{error}}
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="col-auto">
-          {{ form.relationship.label_tag}}
-          {{ form.relationship|add_class:"form-control"}}
-          {% for error in form.relationship.errors %}
-          <div class="alert alert-danger" role="alert">
-            {{error}}
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="col-auto">
-          {{ form.purpose.label_tag}}
-          {{ form.purpose|add_class:"form-control"}}
-          {% for error in form.purpose.errors %}
-          <div class="alert alert-danger" role="alert">
-            {{error}}
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="col-auto">
-          {{ form.rem_country.label_tag}}
-          {{ form.rem_country|add_class:"form-control"}}
-          {% for error in form.rem_country.errors %}
-          <div class="alert alert-danger" role="alert">
-            {{error}}
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="col-auto">
-          {{ form.reference.label_tag}}
-          {{ form.reference|add_class:"form-control"}}
-          {% for error in form.reference.errors %}
-          <div class="alert alert-danger" role="alert">
-            {{error}}
-          </div>
-          {% endfor %}
 
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="col-auto">
-          {{ form.sender.label_tag}}
-          {{ form.sender|add_class:"form-control"}}
-          {% for error in form.sender.errors %}
-          <div class="alert alert-danger" role="alert">
-            {{error}}
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="col-auto">
-          {{ form.sender_occupation.label_tag}}
-          {{ form.sender_occupation|add_class:"form-control"}}
-          {% for error in form.sender_occupation.errors %}
-          <div class="alert alert-danger" role="alert">
-            {{error}}
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="col-auto">
-          {{ form.date_sending.label_tag}}
-          {{ form.date_sending|add_class:"form-control date"}}
-          {% for error in form.date_sending.errors %}
-          <div class="alert alert-danger" role="alert">
-            {{error}}
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="col-auto">
-          {{ form.amount.label_tag}}
-          {{ form.amount|add_class:"form-control"}}
-          {% for error in form.amount.errors %}
-          <div class="alert alert-danger" role="alert">
-            {{error}}
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="col-auto">
-          {{ form.cash_incentive_status.label_tag}}
-          {{ form.cash_incentive_status|add_class:"form-control"}}
-          {% for error in form.cash_incentive_status.errors %}
-          <div class="alert alert-danger" role="alert">
-            {{error}}
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="col-auto">
-          {{ form.unpaid_cash_incentive_reason.label_tag}}
-          {{ form.unpaid_cash_incentive_reason|add_class:"form-control"}}
-          {% if form.unpaid_cash_incentive_reason.help_text %}
-            <small style="color: grey">{{ form.unpaid_cash_incentive_reason.help_text|safe }}</small>
-          {% endif %}
-          {% for error in form.unpaid_cash_incentive_reason.errors %}
-          <div class="alert alert-danger" role="alert">
-            {{error}}
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="col-auto">
-          {{ form.screenshot.label_tag}}
-          {{ form.screenshot|add_class:"form-control"}}
-          {% for error in form.screenshot.errors %}
-          <div class="alert alert-danger" role="alert">
-            {{error}}
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <input type="submit" class="btn btn-primary element_margin" value="Submit" />
+      {% crispy form %}
     </form>
   </div>
 </div>
