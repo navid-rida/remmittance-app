@@ -190,6 +190,8 @@ class RemittInfoForm(RemmitForm):
         cash_incentive_status = cleaned_data.get("entry_category")
         unpaid_cash_incentive_reason = cleaned_data.get("reason_a")
         #if 'cash_incentive_status' in form.changed_data:
+        if self.has_changed() and 'entry_category' in self.changed_data:
+            self.add_error('entry_category','Payment status cannot be changed while updating remittane information')
         if cash_incentive_status == 'U' and unpaid_cash_incentive_reason=="":
             msg = 'Reason is required if cash incentive status is unpaid'
             self.add_error('reason_a', msg)

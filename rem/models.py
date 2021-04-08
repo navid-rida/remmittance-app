@@ -304,7 +304,7 @@ class Remmit(models.Model):
     currency = models.ForeignKey(Currency,on_delete=models.CASCADE, verbose_name='Currency of Remittance', default=Currency.objects.get(name='BANGLADESHI TAKA').id)
     rem_country = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Remitting Country')
     sender = models.CharField("Name of Remitter", validators=[name], max_length=50)
-    sender_occupation = models.CharField("Occupation of Remitter", help_text="Service/ Business etc.",validators=[alpha], max_length=50, null=True, blank=True)
+    sender_occupation = models.CharField("Occupation of Remitter", help_text="Service/ Business etc.",validators=[alpha], max_length=50)
     MALE= 'M'
     FEMALE = 'F'
     OTHER = 'O'

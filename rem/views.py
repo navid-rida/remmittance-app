@@ -742,11 +742,15 @@ class RemmitInfoUpdate(PermissionRequiredMixin, SuccessMessageMixin, UpdateView)
     template_name = 'rem/forms/remmit_info_update_form.html'
     success_url = reverse_lazy('show_rem')
     success_message = "Remittance information was updated successfully"
+    
+
+    def get_initial(self):
+        entry_category = self.object.cashincentive_set.last().entry_category
+        reason_a = self.object.cashincentive_set.last().unpaid_cash_incentive_reason
+        return {'entry_category': entry_category, 'reason_a': reason_a}
 
     def form_valid(self, form):
         form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.02)
-        if form.has_changed() and 'cash_incentive_status' in form.changed_data:
-            raise ValidationError('Payment status cannot be changed form this view')
         self.object = form.save(commit=False)
         # in case you want to modify the object before commit
         self.object.save()
