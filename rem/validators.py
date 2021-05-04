@@ -21,7 +21,7 @@ xpress_re = RegexValidator(
 )
 
 ria_re = RegexValidator(
-    _lazy_re_compile(r'^[0-9a-zA-Z]{2}[0-9]{6,10}$'),
+    _lazy_re_compile(r'^[0-9]{11}$'),
     message=_('Please enter a valid Ria PIN'),
     code='invalid_ria',
 )
