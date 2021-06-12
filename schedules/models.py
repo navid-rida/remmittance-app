@@ -7,7 +7,7 @@ class Currency(models.Model):
     name = models.CharField("Name of Currenct", max_length=50)
     ccy_id = models.CharField("CCY ID", max_length=4,  validators=[numeric])
     cur_code = models.CharField("Currency Code", max_length=3,  validators=[numeric])
-    short = models.CharField("Short Code", max_length=3,  validators=[alpha])
+    short = models.CharField("Short Code", max_length=5,  validators=[alpha])
 
     def __str__(self):
         return self.name

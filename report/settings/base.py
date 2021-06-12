@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     #Rules
     'rules',
+    ####### Extension
+    'django_extensions',
 
 ]
 
