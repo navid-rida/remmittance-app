@@ -1,6 +1,6 @@
 from .models import *
 from django.contrib.auth.models import User
-import pandas as pdb
+import pandas as pd
 from pathlib import Path
 
 
@@ -21,4 +21,15 @@ def get_all_cash_incentive_from_remittance_table(qset):
             #return True
         except Exception as e:
             print(e)
-        
+
+
+def get_all_country_from_reference(pathtoreference='REFERENCE_FILE.xlsm'):
+    df = pd.read_excel(pathtoreference, 'COUNTRY', dtype=object)
+    for inx, row in df.iterrows():
+        try:
+            cn = Country()
+            cn.name = row['COUNTRY']
+            cn.code = row['COUNTRY_ID']
+            cn.save()
+        except Exception as e:
+            print(e)
