@@ -44,9 +44,13 @@ EMAIL_HOST = '192.168.50.54'
 #EMAIL_HOST_USER = 'kazinavidanzum@nrbcommercialbank.com'
 
 EMAIL_PORT = 465
-DEFAULT_FROM_EMAIL='no-reply@cfrdsnrbc.com'
-ADMINS=[('Navid', 'kazinavidanzum@nrbcommercialbank.com'), ('Chakibbai', 'nazmussaqib@nrbcommercialbank.com')]
-MANAGERS=[('Navid', 'kazinavidanzum@nrbcommercialbank.com'), ('Chakibbai', 'nazmussaqib@nrbcommercialbank.com')]
+#EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'cfrd.support@nrbcommercialbank.com'
+EMAIL_HOST_PASSWORD = '%97jR@PEv1'
+DEFAULT_FROM_EMAIL='cfrd.support@nrbcommercialbank.com'
+#ADMINS=[('Navid', 'kazinavidanzum@nrbcommercialbank.com'), ('Chakibbai', 'nazmussaqib@nrbcommercialbank.com')]
+#MANAGERS=[('Navid', 'kazinavidanzum@nrbcommercialbank.com'), ('Chakibbai', 'nazmussaqib@nrbcommercialbank.com')]
 
 
 ################################ Configurations #########################################
