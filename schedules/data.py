@@ -26,7 +26,7 @@ ref_commodity = pd.read_excel(ref_file_path, sheet_name='BOP_COMMODITY', dtype= 
 ref_commodity['HS_CODE'] = ref_commodity['COMMODITY_ID'].str[-8:].apply(int)
 ref_unit = pd.read_excel(ref_file_path, sheet_name='UOM')
 ref_fx_type_df = pd.read_excel(ref_file_path, sheet_name='FX_TYPE', dtype = float)
-ref_economic_sector_df = pd.read_excel(ref_file_path, sheet_name='CATEGORY_TO_ECONOMIC_SECTOR',)
+ref_economic_sector_df = pd.read_excel(ref_file_path, sheet_name='CATEGORY_TO_ECONOMIC_SECTOR',)"""
 
 def get_fx_trn_type(value,ref_fx_type_df):
     #types = ref_fx_type_df.to_dict(orient='list')
@@ -37,7 +37,7 @@ def get_fx_trn_type(value,ref_fx_type_df):
 
 #################################### Export Part #########################################
 exp_columns = ['Schedule','Type','Month','AD','CUR_CODE','Serial','UNIT_CODE','Volume','fc_amount','COUNTRY_CODE','HS_CODE']
-exp_df = pd.read_csv(export_text_path,sep='|', names=exp_columns, )
+#exp_df = pd.read_csv(export_text_path,sep='|', names=exp_columns, )
 
 
 def get_exp_rit_df(df):
@@ -56,7 +56,7 @@ def get_exp_rit_df(df):
 
 ########################################## Import Payment #################################################
 imp_pay_columns = ['Schedule','Type','Month','AD','CUR_CODE','Serial','UNIT_CODE','Volume','fc_amount','COUNTRY_CODE','HS_CODE','CATEGORY_CODE']
-imp_pay_df = pd.read_csv(import_payment_text_path,sep='|', names=imp_pay_columns,)
+#imp_pay_df = pd.read_csv(import_payment_text_path,sep='|', names=imp_pay_columns,)
 
 def get_imp_pay_rit_df(df):
     #df = exp_df
@@ -76,7 +76,7 @@ def get_imp_pay_rit_df(df):
 ####################################### Invisible Payments ########################################################
 
 invisible_pay_columns = ['Schedule','Type','Month','AD','CUR_CODE','Serial','fc_amount','COUNTRY_CODE','PURPOSE_CODE','CATEGORY_CODE']
-invisible_pay_df = pd.read_csv(invisible_payment_text_path,sep='|', names=invisible_pay_columns, dtype= {'PURPOSE_CODE':str,})
+#invisible_pay_df = pd.read_csv(invisible_payment_text_path,sep='|', names=invisible_pay_columns, dtype= {'PURPOSE_CODE':str,})
 
 def get_inv_pay_rit_df(df):
     #df = exp_df
@@ -96,7 +96,7 @@ def get_inv_pay_rit_df(df):
 ############################################## Invisible Receipts #####################################################################
 
 invisible_rec_columns = ['Schedule','Type','Month','AD','CUR_CODE','Serial','fc_amount','COUNTRY_CODE','PURPOSE_CODE']
-invisible_rec_df = pd.read_csv(invisible_receipt_text_path,sep='|', names=invisible_rec_columns, dtype= {'PURPOSE_CODE':str,})
+#invisible_rec_df = pd.read_csv(invisible_receipt_text_path,sep='|', names=invisible_rec_columns, dtype= {'PURPOSE_CODE':str,})
 
 def get_inv_rec_rit_df(df):
     #df = exp_df
@@ -114,7 +114,7 @@ def get_inv_rec_rit_df(df):
 
 ###################################################### Wage Remiitance ############################################
 wage_remit_columns = ['Schedule','Type','Month','AD','CUR_CODE','Serial','COUNTRY_CODE','fc_amount',]
-wage_remit_df = pd.read_csv(wage_remit_text_path,sep='|', names=wage_remit_columns, )
+#wage_remit_df = pd.read_csv(wage_remit_text_path,sep='|', names=wage_remit_columns, )
 
 def get_wage_remit_rit_df(df):
     #df = exp_df
@@ -144,7 +144,7 @@ def rit_all_df(exp_rec,imp_pay,inv_pay,inv_rec,wage_remit):
     return df
 
 
-final_df = rit_all_df(exp_df,imp_pay_df,invisible_pay_df,invisible_rec_df,wage_remit_df)
+#final_df = rit_all_df(exp_df,imp_pay_df,invisible_pay_df,invisible_rec_df,wage_remit_df)
 
 
 ########################################### Remittance Reports from DB ########################################
@@ -206,4 +206,4 @@ def get_daily_bb_remittance(qset):
             "Branch": branch,
             }
     df = pd.DataFrame(dct)
-    return df"""
+    return df
