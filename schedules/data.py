@@ -4,7 +4,7 @@ from pathlib import Path
 import datetime
 
 ###################### paths ###########################################
-folder_path = "F:\\Projects\\Return RIT\\2021\\RETURN_RIT_MAY_2021"
+"""folder_path = "F:\\Projects\\Return RIT\\2021\\RETURN_RIT_MAY_2021"
 export_text_file = 'exprecpt.txt'
 import_payment_text_file = 'imppaynt.txt'
 invisible_payment_text_file = 'invpaynt.txt'
@@ -206,4 +206,4 @@ def get_daily_bb_remittance(qset):
             "Branch": branch,
             }
     df = pd.DataFrame(dct)
-    return df
+    return df"""
