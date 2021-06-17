@@ -43,7 +43,7 @@ MEDIA_URL = '/media/'
 EMAIL_HOST = '192.168.50.54'
 #EMAIL_HOST_USER = 'kazinavidanzum@nrbcommercialbank.com'
 
-EMAIL_PORT = 25
+EMAIL_PORT = 465
 DEFAULT_FROM_EMAIL='no-reply@cfrdsnrbc.com'
 ADMINS=[('Navid', 'kazinavidanzum@nrbcommercialbank.com'), ('Chakibbai', 'nazmussaqib@nrbcommercialbank.com')]
 MANAGERS=[('Navid', 'kazinavidanzum@nrbcommercialbank.com'), ('Chakibbai', 'nazmussaqib@nrbcommercialbank.com')]
