@@ -24,7 +24,10 @@ def gender_abbr(gender_short):
         return 'Female'
     else:
         return 'OTHER'
-
+    
+def get_usd_rate(report_date=timezone.now().date()):
+    usd_rate = Rate.objects.filter(currency__short= 'USD').filter(date__lte=report_date).last()
+    return usd_rate.rate
 
 def remittance_rit(qset):
     if qset.exists():
@@ -33,42 +36,45 @@ def remittance_rit(qset):
         remit_df['date_create'] = pd.to_datetime(remit_df['date_create']).dt.date
         receiver_df = qset_to_df(Receiver.objects.filter(remmit__in=qset).distinct())
         e_df = qset_to_df(ExchangeHouse.objects.filter(remmit__in=qset).distinct())
-        currency_qset = Currency.objects.filter(remmit__in=qset).distinct()
-        rate_qset = Rate.objects.filter(currency__in=currency_qset)
-        currency_df = qset_to_df(currency_qset)
-        rate_df = qset_to_df(rate_qset)
-        rate_df['date'] = pd.to_datetime(rate_df['date']).dt.date
-        usd_df = qset_to_df(Rate.objects.filter(currency__short= 'USD'))
         country_df = qset_to_df(Country.objects.filter(remmit__in=qset).distinct())
-        cashin_qset = CashIncentive.objects.filter(remittance__in=qset).distinct()
-        cashin_df = qset_to_df(cashin_qset.filter(cashin_qset))
-
+        currency_qset = Currency.objects.filter(remmit__in=qset).distinct()
+        currency_df = qset_to_df(currency_qset)
+        rate_qset = Rate.objects.filter(currency__in=currency_qset)
+        rate_df = qset_to_df(rate_qset)
+        usd_rate = qset_to_df(Rate.objects.filter(currency__short= 'USD').filter(date__lte=timezone.now().date()))['rate'].values[0]
+        
+        cashin_qset = CashIncentive.objects.filter(remittance__in=qset, entry_category='P').distinct()
+        cashin_df = qset_to_df(cashin_qset)
+        
         df = pd.merge(receiver_df, remit_df, how = 'outer', left_on='id', right_on='receiver_id', suffixes=('_receiver', '_remittance'))
-        df = df.merge(cashin_df, how = 'left', left_on='id_remittance', right_on='remittance_id', suffixes=('', '_cashin')) if not cashin_df.empty else df
-        df = df[df['entry_category_cashin']]
-        df = df.merge(e_df, how = 'outer', left_on='exchange_id', right_on='id',suffixes=('', '_exchange'))
-        df = df.merge(country_df, how = 'outer', left_on='rem_country_id', right_on='id',suffixes=('', '_country'))
-        df = df.merge(currency_df, how = 'outer', left_on='currency_id', right_on='id', suffixes=('', '_currency'))
-        df = df.merge(rate_df, how = 'left', left_on = ['id_currency','date_create'], right_on=['currency_id','date'], suffixes=('','_rate'))
-        df = df.merge(usd_df, how = 'left', left_on = 'date_create', right_on='date', suffixes=('','_usd'))
+        df['receiver_gender'] = df['gender'].apply(gender_abbr)
 
         df['bank'] = 'NRB COMMERCIAL BANK LTD.'
+
         df['trn_type'] = 'CASH-PICKUP(OTC)'
-        df['date_cash_incentive_paid_cashin'] = df['date_cash_incentive_paid_cashin'].dt.date.strftime("%d-%b-%Y").str.upper() if not cashin_df.empty else 'None'
-        #df['exc_rate'] = Decimal(80.24)
-        df['amt_bdt'] = df.apply(lambda x: x['amount'] if x['short']=='BDT' else Decimal(x['amount'])*Decimal(x['rate']), axis=1)
-        df['currency_short_name'] = df['short'].apply(lambda x: "USD" if x=='BDT' else x)
-        df['receiver_gender'] = df['gender'].apply(gender_abbr)
+
         df['sender_gender'] = df['sender_gender'].apply(gender_abbr)
-        df['amt_usd'] = df['amt_bdt']/df['rate_usd']
-        df['amount'] = df.apply(lambda x:x['amt_usd'] if x['short']=='BDT' else x['amount'], axis=1)
-        #df['date_cash_incentive_paid_cashin'] = pd.to_datetime(df['date_cash_incentive_paid_cashin']).dt.strftime("%d-%b-%Y").str.upper()
+
+        df = df.merge(country_df, how = 'outer', left_on='rem_country_id', right_on='id',suffixes=('', '_country'))
+
+        df = df.merge(e_df, how = 'outer', left_on='exchange_id', right_on='id',suffixes=('', '_exchange'))
+
         df['date_sending'] = pd.to_datetime(df['date_sending']).dt.strftime("%d-%b-%Y").str.upper()
-        return df[['reference','verbose_name','receiver_gender','idtype','idno', 'bank','trn_type', 'sender', 'sender_gender','sender_occupation', 'name_country','name_exchange', 'date_sending', 'amount','currency_short_name', 'rate', 'amt_bdt','amt_usd','cash_incentive_amount_cashin', 'date_cash_incentive_paid_cashin']]
+
+        df = df.merge(currency_df, how = 'outer', left_on='currency_id', right_on='id', suffixes=('', '_currency'))
+
+        df = df.merge(rate_df, how = 'left', left_on = ['id_currency','date_create'], right_on=['currency_id','date'], suffixes=('','_rate'))
+
+        df['amt_bdt'] = df.apply(lambda x: Decimal(x['amount']) * Decimal(x['rate']) if x['rate']!=None else None, axis=1)
+        df['amt_usd'] = df['amt_bdt']/get_usd_rate()
+        
+        df = df.merge(cashin_df, how = 'left', left_on='id_remittance', right_on='remittance_id', suffixes=('', '_cashin')) if not cashin_df.empty else df
+        df['date_cash_incentive_paid_cashin'] = pd.to_datetime(df['date_cash_incentive_paid_cashin']).dt.strftime("%d-%b-%Y").str.upper()
+        
+        return df[['reference','name','receiver_gender','idtype','idno','bank','trn_type', 'sender', 'sender_gender','sender_occupation','name_country','name_exchange', 'date_sending', 'amount','short','rate','amt_bdt','amt_usd','cash_incentive_amount_cashin', 'date_cash_incentive_paid_cashin']]
     else:
         df = pd.DataFrame()
         return df
-
     """name= []
     for q in qset:
         name.append(q.receiver.name)
