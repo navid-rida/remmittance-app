@@ -334,7 +334,7 @@ class Remmit(models.Model):
     date_sending = models.DateField("Date of Sending Remittance from Abroad")
     date_cash_incentive_paid = models.DateTimeField("Date of Cash Incentive payment", null=True, blank= True)
     date_cash_incentive_settlement = models.DateField("Date of Cash Incentive Settlement", null=True, blank= True)
-    date_create = models.DateTimeField("Date of posting", auto_now_add=True)
+    date_creat = models.DateTimeField("Date of posting", auto_now_add=True)
     date_edited = models.DateTimeField("Date of last modified", auto_now=True)
     reference = models.CharField("Referene No./PIN/MTCN", max_length=16, unique=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
@@ -379,7 +379,7 @@ class Remmit(models.Model):
         return False
 
     def get_paid_cash_incentives(self):
-        return self.cashincentive_set.filter(entry_category='P').last()
+        return self.cashincentive_set.filter(entry_category='P')
 
 
     def pay_previously_unpaid_cash_incentive(self):
@@ -419,6 +419,14 @@ class Remmit(models.Model):
 
     def get_exchange_rate(self):
         return self.currency.get_latest_rate(self.date_create)
+
+    def get_total_paid_cash_incentive_sum(self):
+        ###Returns the sum of all paid cash incentives
+        q = self.get_paid_cash_incentives(self)
+        total = 0
+        for e in q:
+            total = total + e.cash_incentive_amount
+        return total
 
 class RemittanceUpdateHistory(models.Model):
     remittance=models.ForeignKey(Remmit, on_delete=models.CASCADE, verbose_name= "Remittance Entry")
