@@ -31,9 +31,9 @@ def excel_output(df):
     xlsx_data = output.getvalue()
     return xlsx_data
 
-def qset_to_df(qset):
+def qset_to_df(qset, datatype='object'):
     """ accepts Django queryset and converts to pandas Dataframe """
-    df = pd.DataFrame(list(qset.values()))
+    df = pd.DataFrame(list(qset.values()), dtype=datatype)
     return df
 
 def find_same_amount(df):

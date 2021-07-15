@@ -71,7 +71,7 @@ def remittance_rit(qset):
         df = df.merge(cashin_df, how = 'left', left_on='id_remittance', right_on='remittance_id', suffixes=('', '_cashin')) if not cashin_df.empty else df
         df['date_cash_incentive_paid_cashin'] = pd.to_datetime(df['date_cash_incentive_paid_cashin']).dt.strftime("%d-%b-%Y").str.upper()
         
-        return df[['reference','name','receiver_gender','idtype','idno','bank','trn_type', 'sender', 'sender_gender','sender_occupation','name_country','name_exchange', 'date_sending', 'amount','short','rate','amt_bdt','amt_usd','cash_incentive_amount_cashin', 'date_cash_incentive_paid_cashin']]
+        return df[['reference','name','receiver_gender','idtype','idno','bank','trn_type', 'sender', 'sender_gender','sender_occupation','name_country','verbose_name', 'date_sending', 'amount','short','rate','amt_bdt','amt_usd','cash_incentive_amount_cashin', 'date_cash_incentive_paid_cashin']]
     else:
         df = pd.DataFrame()
         return df
