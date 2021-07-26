@@ -305,14 +305,14 @@ class Remmit(models.Model):
     rem_country = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Remitting Country')
     sender = models.CharField("Name of Remitter", validators=[name], max_length=50)
     SERVICE= 'M'
-    BUSINESS = 'F'
+    BUSINESS = 'B'
     OTHER = 'O'
     OCCUPATION_CHOICES = (
         (SERVICE,'SERVICE'),
-        (BUSINESS, 'FEMALE'),
+        (BUSINESS, 'BUSINESS'),
         (OTHER, 'OTHER'),
         )
-    sender_occupation = models.CharField("Occupation of Remitter", help_text="Service/ Business etc.",validators=[alpha], max_length=50)
+    sender_occupation = models.CharField("Occupation of Remitter", help_text="Service/ Business etc.",choices=OCCUPATION_CHOICES, validators=[alpha], max_length=50)
     MALE= 'M'
     FEMALE = 'F'
     OTHER = 'O'
