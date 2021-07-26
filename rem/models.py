@@ -304,6 +304,14 @@ class Remmit(models.Model):
     currency = models.ForeignKey(Currency,on_delete=models.CASCADE, verbose_name='Currency of Remittance', default=Currency.objects.get(name='BANGLADESHI TAKA').id)
     rem_country = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Remitting Country')
     sender = models.CharField("Name of Remitter", validators=[name], max_length=50)
+    SERVICE= 'M'
+    BUSINESS = 'F'
+    OTHER = 'O'
+    OCCUPATION_CHOICES = (
+        (SERVICE,'SERVICE'),
+        (BUSINESS, 'FEMALE'),
+        (OTHER, 'OTHER'),
+        )
     sender_occupation = models.CharField("Occupation of Remitter", help_text="Service/ Business etc.",validators=[alpha], max_length=50)
     MALE= 'M'
     FEMALE = 'F'
@@ -334,7 +342,7 @@ class Remmit(models.Model):
     date_sending = models.DateField("Date of Sending Remittance from Abroad")
     date_cash_incentive_paid = models.DateTimeField("Date of Cash Incentive payment", null=True, blank= True)
     date_cash_incentive_settlement = models.DateField("Date of Cash Incentive Settlement", null=True, blank= True)
-    date_creat = models.DateTimeField("Date of posting", auto_now_add=True)
+    date_create = models.DateTimeField("Date of posting", auto_now_add=True)
     date_edited = models.DateTimeField("Date of last modified", auto_now=True)
     reference = models.CharField("Referene No./PIN/MTCN", max_length=16, unique=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
