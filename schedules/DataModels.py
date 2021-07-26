@@ -51,7 +51,7 @@ def remittance_rit(qset):
 
         df['bank'] = 'NRB COMMERCIAL BANK LTD.'
 
-        df['trn_type'] = 'CASH-PICKUP(OTC)'
+        df['trn_type'] = 'SUBAGENT_CASHPICKUP'
 
         df['sender_gender'] = df['sender_gender'].apply(gender_abbr)
 
@@ -59,7 +59,7 @@ def remittance_rit(qset):
 
         df = df.merge(e_df, how = 'outer', left_on='exchange_id', right_on='id',suffixes=('', '_exchange'))
 
-        df['date_sending'] = pd.to_datetime(df['date_sending']).dt.strftime("%d-%b-%Y").str.upper()
+        df['date_sending'] = pd.to_datetime(df['date_sending']).dt.strftime("%d-%b-%y").str.upper()
 
         df = df.merge(currency_df, how = 'outer', left_on='currency_id', right_on='id', suffixes=('', '_currency'))
 
@@ -69,7 +69,7 @@ def remittance_rit(qset):
         df['amt_usd'] = df['amt_bdt']/get_usd_rate()
         
         df = df.merge(cashin_df, how = 'left', left_on='id_remittance', right_on='remittance_id', suffixes=('', '_cashin')) if not cashin_df.empty else df
-        df['date_cash_incentive_paid_cashin'] = pd.to_datetime(df['date_cash_incentive_paid_cashin']).dt.strftime("%d-%b-%Y").str.upper()
+        df['date_cash_incentive_paid_cashin'] = pd.to_datetime(df['date_cash_incentive_paid_cashin']).dt.strftime("%d-%b-%y").str.upper()
         
         return df[['reference','name','receiver_gender','idtype','idno','bank','trn_type', 'sender', 'sender_gender','sender_occupation','name_country','verbose_name', 'date_sending', 'amount','short','rate','amt_bdt','amt_usd','cash_incentive_amount_cashin', 'date_cash_incentive_paid_cashin']]
     else:
