@@ -22,7 +22,7 @@ class ReceiverAdmin(admin.ModelAdmin):
     search_fields = ('idno','name','cell')
 
 class CashIncentiveAdmin(admin.ModelAdmin):
-    search_fields = ('remittance__reference')
+    search_fields = ('remittance__reference',)
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
