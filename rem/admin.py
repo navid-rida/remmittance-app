@@ -21,6 +21,9 @@ class PaymentAdmin(admin.ModelAdmin):
 class ReceiverAdmin(admin.ModelAdmin):
     search_fields = ('idno','name','cell')
 
+class CashIncentiveAdmin(admin.ModelAdmin):
+    search_fields = ('remittance__reference')
+
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(Remmit, RemmitAdmin)
@@ -35,4 +38,4 @@ admin.site.register(Payment, PaymentAdmin)
 #admin.site.register(RemittanceUpdateHistory)
 admin.site.register(Booth)
 admin.site.register(Claim)
-admin.site.register(CashIncentive)
+admin.site.register(CashIncentive, CashIncentiveAdmin)
