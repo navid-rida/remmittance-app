@@ -32,7 +32,7 @@ def get_usd_rate(report_date=timezone.now().date()):
 def remittance_rit(qset):
     if qset.exists():
         #Takes remittance quesryset and returns RIT Dataframe
-        remit_df = qset_to_df(qset.filter(cashincentive__entry_category='P'))
+        remit_df = qset_to_df(qset.filter(cashincentive__entry_category='P', cashincentive__date_cash_incentive_settlement__isnull=False))
         remit_df['date_create'] = pd.to_datetime(remit_df['date_create']).dt.date
         receiver_df = qset_to_df(Receiver.objects.filter(remmit__in=qset).distinct())
         e_df = qset_to_df(ExchangeHouse.objects.filter(remmit__in=qset).distinct())

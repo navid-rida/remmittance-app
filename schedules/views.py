@@ -33,9 +33,9 @@ def remittance_rit_list(request):
         if form.is_valid():
             date_from = form.cleaned_data['date_from']
             date_to = form.cleaned_data['date_to']
-            query_set = Remmit.objects.filter(cashincentive__entry_category='P')
+            query_set = Remmit.objects.filter(cashincentive__entry_category='P', cashincentive__date_cash_incentive_settlement__isnull=False)
             if date_from and date_to:
-                query_set = query_set.filter(date_create__date__range=(date_from,date_to))
+                query_set = query_set.filter(cashincentive__date_cash_incentive_settlement__range=(date_from,date_to))
             #q = filter_remittance(query_set,start_date=date_from, end_date= date_to)
             #q = filter_remittance(query_set, start_date=date_from, end_date= date_to, cash_incentive_status='P', cash_incentive_settlement_done=True)
             #q = query_set.filter(dateresolved__date__range=(date_from,date_to))
