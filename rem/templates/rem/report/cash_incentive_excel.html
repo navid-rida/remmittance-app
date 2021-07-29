@@ -1,22 +1,60 @@
-{% extends "rem/report/rem_list_base.html" %}
+{% extends "rem/base.html" %}
 {% load widget_tweaks %}
-{% block title %} Cash Incentive Excel Download {% endblock %}
-{% block select_date%}
-  <div class="col-auto">
-    {{form.date_from.label_tag}}
-    {{form.date_from|add_class:"form-control date"}}
-    {% for error in form.date_from.errors %}
+{% block title %} Cash incentive Settlement {% endblock %}
+
+
+{% block content %}
+<form method="post">
+  {% csrf_token %}
+  <div class='form-row'>
+    {% block select_date%}
+    <div class="col-auto">
+      {{form.date_from.label_tag}}
+      {{form.date_from|add_class:"form-control date"}}
+      {% for error in form.date_from.errors %}
       <div class="alert alert-danger" role="alert">{{ error}}</div>
-    {% endfor %}
-  </div>
-  <div class="col-auto">
-    {{form.date_to.label_tag}}
-    {{form.date_to|add_class:"form-control date"}}
-    {% for error in form.date_to.errors %}
+      {% endfor %}
+    </div>
+    <div class="col-auto">
+      {{form.date_to.label_tag}}
+      {{form.date_to|add_class:"form-control date"}}
+      {% for error in form.date_to.errors %}
       <div class="alert alert-danger" role="alert">{{ error}}</div>
-    {% endfor %}
+      {% endfor %}
+    </div>
+    {% endblock %}
+    <div class="col-auto">
+      {{form.exchange.label_tag}}
+      {{form.exchange|add_class:"form-control"}}
+      {% for error in form.exchange.errors %}
+      <div class="alert alert-danger" role="alert">{{ error}}</div>
+      {% endfor %}
+    </div>
+    <div class="col-auto">
+      {{form.branch.label_tag}}
+      {{form.branch|add_class:"form-control"}}
+      {% for error in form.branch.errors %}
+      <div class="alert alert-danger" role="alert">{{ error}}</div>
+      {% endfor %}
+    </div>
   </div>
+  <div class="form-row">
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary element_margin">Search</button>
+    </div>
+  </div>
+</form>
+
+{{ rem_list|safe }}
 {% endblock %}
 {% block form %}
-<form method="post" action="{% url 'cash_incentive_excel'%}">
-{% endblock %}
+<form method="post" action="{% url 'cash_incentive_mark_settle'%}">
+  {% endblock %}
+
+  {% block js %}
+  <script>
+    $(document).ready(function () {
+      $('#table_id').DataTable();
+    });
+  </script>
+  {% endblock %}
