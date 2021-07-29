@@ -472,6 +472,23 @@ class CashIncentive(models.Model):
         else:
             return False
 
+    def is_settled(self):
+        """Checks whether the payment cash incentive is settled.
+            Returns True if settled else False"""
+        if self.entry_category=='P' and self.date_cash_incentive_paid and self.date_cash_incentive_settlement:
+            return True
+        else:
+            return False
+
+
+    def settle_cash_incentive(self):
+        """Checks and settles a cash incentive and return the remittance object. returns false if already settled"""
+        if not self.cash_incentive_is_settled():
+            self.date_cash_incentive_settlement = timezone.now().date()
+            return self
+        else:
+            return False
+
 
     def create_entry_from_remittance(self, remitt):
         if remitt.check_unpaid_cash_incentive():

@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm, SettlementForm, MultipleSearchForm, ClaimForm
 from django.contrib.auth.decorators import login_required,user_passes_test
-from .models import Remmit, Requestpay, Payment, Receiver,Employee, ReceiverUpdateHistory,RemittanceUpdateHistory, Branch, Booth, Claim
+from .models import Remmit, Requestpay, Payment, Receiver,Employee, ReceiverUpdateHistory,RemittanceUpdateHistory, Branch, Booth, Claim, CashIncentive
 from django.db.models import Sum, Count
 import datetime
 from .DataModels import *
@@ -246,13 +246,13 @@ def select_cash_incentive_list(request):
         if form.is_valid():
             #date_from = form.cleaned_data['date_from']
             #date_to = form.cleaned_data['date_to']
-            filt['requestpay__remittance__exchange'] = form.cleaned_data['exchange']
-            filt['requestpay__remittance__branch'] = form.cleaned_data['branch']
-            filt['requestpay__remittance__cash_incentive_status'] = 'P'
-            filt['requestpay__remittance__date_cash_incentive_settlement__isnull'] = True
+            filt['remittance__exchange'] = form.cleaned_data['exchange']
+            filt['remittance__branch'] = form.cleaned_data['branch']
+            filt['entry_category'] = 'P'
+            filt['date_cash_incentive_settlement__isnull'] = True
             filter_args = {k:v for k,v in filt.items() if v is not None}
-            rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','-dateresolved','requestpay__remittance__branch__code')
-            if rem_list:
+            rem_list = qset_to_df(CashIncentive.objects.filter(**filter_args).order_by('remittance__exchange','-date_cash_incentive_paid','remittance__branch__code'))
+            if not rem_list.empty:
                 #df = qset_to_df(rem_list)
                 #ids = list(df['id'][df.duplicated(['amount','branch_id','exchange_id'],keep=False)==True].values)
                 context = {'rem_list': rem_list, 'form':form}
