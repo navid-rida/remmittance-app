@@ -33,3 +33,10 @@ def get_all_country_from_reference(pathtoreference='REFERENCE_FILE.xlsm'):
             cn.save()
         except Exception as e:
             print(e)
+
+
+"""for item in r:
+    ...:     e = item.temp_settle_cash_incentive_from_ci_table()
+    ...:     if e != True and e != "Already settled":
+    ...:         print(e)
+    ...:"""

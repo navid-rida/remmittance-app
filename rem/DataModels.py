@@ -1,4 +1,5 @@
 #from .models import Remmit,Branch,Booth,ExchangeHouse
+#from rem.models import CashIncentive
 import pandas as pd
 from datetime import datetime, date,timedelta
 import io
@@ -126,7 +127,7 @@ def make_ac_df(list,category,columns,payments):
     #df = df.sort_values(by=['ac_no','branch_code'])
     return df
 
-def make_cash_incentive_df(list,category,columns,payments):
+def make_cash_incentive_df(list,category,columns,cis):
     #day = date.strftime('%Y-%m-%d')
     dict = {}
     #payments = Payment.objects.filter(id__in=list).order_by('requestpay__remittance__exchange','dateresolved','requestpay__remittance__branch__code')
@@ -142,18 +143,18 @@ def make_cash_incentive_df(list,category,columns,payments):
     flags = []
     #country = []
     i = 1
-    for pay in payments:
+    for ci in cis:
         #Sl.append(i)
         #i = i + 1
         dr_cr = 'C' if category=='gl' else 'D'
         tr_date.append(date.today().strftime('%d/%m/%Y'))
         #br_code.append(rem.branch.code)
         if category=='gl':
-            branch = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.code
+            branch = ci.remittance.booth.code if ci.remittance.booth else ci.remittance.branch.code
             br_code.append(branch)
             #booth = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else '0001'
             #booth_code.append(booth)
-            ac_no.append(pay.requestpay.remittance.exchange.cash_incentive_gl_no)
+            ac_no.append(ci.remittance.exchange.cash_incentive_gl_no)
             #br_name.append(pay.requestpay.remittance.branch.name)
         else:
             br_code.append("0100")
@@ -162,21 +163,21 @@ def make_cash_incentive_df(list,category,columns,payments):
             #br_name.append("Head Office")
         #br_name.append(pay.requestpay.remittance.branch.name)
         type.append(dr_cr)
-        amount.append(pay.requestpay.remittance.cash_incentive_amount)
+        amount.append(ci.remittance.cash_incentive_amount)
 
         if dr_cr == 'C':
-            br_sub_br = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.code
-            narration = "Adj for Incentive against "+ pay.requestpay.remittance.reference +" at "+br_sub_br+" on "+pay.dateresolved.strftime('%d/%m/%Y')
+            br_sub_br = ci.remittance.booth.code if ci.remittance.booth else ci.remittance.branch.code
+            narration = "Adj for Incentive against "+ ci.remittance.reference +" at "+br_sub_br+" on "+ci.date_cash_incentive_paid.strftime('%d/%m/%Y')
         else:
-            br_sub_br = pay.requestpay.remittance.booth.code if pay.requestpay.remittance.booth else pay.requestpay.remittance.branch.code
-            narration = "Agt "+ pay.requestpay.remittance.exchange.name+" Pmt "+pay.requestpay.remittance.reference +" fvg "+br_sub_br+" on "+pay.dateresolved.strftime('%d/%m/%Y')
+            br_sub_br = ci.remittance.booth.code if ci.remittance.booth else ci.remittance.branch.code
+            narration = "Agt "+ ci.remittance.exchange.name+" Pmt "+ci.remittance.reference +" fvg "+br_sub_br+" on "+ci.date_cash_incentive_paid.strftime('%d/%m/%Y')
         narrations.append(narration)
         if category=='br_ac' and dr_cr == 'D':
             flag=0
         else:
             flag=0
         flags.append(flag)
-        #country.append(pay.requestpay.remittance.rem_country.name)
+        #country.append(ci.remittance.rem_country.name)
         dict ={
         #'Sl' : Sl,
         'date' : tr_date,
@@ -204,11 +205,11 @@ def rem_bb_summary(list, payments):
     complete_df = pd.concat(frames)
     return complete_df
 
-def cash_incentive_df(list, payments):
-    payments = payments.filter(id__in=list)
+def cash_incentive_df(list, ci):
+    ci = ci.filter(id__in=list)
     columns=['date', 'br_code', 'br_name','booth_code', 'ac_no', 'type', 'amount', 'narration', 'flag', 'country']
-    gl_df = make_cash_incentive_df(list,'gl',columns, payments)
-    ac_df = make_cash_incentive_df(list,'br_ac',columns, payments)
+    gl_df = make_cash_incentive_df(list,'gl',columns, ci)
+    ac_df = make_cash_incentive_df(list,'br_ac',columns, ci)
     frames = [gl_df, ac_df]
     complete_df = pd.concat(frames)
     return complete_df

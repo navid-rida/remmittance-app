@@ -410,13 +410,31 @@ class Remmit(models.Model):
         else:
             return False
 
-    def settle_cash_incentive(self):
+    def settle_cash_incentive(self, date_settle= timezone.now().date()):
         """Checks and settles a cash incentive and return the remittance object. returns false if already settled"""
         if not self.cash_incentive_is_settled():
-            self.date_cash_incentive_settlement = timezone.now().date()
+            self.date_cash_incentive_settlement = date_settle
             return self
         else:
             return False
+
+    def temp_settle_cash_incentive_from_ci_table(self):
+        if self.cash_incentive_is_settled()==True and self.cashincentive_set.count()==1:
+            c = self.cashincentive_set.first()
+            if c.is_settled()==False:
+                try:
+                    c= c.settle_cash_incentive(date_settle = self.date_cash_incentive_settlement)
+                    c.save()
+                    return True
+                except Exception as e:
+                    return e
+            else:
+                return "Already settled"
+        else:
+            return "Either cash incentive not settled or multiple cash incentives"
+
+            
+
 
     def calculate_cash_incentive(self):
         return self.amount*Decimal(0.02)
@@ -481,10 +499,10 @@ class CashIncentive(models.Model):
             return False
 
 
-    def settle_cash_incentive(self):
+    def settle_cash_incentive(self, date_settle= timezone.now().date()):
         """Checks and settles a cash incentive and return the remittance object. returns false if already settled"""
-        if not self.cash_incentive_is_settled():
-            self.date_cash_incentive_settlement = timezone.now().date()
+        if not self.is_settled():
+            self.date_cash_incentive_settlement = date_settle
             return self
         else:
             return False
