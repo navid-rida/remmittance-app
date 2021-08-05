@@ -431,7 +431,7 @@ class Remmit(models.Model):
             else:
                 return "Already settled"
         else:
-            return "Either cash incentive not settled or multiple cash incentives"
+            return "Either cash incentive not settled or multiple cash incentives "+self.reference
 
             
 
