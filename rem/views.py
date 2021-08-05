@@ -503,12 +503,19 @@ def mark_settle_all(request):
                 q = Remmit.objects.filter(reference__in=lst)
                 for item in q:
                     ref = item.reference
-                    item = item.settle_cash_incentive()
-                    if item:
-                        item.save()
-                        messages.success(request, ref+" Cash Incentive Successfully Settled")
+                    item_rtable = item.settle_cash_incentive()
+                    item_cashin = item.cashincentive_set.last().settle_cash_incentive()
+                    if item_rtable:
+                        item_rtable.save()
+                        messages.success(request, ref+" Cash Incentive Successfully Settled in remittance table")
                     else:
-                        messages.error(request, ref+' Cash Incentive Cannot be settled')
+                        messages.error(request, ref+' Cash Incentive Cannot be settled in remittance table')
+                    
+                    if item_cashin:
+                        item_cashin.save()
+                        messages.success(request, ref+" Cash Incentive Successfully Settled in Cash inentive table")
+                    else:
+                        messages.error(request, ref+' Cash Incentive Cannot be settled in Cash Incentive table')
 
             context = {'list': lst, 'form':form}
     else:
