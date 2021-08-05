@@ -1,0 +1,179 @@
+{% extends "rem/base.html" %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block js %}
+{% load l10n %}
+{% load tz %}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#selecctall_1').click(function(event) {
+            if (this.checked) {
+                $('.jqselect_1').each(function() { //loop through each checkbox
+                    $(this).prop('checked', true); //check
+                });
+            } else {
+                $('.jqselect_1').each(function() { //loop through each checkbox
+                    $(this).prop('checked', false); //uncheck
+                });
+            }
+        });
+        $('#selecctall_2').click(function(event) {
+            if (this.checked) {
+                $('.jqselect_2').each(function() { //loop through each checkbox
+                    $(this).prop('checked', true); //check
+                });
+            } else {
+                $('.jqselect_2').each(function() { //loop through each checkbox
+                    $(this).prop('checked', false); //uncheck
+                });
+            }
+        });
+        $('#selecctall_3').click(function(event) {
+            if (this.checked) {
+                $('.jqselect_3').each(function() { //loop through each checkbox
+                    $(this).prop('checked', true); //check
+                });
+            } else {
+                $('.jqselect_3').each(function() { //loop through each checkbox
+                    $(this).prop('checked', false); //uncheck
+                });
+            }
+        });
+        $('#selecctall_4').click(function(event) {
+            if (this.checked) {
+                $('.jqselect_4').each(function() { //loop through each checkbox
+                    $(this).prop('checked', true); //check
+                });
+            } else {
+                $('.jqselect_4').each(function() { //loop through each checkbox
+                    $(this).prop('checked', false); //uncheck
+                });
+            }
+        });
+        $('#selecctall_5').click(function(event) {
+            if (this.checked) {
+                $('.jqselect_5').each(function() { //loop through each checkbox
+                    $(this).prop('checked', true); //check
+                });
+            } else {
+                $('.jqselect_5').each(function() { //loop through each checkbox
+                    $(this).prop('checked', false); //uncheck
+                });
+            }
+        });
+    });
+</script>
+
+{% endblock %}
+{% block title %} Remittance List {% endblock %}
+{% block content %}
+<br>
+<form method="post">
+    {% csrf_token %}
+    <div class='form-row'>
+        {% block select_date%}{% endblock %}
+        <div class="col-auto">
+            {{form.exchange.label_tag}}
+            {{form.exchange|add_class:"form-control"}}
+            {% for error in form.exchange.errors %}
+              <div class="alert alert-danger" role="alert">{{ error}}</div>
+            {% endfor %}
+        </div>
+        <div class="col-auto">
+            {{form.branch.label_tag}}
+            {{form.branch|add_class:"form-control"}}
+            {% for error in form.branch.errors %}
+              <div class="alert alert-danger" role="alert">{{ error}}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="form-row">
+      <div class="col-auto">
+          <button type="submit" class="btn btn-primary element_margin">Search</button>
+      </div>
+    </div>
+</form>
+</br>
+{%if done_list %}
+<ol>
+  {% for entity in done_list %}
+    <li>{{ entity.remittance.reference}}, Amount:{{ entity.remittance.amount}}, Incentive: {{ entity.remittance.cash_incentive_amount}}, Settlement- Payment: {{ entity.date_settle}} Incentive: {{ entity.remittance.date_cash_incentive_settlement}} </li>
+  {% endfor %}
+</ol>
+{% endif%}
+{%if rem_list %}
+{% regroup rem_list by remittance.exchange as remmittance_list %}
+{% block form %}{% endblock %}
+<fieldset id="group_1">
+    {% csrf_token %}
+    {% for rem in remmittance_list %}
+    </br>
+    <h4> {{ rem.grouper }} </h4>
+    <table id="table_{{forloop.counter}}" class='table table-hover table-sm'>
+        <thead>
+            <tr>
+                <th scope="col">
+                    <input type="checkbox" id="selecctall_{{forloop.counter}}" />
+                </th>
+                <th></th>
+                <th scope="col">Branch</th>
+                <th scope="col">Sub-Branch</th>
+                <th scope="col">Country</th>
+                <th scope="col">Ref. No</th>
+
+                <th scope="col">Sender</th>
+                <th scope="col">Benificiary</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Cash Incentive Amount</th>
+
+                <th scope="col">Cash Incentive Settle Date</th>
+
+                <th scope="col">Posting Date</th>
+
+                <th scope="col">Request Posted By</th>
+                <th scope="col">Action</th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in rem.list %}
+
+            <tr {% if entry.id in ids %} class="table-warning" {% endif %}>
+                <td>
+                    <div class="form-check">
+                        <input class="form-check-input jqselect_{{forloop.parentloop.counter}}" type="checkbox" name="checks" value="{{entry.pk}}" id="Check-{{entry.pk}}">
+                    </div>
+                </td>
+                <td>{{forloop.counter}}</td>
+                <td>{{entry.remittance.branch}}</td>
+                {% if entry.remittance.booth %}
+                  <td> {{entry.remittance.booth}}</td>
+                {% else %}
+                  <td> </td>
+                {% endif %}
+                <td>{{entry.remittance.rem_country}}</td>
+                <td>{{entry.remittance.reference}}</td>
+                <td>{{entry.remittance.sender.title}}</td>
+                <td>{{entry.remittance.receiver.name.title}}</td>
+                <td>{{entry.remittance.amount|intcomma}}</td>
+                <td>{{entry.remittance.cash_incentive_amount|intcomma}} ({{entry.remittance.get_cash_incentive_status_display}})</td>
+
+                <td>{{entry.remittance.date_cash_incentive_settlement}}</td>
+                <td>{{entry.remittance.date_create|localtime}}</td>
+                <td>{{entry.created_by}} <br>Cell: {{entry.created_by.employee.cell}}</td>
+
+                <td><a class="btn btn-success btn-sm" href="{% url 'remitt-detail' entry.remittance.pk %}"><i class="fas fa-info-square"></i> Details</a></td>
+            </tr>
+
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
+</fieldset>
+<input type="submit" class="btn btn-primary" value="Submit" />
+</form>
+{%endif%}
+{% block error %}{% endblock %}
+{% endblock %}

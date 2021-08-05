@@ -251,8 +251,8 @@ def select_cash_incentive_list(request):
             filt['entry_category'] = 'P'
             filt['date_cash_incentive_settlement__isnull'] = True
             filter_args = {k:v for k,v in filt.items() if v is not None}
-            rem_list = qset_to_df(CashIncentive.objects.filter(**filter_args).order_by('remittance__exchange','-date_cash_incentive_paid','remittance__branch__code'))
-            if not rem_list.empty:
+            rem_list = CashIncentive.objects.filter(**filter_args).order_by('remittance__exchange','-date_cash_incentive_paid','remittance__branch__code')
+            if rem_list:
                 #df = qset_to_df(rem_list)
                 #ids = list(df['id'][df.duplicated(['amount','branch_id','exchange_id'],keep=False)==True].values)
                 context = {'rem_list': rem_list, 'form':form}
@@ -438,8 +438,8 @@ def download_cash_incentive_excel(request):
     if request.method == 'POST' and request.POST.getlist('checks'):
         list = request.POST.getlist('checks') # If the form has been submitted...
         #form = Remmit.objects.filter(id__in=selected_values)
-        payments = Payment.objects.order_by('requestpay__remittance__exchange','dateresolved','requestpay__remittance__branch__code')
-        df = cash_incentive_df(list, payments)
+        ci = CashIncentive.objects.order_by('remittance__exchange','date_cash_incentive_paid','remittance__branch__code')
+        df = cash_incentive_df(list, ci)
         xlsx_data = excel_output(df)
         response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         time = str(timezone.now().date())
