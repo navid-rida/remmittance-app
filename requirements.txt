@@ -65,7 +65,7 @@ pyrsistent==0.14.11
 python-dateutil==2.7.3
 python-decouple==3.1
 pytz==2018.5
-pywin32==223
+pywin32==301
 pywinpty==0.5.5
 pyzmq==18.0.1
 qtconsole==4.4.3
