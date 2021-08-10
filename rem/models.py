@@ -293,7 +293,7 @@ class ExchangeHouse(models.Model):
     cash_incentive_gl_key_name = models.CharField("Name of Cash incentive GL Key Head", max_length=50)
     ac_no = models.CharField("Account no./ GL No. of Exchange House", max_length=15,  validators=[numeric])
     ac_no_branch = models.ForeignKey(Branch,on_delete=models.CASCADE, verbose_name="Branch of CD Account/ GL")
-    verbose_name = models.CharField("Full Name of the Exchangehouse", max_length= 50)
+    verbose_name = models.CharField("Full Name of the Exchangehouse", max_length= 100)
 
     def __str__(self):
         return self.name
