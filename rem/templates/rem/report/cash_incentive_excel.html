@@ -20,10 +20,3 @@
 {% block form %}
 <form method="post" action="{% url 'cash_incentive_excel'%}">
 {% endblock %}
-{% block js %}
-<script>
-  $(document).ready( function () {
-    $("#table_1").DataTable();
-} );
-</script>
-{% endblock %}
