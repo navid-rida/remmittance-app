@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Remmit, Branch,ExchangeHouse, Employee, Country, Receiver, Requestpay,Payment, Booth,Claim, CashIncentive
+from .models import Remmit, Branch,ExchangeHouse, Employee, Country, Receiver, Requestpay,Payment, Booth,Claim, CashIncentive, RemittanceUpdateHistory
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 # Register your models here.
@@ -24,6 +24,9 @@ class ReceiverAdmin(admin.ModelAdmin):
 class CashIncentiveAdmin(admin.ModelAdmin):
     search_fields = ('remittance__reference',)
 
+class RemittanceUpdateHistoryAdmin(admin.ModelAdmin):
+    search_fields = ('remittance__reference',)
+
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(Remmit, RemmitAdmin)
@@ -39,3 +42,4 @@ admin.site.register(Payment, PaymentAdmin)
 admin.site.register(Booth)
 admin.site.register(Claim)
 admin.site.register(CashIncentive, CashIncentiveAdmin)
+admin.site.register(RemittanceUpdateHistory, RemittanceUpdateHistoryAdmin)
