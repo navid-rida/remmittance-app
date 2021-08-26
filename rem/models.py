@@ -460,6 +460,9 @@ class RemittanceUpdateHistory(models.Model):
     createdby = models.ForeignKey(User, on_delete=models.PROTECT)
     ip = models.GenericIPAddressField("User IP Address")
 
+    def __str__(self):
+        return self.remittance.reference+" by "+self.createdby.username+" on "+str(self.datecreate)
+
     
 
 
