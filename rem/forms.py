@@ -121,6 +121,11 @@ class RemmitForm(ModelForm):
                 validate_necmoney_ref(reference)
             except ValidationError as err:
                 self.add_error('reference',err)
+        elif exchange.name == 'NATIONAL EXCHANGE':
+            try:
+                validate_necitaly_ref(reference)
+            except ValidationError as err:
+                self.add_error('reference',err)
         else:
             self.add_error('reference',"The reference number does not match with any known third party remittance services ")
         #form.add_error('reference', err)

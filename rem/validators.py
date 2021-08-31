@@ -55,6 +55,14 @@ necmoney_re = RegexValidator(
     message=_('Please enter a valid NEC Money Transfer Reference No.'),
     code='invalid_necmoney_ref',
 )
+
+necitaly_re = RegexValidator(
+    _lazy_re_compile(r'^NEC[0-9]{9}$'),
+    message=_('Please enter a valid NEC Money Transfer Reference No.'),
+    code='invalid_necmoney_ref',
+)
+
+
 mobile_re = RegexValidator(
     _lazy_re_compile(r'^(\+8801|8801|01)[3456789][0-9]{8}$'),
     message=_('Please enter a valid Mobile phone number'),
@@ -152,6 +160,9 @@ def validate_merchantrade_ref(value):
 
 def validate_necmoney_ref(value):
     return necmoney_re(value)
+
+def validate_necitaly_ref(value):
+    return necitaly_re(value)
 
 def validate_ref_no(value):
     validator_list=[western_union,placid_re,ria_re,xpress_re,moneygram_re, prabhu_re ]

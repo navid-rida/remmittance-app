@@ -316,7 +316,7 @@ def filter_claim(query_set, start_date=None, end_date= None, branch= None, booth
     return claims.order_by('-date_claim','branch__code')
 
 
-def get_reference_no_from_narration(narration,validatorlist=[validate_western_code,validate_ria,validate_placid, validate_xpress,validate_moneygram, validate_prabhu_ref, validate_merchantrade_ref, validate_necmoney_ref]):
+def get_reference_no_from_narration(narration,validatorlist=[validate_western_code,validate_ria,validate_placid, validate_xpress,validate_moneygram, validate_prabhu_ref, validate_merchantrade_ref, validate_necmoney_ref, validate_necitaly_ref]):
     """gets all reference number from a narration. returns list"""
     ref_list = []
     for e in narration.split():
