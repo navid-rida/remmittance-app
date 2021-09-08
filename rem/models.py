@@ -228,6 +228,12 @@ class Receiver(models.Model):
     idno = models.CharField("ID Number", max_length=17, unique=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, default=0)
 
+    class Meta:
+        verbose_name = "Benificiary of Remittance"
+        constraints = [
+            models.CheckConstraint(check=models.Q(nationality='BANGLADESH'), name='nationality_is_bangladeshi'),
+        ]
+
 
     def __str__(self):
         return self.name
@@ -304,7 +310,7 @@ class Remmit(models.Model):
     currency = models.ForeignKey(Currency,on_delete=models.CASCADE, verbose_name='Currency of Remittance', default=Currency.objects.get(name='BANGLADESHI TAKA').id)
     rem_country = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Remitting Country')
     sender = models.CharField("Name of Remitter", validators=[name], max_length=50)
-    SERVICE= 'M'
+    SERVICE= 'S'
     BUSINESS = 'B'
     OTHER = 'O'
     OCCUPATION_CHOICES = (
@@ -356,6 +362,9 @@ class Remmit(models.Model):
         (PAID, 'Amount Payable to Customer'),
         )
     status=models.CharField("Request Status",max_length=2, choices=STATUS_CHOICES, default=REVIEW)"""
+
+    class Meta:
+        verbose_name = "Remittance"
 
     def __str__(self):
         return self.reference+" on "+self.branch.name
@@ -413,7 +422,7 @@ class Remmit(models.Model):
     def settle_cash_incentive(self, date_settle= timezone.now().date()):
         """Checks and settles a cash incentive and return the remittance object. returns false if already settled"""
         if not self.cash_incentive_is_settled():
-            self.date_cash_incentive_settlement = date_settle
+            self.date_cash_incentive_settlement = timezone.now().date()
             return self
         else:
             return False
@@ -505,7 +514,7 @@ class CashIncentive(models.Model):
     def settle_cash_incentive(self, date_settle= timezone.now().date()):
         """Checks and settles a cash incentive and return the remittance object. returns false if already settled"""
         if not self.is_settled():
-            self.date_cash_incentive_settlement = date_settle
+            self.date_cash_incentive_settlement = timezone.now().date()
             return self
         else:
             return False

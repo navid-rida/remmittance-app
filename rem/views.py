@@ -507,13 +507,13 @@ def mark_settle_all(request):
                     item_cashin = item.cashincentive_set.last().settle_cash_incentive()
                     if item_rtable:
                         item_rtable.save()
-                        messages.success(request, ref+" Cash Incentive Successfully Settled in remittance table")
+                        messages.success(request, ref+" Cash Incentive Successfully Settled in remittance table. date "+item_rtable.date_cash_incentive_settlement)
                     else:
                         messages.error(request, ref+' Cash Incentive Cannot be settled in remittance table')
                     
                     if item_cashin:
                         item_cashin.save()
-                        messages.success(request, ref+" Cash Incentive Successfully Settled in Cash inentive table")
+                        messages.success(request, ref+" Cash Incentive Successfully Settled in Cash inentive table. date"+item_cashin.date_cash_incentive_settlement)
                     else:
                         messages.error(request, ref+' Cash Incentive Cannot be settled in Cash Incentive table')
 
