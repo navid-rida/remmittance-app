@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     'rules',
     ####### Extension
     'django_extensions',
+    ############# api ####
+    'rest_framework',
+    'remapi.apps.RemapiConfig',
+    'drf_yasg',
 
 ]
 
@@ -97,13 +101,13 @@ AUTH_PASSWORD_VALIDATORS = [
 #USE_THOUSAND_SEPARATOR = True
 #NUMBER_GROUPING = (3, 2, 0)
 
-TIME_ZONE = 'Asia/Dhaka'
+#TIME_ZONE = 'Asia/Dhaka'
 
 #USE_I18N = True
 
 #USE_L10N = True
 
-USE_TZ = True
+#USE_TZ = True
 
 DATE_FORMAT = 'd/m/Y'
 
@@ -136,3 +140,11 @@ ACCOUNT_ACTIVATION_DAYS = 2
 
 ####################### Crispy Forms #############################
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+######### api 
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+}
