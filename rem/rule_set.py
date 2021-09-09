@@ -21,8 +21,7 @@ def is_same_branch_as_creator(user,receiver):
 
 @rules.predicate
 def is_transaction_hour(user):
-    #return time(9,59)<timezone.now().time()<time(21,00)
-    return True
+    return time(9,59)<timezone.localtime().time()<time(21,00)
 
 @rules.predicate
 def remittance_less_than_usd1500(user,remittance):

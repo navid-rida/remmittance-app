@@ -422,7 +422,7 @@ class Remmit(models.Model):
     def settle_cash_incentive(self, date_settle= timezone.now().date()):
         """Checks and settles a cash incentive and return the remittance object. returns false if already settled"""
         if not self.cash_incentive_is_settled():
-            self.date_cash_incentive_settlement = timezone.now().date()
+            self.date_cash_incentive_settlement = timezone.localtime().date()
             return self
         else:
             return False
@@ -514,7 +514,7 @@ class CashIncentive(models.Model):
     def settle_cash_incentive(self, date_settle= timezone.now().date()):
         """Checks and settles a cash incentive and return the remittance object. returns false if already settled"""
         if not self.is_settled():
-            self.date_cash_incentive_settlement = timezone.now().date()
+            self.date_cash_incentive_settlement = timezone.localtime().date()
             return self
         else:
             return False

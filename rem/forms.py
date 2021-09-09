@@ -54,9 +54,9 @@ class RemmitForm(ModelForm):
 
     def clean_date_sending(self):
         date_sending = self.cleaned_data['date_sending']
-        if date_sending < timezone.now().date() - timedelta(days=90):
+        if date_sending < timezone.localtime().date() - timedelta(days=90):
             raise ValidationError('Validation error: date is too far away')
-        if date_sending > timezone.now().date():
+        if date_sending > timezone.localtime().date():
             raise ValidationError('Date Sending cannot be a future date')
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
@@ -274,7 +274,7 @@ class ReceiverForm(ModelForm):
     def clean_idissue(self):
         idissue = self.cleaned_data['idissue']
         #idtype = self.cleaned_data['idtype']
-        if idissue and idissue > timezone.now().date():
+        if idissue and idissue > timezone.localtime().date():
             raise ValidationError('ID Issue date cannot be a future date')
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
