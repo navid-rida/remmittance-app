@@ -26,5 +26,6 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('rem/', include('rem.urls')),
     path('schedules/', include('schedules.urls')),
+    path('api/', include('remapi.urls')),
     path('admin/', admin.site.urls),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

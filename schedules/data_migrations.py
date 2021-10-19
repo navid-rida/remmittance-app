@@ -16,3 +16,18 @@ def get_all_currency_from_reference(pathtoreference='REFERENCE_FILE.xlsm'):
         except Exception as e:
             print(e)
     print('Done')
+
+
+
+for ix, row in df2.iterrows():
+    for item in q:
+        if item.ccy_id==row['CCY_ID'] and item.short != row['CURRENCY']:
+            item.short = row['CURRENCY']
+                item.save()
+
+
+for item in q:
+   ...:     if item.cur_code == 'nan':
+   ...:         item.cur_code = None
+   ...:         item.save()
+   ...:

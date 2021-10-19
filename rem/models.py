@@ -230,9 +230,9 @@ class Receiver(models.Model):
 
     class Meta:
         verbose_name = "Benificiary of Remittance"
-        constraints = [
-            models.CheckConstraint(check=models.Q(nationality='BANGLADESH'), name='nationality_is_bangladeshi'),
-        ]
+        #constraints = [
+        #    models.CheckConstraint(check=models.Q(nationality__name='BANGLADESH'), name='nationality_is_bangladeshi'),
+        #]
 
 
     def __str__(self):
@@ -351,6 +351,7 @@ class Remmit(models.Model):
     date_create = models.DateTimeField("Date of posting", auto_now_add=True)
     date_edited = models.DateTimeField("Date of last modified", auto_now=True)
     reference = models.CharField("Referene No./PIN/MTCN", max_length=16, unique=True)
+    screenshot = models.ImageField("Agent Copy", default = 'images/None/no-img.jpg')
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
     edited_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, related_name='editors')
     #REVIEW= 'RV'

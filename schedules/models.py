@@ -4,9 +4,9 @@ from django.utils import timezone
 # Create your models here.
 
 class Currency(models.Model):
-    name = models.CharField("Name of Currenct", max_length=50)
-    ccy_id = models.CharField("CCY ID", max_length=4,  validators=[numeric])
-    cur_code = models.CharField("Currency Code", max_length=3,  validators=[numeric])
+    name = models.CharField("Name of Currenct", max_length=50, unique=True)
+    ccy_id = models.CharField("CCY ID", max_length=4,  validators=[numeric], unique=True)
+    cur_code = models.CharField("Currency Code", max_length=3,  validators=[numeric], null=True, unique = True)
     short = models.CharField("Short Code", max_length=5,  validators=[alpha])
 
     def __str__(self):
