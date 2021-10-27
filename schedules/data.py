@@ -1,4 +1,4 @@
-import pandas as pd
+"""import pandas as pd
 #from pandas.core.arrays.sparse import dtype
 import numpy as np
 from pathlib import Path
@@ -32,24 +32,25 @@ zero_currency = pd.read_excel(zero_matrix_path,sheet_name='CURRCODE', skiprows=2
 ref_currency = pd.read_excel(ref_file_path, sheet_name='CURRENCY')
 ref_currency = ref_currency.merge(zero_currency, how='left', on='CCY_ID')
 
-zero_country = pd.read_excel(zero_matrix_path,sheet_name='Country', names=['COUNTRY_ID','COUNTRY_CODE'])
+zero_country = pd.read_excel(zero_matrix_path,sheet_name='Country', names=['COUNTRY_ID', 'COUNTRY_CODE'], dtype={'COUNTRY_CODE': str})
 ref_country = pd.read_excel(ref_file_path, sheet_name='COUNTRY')
 ref_country = ref_country.merge(zero_country, how='left', on='COUNTRY_ID')
 ref_country['COUNTRY_CODE'] = ref_country['COUNTRY_CODE'].apply(str)
+ref_country['COUNTRY_CODE'] = ref_country['COUNTRY_CODE'].str.zfill(4)
 #ref_country = ref_country[ref_country['COUNTRY_CODE']!='DEFAULT']
 
 
 ref_commodity = pd.read_excel(ref_file_path, sheet_name='BOP_COMMODITY', dtype= {'COMMODITY_ID':str,})
 ref_commodity['HS_CODE'] = ref_commodity['COMMODITY_ID'].str[-8:]#.apply(int)
 
-zero_unit = pd.read_excel(zero_matrix_path,sheet_name='UNITCODE', skiproes=1, dtype=object, names=['CODE_VALUE','UNIT_CODE','UNIT_NAME'])
+zero_unit = pd.read_excel(zero_matrix_path,sheet_name='UNITCODE', skiprows=1, dtype=object, names=['CODE_VALUE','UNIT_CODE','UNIT_NAME'])
 ref_unit = pd.read_excel(ref_file_path, sheet_name='UOM', dtype=object)
 ref_unit = ref_unit.merge(zero_unit, how='left', on='CODE_VALUE')
 ref_unit['UNIT_CODE'] = ref_unit['UNIT_CODE'].apply(str)
 
 ref_fx_type_df = pd.read_excel(ref_additional_data_path, sheet_name='FX_TYPE', dtype = float)
 
-ref_economic_sector_df = pd.read_excel(ref_additional_data_path, sheet_name='CATEGORY_TO_ECONOMIC_SECTOR', dtype=object)
+ref_economic_sector_df = pd.read_excel(ref_additional_data_path, sheet_name='CATEGORY_TO_ECONOMIC_SECTOR', dtype=str)
 
 def get_fx_trn_type(value,ref_fx_type_df):
     #types = ref_fx_type_df.to_dict(orient='list')
@@ -60,7 +61,7 @@ def get_fx_trn_type(value,ref_fx_type_df):
 
 #################################### Export Part #########################################
 exp_columns = ['Schedule','Type','Month','AD','CUR_CODE','Serial','UNIT_CODE','Volume','fc_amount','COUNTRY_CODE','HS_CODE']
-exp_df = pd.read_csv(export_text_path,sep='|', names=exp_columns, dtype={'COUNTRY_CODE':object, 'HS_CODE':object, 'UNIT_CODE': object})
+exp_df = pd.read_csv(export_text_path,sep='|', names=exp_columns, dtype={'COUNTRY_CODE':str, 'HS_CODE':object, 'UNIT_CODE': object})
 
 
 def get_exp_rit_df(df):
@@ -81,7 +82,7 @@ def get_exp_rit_df(df):
 
 ########################################## Import Payment #################################################
 imp_pay_columns = ['Schedule','Type','Month','AD','CUR_CODE','Serial','UNIT_CODE','Volume','fc_amount','COUNTRY_CODE','HS_CODE','CATEGORY_CODE']
-imp_pay_df = pd.read_csv(import_payment_text_path,sep='|', names=imp_pay_columns, dtype={'COUNTRY_CODE':object, 'HS_CODE':object, 'UNIT_CODE': object,'CATEGORY_CODE':object})
+imp_pay_df = pd.read_csv(import_payment_text_path,sep='|', names=imp_pay_columns, dtype={'COUNTRY_CODE':str, 'HS_CODE':object, 'UNIT_CODE': object,'CATEGORY_CODE':object})
 
 def get_imp_pay_rit_df(df):
     #df = exp_df
@@ -103,7 +104,7 @@ def get_imp_pay_rit_df(df):
 ####################################### Invisible Payments ########################################################
 
 invisible_pay_columns = ['Schedule','Type','Month','AD','CUR_CODE','Serial','fc_amount','COUNTRY_CODE','PURPOSE_CODE','CATEGORY_CODE']
-invisible_pay_df = pd.read_csv(invisible_payment_text_path,sep='|', names=invisible_pay_columns, dtype={'PURPOSE_CODE':str, 'COUNTRY_CODE':object, 'HS_CODE':object, 'UNIT_CODE': object,'CATEGORY_CODE':object,})
+invisible_pay_df = pd.read_csv(invisible_payment_text_path,sep='|', names=invisible_pay_columns, dtype={'PURPOSE_CODE':str, 'COUNTRY_CODE':str, 'HS_CODE':object, 'UNIT_CODE': object,'CATEGORY_CODE':object,})
 
 def get_inv_pay_rit_df(df):
     #df = exp_df
@@ -124,7 +125,7 @@ def get_inv_pay_rit_df(df):
 ############################################## Invisible Receipts #####################################################################
 
 invisible_rec_columns = ['Schedule','Type','Month','AD','CUR_CODE','Serial','fc_amount','COUNTRY_CODE','PURPOSE_CODE']
-invisible_rec_df = pd.read_csv(invisible_receipt_text_path,sep='|', names=invisible_rec_columns, dtype={'PURPOSE_CODE':str, 'COUNTRY_CODE':object, 'HS_CODE':object, 'UNIT_CODE': object,'CATEGORY_CODE':object,})
+invisible_rec_df = pd.read_csv(invisible_receipt_text_path,sep='|', names=invisible_rec_columns, dtype={'PURPOSE_CODE':str, 'COUNTRY_CODE':str, 'HS_CODE':object, 'UNIT_CODE': object,'CATEGORY_CODE':object,})
 
 def get_inv_rec_rit_df(df):
     #df = exp_df
@@ -143,7 +144,7 @@ def get_inv_rec_rit_df(df):
 
 ###################################################### Wage Remiitance ############################################
 wage_remit_columns = ['Schedule','Type','Month','AD','CUR_CODE','Serial','COUNTRY_CODE','fc_amount',]
-wage_remit_df = pd.read_csv(wage_remit_text_path,sep='|', names=wage_remit_columns, dtype={'COUNTRY_CODE':object, 'HS_CODE':object, 'UNIT_CODE': object,'CATEGORY_CODE':object})
+wage_remit_df = pd.read_csv(wage_remit_text_path,sep='|', names=wage_remit_columns, dtype={'COUNTRY_CODE':str, 'HS_CODE':object, 'UNIT_CODE': object,'CATEGORY_CODE':object})
 
 def get_wage_remit_rit_df(df):
     #df = exp_df
@@ -236,4 +237,4 @@ def get_daily_bb_remittance(qset):
             "Branch": branch,
             }
     df = pd.DataFrame(dct)
-    return df
+    return df"""
