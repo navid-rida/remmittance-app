@@ -62,6 +62,12 @@ necitaly_re = RegexValidator(
     code='invalid_necmoney_ref',
 )
 
+cbl_re = RegexValidator(
+    _lazy_re_compile(r'^[0-9]{9}$'),
+    message=_('Please enter a valid CBL Money Transfer Reference No.'),
+    code='invalid_cbl_ref',
+)
+
 
 mobile_re = RegexValidator(
     _lazy_re_compile(r'^(\+8801|8801|01)[3456789][0-9]{8}$'),
@@ -164,8 +170,12 @@ def validate_necmoney_ref(value):
 def validate_necitaly_ref(value):
     return necitaly_re(value)
 
+def validate_cbl_ref(value):
+    return cbl_re(value)
+
+
 def validate_ref_no(value):
-    validator_list=[western_union,placid_re,ria_re,xpress_re,moneygram_re, prabhu_re ]
+    validator_list=[western_union,placid_re,ria_re,xpress_re,moneygram_re, prabhu_re, merchantrade_re, necmoney_re, necitaly_re, cbl_re]
     for validator in validator_list:
         try:
             validator(value)

@@ -126,6 +126,11 @@ class RemmitForm(ModelForm):
                 validate_necitaly_ref(reference)
             except ValidationError as err:
                 self.add_error('reference',err)
+        elif exchange.name == 'CBL MONEY TRANSFER':
+            try:
+                validate_cbl_ref(reference)
+            except ValidationError as err:
+                self.add_error('reference',err)
         else:
             self.add_error('reference',"The reference number does not match with any known third party remittance services ")
         #form.add_error('reference', err)

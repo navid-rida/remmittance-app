@@ -14,8 +14,8 @@ from fuzzywuzzy import process
 
 
 ############################# Variables and Lists ######################################
-gl = ['901130537010101','901130539010101','901130537010103','901130537010105','901130537010108', '901130537010110', '901130537010112']
-cd = ['33300000414','33300000616','33300000670','33300000741','33300000848', '902010301062901', '902010301062903']
+gl = ['901130537010101','901130539010101','901130537010103','901130537010105','901130537010108', '901130537010110', '901130537010112', '901130537010118']
+cd = ['33300000414','33300000616','33300000670','33300000741','33300000848', '902010301062901', '902010301062903', '010124100000006']
 ac_list = gl + cd
 
 ####################### common functions#################################################
@@ -316,7 +316,7 @@ def filter_claim(query_set, start_date=None, end_date= None, branch= None, booth
     return claims.order_by('-date_claim','branch__code')
 
 
-def get_reference_no_from_narration(narration,validatorlist=[validate_western_code,validate_ria,validate_placid, validate_xpress,validate_moneygram, validate_prabhu_ref, validate_merchantrade_ref, validate_necmoney_ref, validate_necitaly_ref]):
+def get_reference_no_from_narration(narration,validatorlist=[validate_western_code,validate_ria,validate_placid, validate_xpress,validate_moneygram, validate_prabhu_ref, validate_merchantrade_ref, validate_necmoney_ref, validate_necitaly_ref, validate_cbl_ref]):
     """gets all reference number from a narration. returns list"""
     ref_list = []
     for e in narration.split():
