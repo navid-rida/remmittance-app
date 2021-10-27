@@ -1,4 +1,4 @@
-"""import pandas as pd
+import pandas as pd
 #from pandas.core.arrays.sparse import dtype
 import numpy as np
 from pathlib import Path
@@ -22,7 +22,7 @@ def get_currency_df():
     pass
 
 ############################ Reference path and DFs #########################################################
-ref_file_path = Path('REFERENCE_FILE_new.xlsm')
+"""ref_file_path = Path('REFERENCE_FILE_new.xlsm')
 ref_additional_data_path = Path('ref_additional_data.xlsx')
 zero_matrix_path = Path('zero matrix_August 2021.xls')
 
@@ -175,7 +175,7 @@ def rit_all_df(exp_rec,imp_pay,inv_pay,inv_rec,wage_remit):
     return df
 
 
-final_df = rit_all_df(exp_df,imp_pay_df,invisible_pay_df,invisible_rec_df,wage_remit_df)
+final_df = rit_all_df(exp_df,imp_pay_df,invisible_pay_df,invisible_rec_df,wage_remit_df)"""
 
 
 ########################################### Remittance Reports from DB ########################################
@@ -237,4 +237,4 @@ def get_daily_bb_remittance(qset):
             "Branch": branch,
             }
     df = pd.DataFrame(dct)
-    return df"""
+    return df
