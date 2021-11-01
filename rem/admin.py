@@ -14,9 +14,11 @@ class UserAdmin(BaseUserAdmin):
 
 class RemmitAdmin(admin.ModelAdmin):
     search_fields = ('reference',)
-
 class PaymentAdmin(admin.ModelAdmin):
     search_fields = ('requestpay__remittance__reference',)
+
+class RequestpayAdmin(admin.ModelAdmin):
+    search_fields = ('remittance__reference',)
 
 class ReceiverAdmin(admin.ModelAdmin):
     search_fields = ('idno','name','cell')
@@ -35,7 +37,7 @@ admin.site.register(ExchangeHouse)
 admin.site.register(Employee)
 admin.site.register(Country)
 admin.site.register(Receiver,ReceiverAdmin)
-admin.site.register(Requestpay)
+admin.site.register(Requestpay, RequestpayAdmin)
 admin.site.register(Payment, PaymentAdmin)
 #admin.site.register(ReceiverUpdateHistory)
 #admin.site.register(RemittanceUpdateHistory)
