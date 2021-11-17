@@ -3,14 +3,14 @@ from __future__ import unicode_literals
 from django.shortcuts import render,redirect, get_object_or_404#, render_to_response
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-from .forms import RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm, SettlementForm, MultipleSearchForm, ClaimForm
+from .forms import ReceiverChangeForm, RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm, SettlementForm, MultipleSearchForm, ClaimForm
 from django.contrib.auth.decorators import login_required,user_passes_test
 from .models import Remmit, Requestpay, Payment, Receiver,Employee, ReceiverUpdateHistory,RemittanceUpdateHistory, Branch, Booth, Claim, CashIncentive
 from django.db.models import Sum, Count
-import datetime
+#import datetime
 from .DataModels import *
 from .user_tests import *
-import io
+#import io
 from django.contrib import messages
 from django.views.generic.edit import CreateView,UpdateView
 from django.views.generic.detail import DetailView
@@ -1077,3 +1077,31 @@ def daily_remittance_bb_statement(request):
         form = SearchForm()
         context = {'form':form}
         return render(request, 'rem/report/cash_incentive_bb_statement/daily_remittance_bb_base.html', context)
+
+
+@login_required
+@user_passes_test(check_headoffice)
+@transaction.atomic
+@permission_required(['rem.can_mark_paid_remittance',])
+def change_receiver(request):
+    context={}
+    if request.method == 'POST':
+        form = ReceiverChangeForm(request.POST)
+        if form.is_valid():
+            #file = request.FILES.get('batchfile')
+            reference = request.POST['reference']
+            identification = request.POST['identification']
+            try:
+                remittance = Remmit.objects.get(reference=reference)
+                identification = Receiver.objects.get(idno=identification)
+                update_remittance = remittance.change_receiver(identification)
+                if update_remittance:
+                    messages.success(request, 'Changed Successfully')
+                    context = {'remittance': remittance, 'form': form}
+            except Exception as e:
+                messages.error(request, e)
+                context = {'form':form}
+    else:
+        form = ReceiverChangeForm()
+        context = {'form':form}
+    return render(request, 'rem/process/receiver_change.html', context)

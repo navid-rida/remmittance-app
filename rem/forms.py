@@ -321,6 +321,20 @@ class ReceiverSearchForm(forms.Form):
     #cell = forms.CharField(label="Enter Customer's Cell No.", validators=[validate_mobile])
     identification = forms.CharField(label="Enter NID/Passport/ Birth Certificate No.")
 
+class ReceiverChangeForm(forms.Form):
+    reference = forms.CharField(label="Referene No./PIN/MTCN", max_length=16)
+    identification = forms.CharField(label="Enter NID/Passport/ Birth Certificate No. of New Receiver", max_length=16)
+
+    def __init__(self, *args, **kwargs):
+        super(ReceiverChangeForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        #self.helper.render_unmentioned_fields= True
+        self.helper.layout = Layout(
+            'reference',
+            'identification',
+            Submit('submit', 'Change Receiver')
+        )
+
 class MultipleSearchForm(forms.Form):
     #cell = forms.CharField(label="Enter Customer's Cell No.", validators=[validate_mobile])
     keyword = forms.CharField(label="Enter reference number, name or phone no")

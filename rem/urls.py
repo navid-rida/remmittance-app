@@ -27,6 +27,7 @@ urlpatterns = [
     path('search/client', views.search_receiver, name='search_client'),
     path('search/remittance', views.search_remittance, name='search_remittance'),
     path('add/client', views.ReceiverCreate.as_view(), name='add_client'),
+    path('change/client', views.change_receiver, name='change_client'),
     path('add/claim', views.ClaimCreate.as_view(), name='add_claim'),
     path('edit/client/<int:pk>/', views.ReceiverUpdate.as_view(), name='receiver_update'),
     path('add/req/<int:pk>/', views.ReceiverCreate.as_view(), name='add_req'),

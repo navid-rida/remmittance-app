@@ -20,6 +20,7 @@ from django.utils.translation import gettext_lazy as _
 ####################### Rules ################################
 import rem.rule_set
 import rules
+from rules.contrib.models import RulesModel
 ################################### Other app models ##################
 from schedules.models import District, Currency, Bank
 
@@ -226,7 +227,7 @@ class Receiver(models.Model):
     idissue = models.DateField("Issue date of Identification Document", null=True)
     idexpire = models.DateField("Expiry date of Identification Document", null=True)
     idno = models.CharField("ID Number", max_length=17, unique=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, default=0)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "Benificiary of Remittance"
@@ -366,6 +367,16 @@ class Remmit(models.Model):
 
     class Meta:
         verbose_name = "Remittance"
+        #rules_permissions = {
+           # "add" : rules.add_remit,
+           # "change" : rules.change_remmit,
+           # "read" : rem.rule_set.is_same_branch_user,
+           # "delete" : rules.is_superuser,
+         #}\
+        #permissions = 
+        """constraints = [
+            models.CheckConstraint(check=models.Q)
+        ]"""
 
     def __str__(self):
         return self.reference+" on "+self.branch.name
@@ -373,6 +384,8 @@ class Remmit(models.Model):
     def clean(self):
         if self.cash_incentive_status=='U' and self.date_cash_incentive_paid is not None:
             raise ValidationError({'cash_incentive_status': _('A remittance cannot be marked unpaid once it is paid')})
+        if self.booth and self.booth.branch.code != self.branch.code:
+            raise ValidationError(_('Branch/ Sub-branch Mismatch'))
 
     def get_completed_payment(self):
         r = self.requestpay_set.order_by('datecreate',).last()
@@ -443,8 +456,6 @@ class Remmit(models.Model):
         else:
             return "Either cash incentive not settled or multiple cash incentives "+self.reference
 
-            
-
 
     def calculate_cash_incentive(self):
         return self.amount*Decimal(0.02)
@@ -463,6 +474,11 @@ class Remmit(models.Model):
         for e in q:
             total = total + e.cash_incentive_amount
         return total
+
+    def change_receiver(self, new_receiver):
+        self.receiver = new_receiver
+        self.save()
+        return self
 
 class RemittanceUpdateHistory(models.Model):
     remittance=models.ForeignKey(Remmit, on_delete=models.CASCADE, verbose_name= "Remittance Entry")
