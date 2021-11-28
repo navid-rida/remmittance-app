@@ -1082,7 +1082,7 @@ def daily_remittance_bb_statement(request):
 @login_required
 @user_passes_test(check_headoffice)
 @transaction.atomic
-@permission_required(['rem.can_mark_paid_remittance',])
+@permission_required(['rem.can_change_benifciary_of_remittance',])
 def change_receiver(request):
     context={}
     if request.method == 'POST':

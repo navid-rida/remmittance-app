@@ -39,6 +39,9 @@ is_booth_remittance_user = rules.is_group_member('Booth Remittance Info Submissi
 is_booth_report_observer_user = rules.is_group_member('Booth Report Observer User')
 is_ho_settlement_user = rules.is_group_member('HO Settlement User')
 is_ho_report_user = rules.is_group_member('HO Report Observer User')
+can_change_benifciary_of_remittance = rules.is_group_member('Change remittance benificiary')
+
+is_api_user = rules.is_group_member('API User')
 #is_super = rules.is_superuser(user)
 
 """@rules.predicate
@@ -58,6 +61,7 @@ rules.add_perm('rem.view_ho_br_booth_reports', is_ho_report_user)
 rules.add_perm('rem.can_settle_remitts_cash_incentive', is_ho_settlement_user)
 rules.add_perm('rem.can_mark_paid_remittance', rules.is_superuser) #is_ho_settlement_user | (is_entry_creator & remittance_less_than_usd1500))
 rules.add_perm('rem.can_view_cash_incentive_undertaking', remittance_cash_incentive_paid)
+rules.add_perm('rem.can_change_benifciary_of_remittance', can_change_benifciary_of_remittance)
 #---------------------------------------------------------------------------------
 
 rules.add_perm('rem.change_reciver', is_same_branch_as_creator | rules.is_superuser )
@@ -67,3 +71,8 @@ rules.add_perm('rem.allow_if_transaction_hour', is_transaction_hour )
 rules.add_perm('rem.view_claim', (is_entry_creator & is_same_branch_user)| is_ho_report_user | is_ho_report_user)
 rules.add_perm('rem.change_claim', is_entry_creator & is_same_branch_user )
 rules.add_perm('rem.can_forward_claim', is_ho_settlement_user)
+
+
+#----------------------- API --------------------
+
+rules.add_perm('remapi.is_api_user', is_api_user)

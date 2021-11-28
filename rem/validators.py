@@ -76,7 +76,7 @@ mobile_re = RegexValidator(
 )
 
 old_nid_re = RegexValidator(
-    _lazy_re_compile(r'^[0-9]{13,17}$'),
+    _lazy_re_compile(r'^[0-9]{17}$'),
     message=_('Please enter a valid NID number'),
     code='invalid_old_nid',
 )
@@ -133,7 +133,23 @@ def validate_expire_date(date):
             _('Document is expired'),
         )
 
+exchange_validators = {
+    'WESTERN UNION': western_union,
+    'XPRESS MONEY': xpress_re,
+    'RIA MONEY TRANSFER': ria_re,
+    'PLACID EXPRESS': placid_re,
+    'MONEYGRAM': moneygram_re,
+    'PRABHU MONEY TRANSFER':prabhu_re,
+    'MERCHANTRADE': merchantrade_re,
+    'NEC MONEY TRANSFER': necmoney_re,
+    'NATIONAL EXCHANGE': necitaly_re,
+    'CBL MONEY TRANSFER': cbl_re,
 
+}
+
+def validate_all_reference(exchange_name, reference_number, validator_list= exchange_validators):
+    validator = validator_list[exchange_name]
+    return validator(reference_number)
 
 def validate_western_code(value):
     return western_union(value)
@@ -163,6 +179,7 @@ def validate_merchantrade_ref(value):
             _('%(year)s is not a valid initial sequence for Merchantrade reference'),
             params={'year': value[:2]},
         )
+    return merchantrade_re(value)
 
 def validate_necmoney_ref(value):
     return necmoney_re(value)
