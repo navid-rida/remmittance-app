@@ -3,7 +3,10 @@
 {% load crispy_forms_tags %}
 {% load rules %}
 {% load humanize %}
+{% load number_filters %}
 {% block title %} Payment Details {% endblock %}
+
+
 {% block content %}
 
 {{ form.errors}}
@@ -59,7 +62,7 @@
         </tr>
         <tr>
           <td>Cash Incentive Amount</td>
-          <td>: BDT {{ object.cash_incentive_amount|intcomma }}</td>
+          <td>: BDT {{ object.cash_incentive_amount|comma_seperated_bangla }}</td>
         </tr>
         <tr>
           <td>Cash Incentive Status</td>
@@ -103,7 +106,7 @@
         </tr>
         <tr>
           <td>Value</td>
-          <td>:<b class="text-danger"> {{object.currency.short}} {{object.amount }}</b></td>
+          <td>:<b class="text-danger"> {{object.currency.short}} {{object.amount|comma_seperated_bangla}} (Taka {{object.amount|number_to_word_bangla_style}})</b></td>
         </tr>
       </tbody>
     </table>
