@@ -2,6 +2,7 @@ from django.db import models
 from decimal import Decimal
 #from datetime import date
 from django.core.exceptions import ValidationError
+from django.db.models.fields.related import ForeignKey
 from .validators import validate_expire_date, validate_neg, validate_post_date, validate_mobile, numeric, name, alpha, alpha_num, western_union, nrbc_acc
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
@@ -11,7 +12,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 import pandas as pd
-from rem.DataModels import filter_remittance, filter_claim
+from rem.DataModels import cash_incentive_df, filter_remittance, filter_claim
 ########################## aggregate functions ###############################
 from django.db.models import Sum, Q
 ################# import for validation errrors ##############################
@@ -193,6 +194,8 @@ def update_user_employee(sender, instance, created, **kwargs):
         Employee.objects.create(user=instance, branch=None, cell=None)
     instance.employee.save()"""
 
+
+
 class Receiver(models.Model):
     name = models.CharField("Name of Receiver", validators=[name], max_length=100)
     MALE= 'M'
@@ -289,7 +292,30 @@ class ReceiverUpdateHistory(models.Model):
     createdby = models.ForeignKey(User, on_delete=models.PROTECT)
     ip = models.GenericIPAddressField("User IP Address")
 
+class Account(models.Model):
+    receiver = models.ForeignKey(Receiver, on_delete=models.PROTECT, verbose_name="Receiver")
+    number = models.CharField("Account Number (Full)", max_length=15, validators=[nrbc_acc], unique=True)
+    title = models.CharField("Account Ttile", max_length=100)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+    booth = models.ForeignKey(Booth, on_delete=models.CASCADE, null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    date_create = models.DateTimeField("Date of Creation", auto_now_add=True)
 
+    def __str__(self):
+        return self.number+" "+self.title
+    
+
+    def clean(self):
+        br_prefix = self.number[0:4]
+        if self.booth:
+            if br_prefix!=self.booth.code:
+                raise ValidationError({'number': _('Sub-branch prefix mismatch')})
+            if self.booth.branch!=self.branch:
+                raise ValidationError({'booth': _('Branch/Sub-branch mismatch')})
+        else:
+            if br_prefix!=self.branch.code:
+                raise ValidationError({'number': _('Branch prefix mismatch')})
+        
 class ExchangeHouse(models.Model):
     name = models.CharField("Name of Exchange House", max_length=30)
     gl_no = models.CharField("GL Head of Exchange House", max_length=15,  validators=[numeric])
@@ -381,11 +407,35 @@ class Remmit(models.Model):
     def __str__(self):
         return self.reference+" on "+self.branch.name
 
+
+
+    #################### Encashment Related Methods ######################
+
+
+    def get_total_encashment_value(self):
+        total_encashment = self.encashment_set.aggregate(sum=Sum('amount'))
+        if total_encashment['sum']:
+            return total_encashment['sum']
+        else:
+            return 0
+    
+    def get_encashment_room(self):
+        ### return available limit for encashment 
+        room = self.amount - self.get_total_encashment_value()
+        if room>0:
+            return room
+        else:
+            return 0
+
     def clean(self):
         if self.cash_incentive_status=='U' and self.date_cash_incentive_paid is not None:
             raise ValidationError({'cash_incentive_status': _('A remittance cannot be marked unpaid once it is paid')})
         if self.booth and self.booth.branch.code != self.branch.code:
             raise ValidationError(_('Branch/ Sub-branch Mismatch'))
+        if self.exchange.name=='SWIFT' and self.currency.name=='BANGLADESHI TAKA':
+            raise ValidationError(_('Currency must be FC for SWIFT or Cash Remttance'))
+        #if self.exchange.name == 'SWIFT' and (not self.receiver.ac_no):
+            #raise ValidationError(_('Receiver acccount required'))
 
     def get_completed_payment(self):
         r = self.requestpay_set.order_by('datecreate',).last()
@@ -418,7 +468,7 @@ class Remmit(models.Model):
             self._entry_cat='P'
             self.cash_incentive_status='P'
             self.date_cash_incentive_paid=timezone.now()
-            self.cash_incentive_amount=self.amount*Decimal(0.02)
+            self.cash_incentive_amount=self.amount*Decimal(0.025)
             self.save()
             self.refresh_from_db()
             return self
@@ -458,7 +508,7 @@ class Remmit(models.Model):
 
 
     def calculate_cash_incentive(self):
-        return self.amount*Decimal(0.02)
+        return self.amount*Decimal(0.025)
 
     def get_ci_trn_type(self):
         #returns cash incentive transaction type for RIT
@@ -490,11 +540,49 @@ class RemittanceUpdateHistory(models.Model):
         return self.remittance.reference+" by "+self.createdby.username+" on "+str(self.datecreate)
 
     
+class Encashment(models.Model):
+    remittance = models.ForeignKey(Remmit, on_delete=models.CASCADE,)
+    amount = models.DecimalField("Amount of Encashment",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Something ")
+    rate = models.DecimalField("Rate of Encashment",max_digits=6, decimal_places=2, validators=[validate_neg], help_text="Something ")
+    PAYMENT= 'P'
+    NONPAYMENT = 'U'
+    NOTAPPLICABLE = 'NA'
+    ENTRYCAT_CHOICES = (
+        (PAYMENT,'Paid'),
+        (NONPAYMENT, 'Not Paid'),
+        (NOTAPPLICABLE, 'Not Applicable'),
+        )
+    cashin_category = models.CharField("Cash Incentive Payment Status", choices=ENTRYCAT_CHOICES, max_length=2, )
+    reason = models.CharField('Reason for not paying cash incentive', max_length=100, null=True, blank=True)
+    account = models.ForeignKey(Account,verbose_name='Destination Account', on_delete=models.PROTECT, null=True, blank = True)
+    createdby = models.ForeignKey(User, on_delete=models.PROTECT)
+    date_create = models.DateTimeField("Date of posting", auto_now_add=True)
+
+    def __str__(self):
+        return self.remittance.reference+" by "+self.createdby.username+" on "+str(self.date_create)
+
+    def clean(self):
+        if self.cashin_category=='U' and (not self.reason):
+            raise ValidationError({'reason': _('Reason cannot be left blank if cash incentive is unpaid')})
+        #if self.remittance.get_encashment_room()<self.amount:
+            #raise ValidationError({'amount': _('Encashment limit exceeded')})
+    
+    def calculate_cash_incentive(self):
+        return self.amount*Decimal(0.025)
+
+    def pay_unpaid_cash_incentive(self):
+        q = CashIncentive.objects.filter(encashment=self, entry_category='P').exists()
+        if self.cashin_category=='U' and (not q):
+            ci = CashIncentive.objects.create(remittance = self.remittance, encashment=self, cash_incentive_amount= self.calculate_cash_incentive(), date_cash_incentive_paid=timezone.now(), entry_category=self.cashin_category)
+            return ci
+        else:
+            return False
 
 
 
 class CashIncentive(models.Model):
     remittance = models.ForeignKey(Remmit, on_delete=models.CASCADE,)
+    encashment = models.ForeignKey(Encashment, on_delete=models.CASCADE, null=True)
     cash_incentive_amount = models.DecimalField("Amount of Cash Incentive",max_digits=20,decimal_places=2, validators=[validate_neg])
     date_cash_incentive_paid = models.DateTimeField("Date of Cash Incentive payment", null=True, blank= True)
     date_cash_incentive_settlement = models.DateField("Date of Cash Incentive Settlement", null=True, blank= True)
@@ -511,7 +599,7 @@ class CashIncentive(models.Model):
     partial_payment_status = models.BooleanField("Partial Cash Incentive Payment?", default=False)
 
     def __str__(self):
-        return self.remittance.reference +" "+ self.entry_category
+        return self.remittance.reference +" "+ self.entry_category + " Encashment ID: "+ (str(self.encashment.id) if self.encashment else " No Encashment")
 
     def check_if_paid(self):
         if self.entry_category=='P':
@@ -577,6 +665,7 @@ class CashIncentive(models.Model):
             except Exception as e:
                 print(e, remitt)
     
+
 
 
 class Requestpay(models.Model):

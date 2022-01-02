@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 from django.shortcuts import render,redirect, get_object_or_404#, render_to_response
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-from .forms import ReceiverChangeForm, RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm, SettlementForm, MultipleSearchForm, ClaimForm
+from .forms import ReceiverChangeForm, RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm, SettlementForm, MultipleSearchForm, ClaimForm, EncashmentForm, AccountForm
 from django.contrib.auth.decorators import login_required,user_passes_test
-from .models import Remmit, Requestpay, Payment, Receiver,Employee, ReceiverUpdateHistory,RemittanceUpdateHistory, Branch, Booth, Claim, CashIncentive
+from .models import Remmit, Requestpay, Payment, Receiver,Employee, ReceiverUpdateHistory,RemittanceUpdateHistory, Branch, Booth, Claim, CashIncentive, Encashment, Account
 from django.db.models import Sum, Count
 #import datetime
 from .DataModels import *
@@ -71,7 +71,7 @@ class RemmitCreate(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
             form.instance.booth = self.request.user.employee.booth
         receiver = get_object_or_404(Receiver, pk=self.kwargs['pk'])
         form.instance.receiver = receiver
-        form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.02)
+        form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.025)
         self.object = form.save(commit=False)
         # in case you want to modify the object before commit
         if self.object.cash_incentive_status=='P':
@@ -572,6 +572,12 @@ class RemmitDetailView(DetailView):
     model = Remmit
     template_name = 'rem/detail/remmit_detail_base.html'
 
+
+@method_decorator([login_required,], name='dispatch')
+class ReceiverDetailView(DetailView):
+    model = Receiver
+    template_name = 'rem/detail/receiver_detail.html'
+
     """def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = PaymentForm()
@@ -718,11 +724,14 @@ class RemmitInfoCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
             form.instance.booth = self.request.user.employee.booth
         receiver = get_object_or_404(Receiver, pk=self.kwargs['pk'])
         form.instance.receiver = receiver
-        form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.02)
+        form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.025) if form.instance.cash_incentive_status=='P' else 0
         self.object = form.save(commit=False)
         # in case you want to modify the object before commit
-        if self.object.cash_incentive_status=='P':
+        if self.object.cash_incentive_status=='P' and self.object.exchange.name!='SWIFT':
             self.object.date_cash_incentive_paid=timezone.now()
+            self.object.cash_incentive_amount = self.object.amount*Decimal(0.025)
+        else:
+            self.object.cash_incentive_amount = 0
         self.object.save()
         req = Requestpay(remittance=self.object, created_by=self.request.user, status='PD', ip=get_client_ip(self.request))
         req.save()
@@ -757,7 +766,7 @@ class RemmitInfoUpdate(PermissionRequiredMixin, SuccessMessageMixin, UpdateView)
         return {'entry_category': entry_category, 'reason_a': reason_a}
 
     def form_valid(self, form):
-        form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.02)
+        form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.025)
         self.object = form.save(commit=False)
         # in case you want to modify the object before commit
         self.object.save()
@@ -783,6 +792,25 @@ def pay_unpaid_incentive(request, pk):
         update.createdby = request.user
         update.ip = get_client_ip(request)
         update.save()
+        messages.success(request, 'Cash incentive now marked as paid')
+        return redirect('show_rem')
+    else:
+        messages.warning(request, 'Cannot process the request right now')
+        return redirect('show_rem')
+    #return render(request,'rem/forms/remmit_resubmit.html',context)
+
+@login_required
+@permission_required(['rem.can_mark_paid_remittance','rem.allow_if_transaction_hour'], fn=objectgetter(Remmit, 'pk'))
+@transaction.atomic
+def pay_unpaid__encashment_incentive(request, pk):
+    e = Encashment.objects.get(pk=pk)
+    result = e.pay_unpaid_cash_incentive()
+    if result:
+        #update = RemittanceUpdateHistory()
+        #update.remittance= result
+        #update.createdby = request.user
+        #update.ip = get_client_ip(request)
+        #update.save()
         messages.success(request, 'Cash incentive now marked as paid')
         return redirect('show_rem')
     else:
@@ -1105,3 +1133,80 @@ def change_receiver(request):
         form = ReceiverChangeForm()
         context = {'form':form}
     return render(request, 'rem/process/receiver_change.html', context)
+
+##########################  Encashment Related Views ##############################
+
+
+@method_decorator([login_required,transaction.atomic], name='dispatch')
+class EncashmentCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
+    model = Encashment
+    permission_required = ['rem.add_remmit','rem.allow_if_transaction_hour']
+    form_class = EncashmentForm
+    template_name = 'rem/forms/encashment_form.html'
+    success_message = "Encashment information was submitted successfully"
+    success_url = reverse_lazy('index')
+
+    """def get_success_url(self):
+        return reverse('add_req', kwargs={'pk': self.object.id})"""
+
+
+    def get_form_kwargs(self):
+        kwargs = super(EncashmentCreate, self).get_form_kwargs()
+        kwargs.update({'pk': self.kwargs['pk']})
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.createdby = self.request.user
+        remittance = get_object_or_404(Remmit, pk=self.kwargs['pk'])
+        form.instance.remittance = remittance
+        #form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.02) if form.instance.cash_incentive_status=='P' else 0
+        self.object = form.save(commit=False)
+        # in case you want to modify the object before commit
+        if self.object.remittance.get_encashment_room()<self.object.amount:
+            form.add_error('amount','Encashment limit exceeded')
+            return super().form_invalid(form)
+        if self.object.remittance.receiver.account_set.all().count()<1:
+            form.add_error(None, 'Encashment cannot be done for receivers without accounts')
+            return super().form_invalid(form)
+        if self.object.cashin_category=='P' and self.object.remittance.exchange.name=='SWIFT':
+            self.object.remittance.date_cash_incentive_paid=timezone.now()
+            self.object.remittance.cash_incentive_amount = self.object.amount*Decimal(0.025)
+        else:
+            self.object.cash_incentive_amount = 0
+        self.object.save()
+        return super().form_valid(form)
+
+
+    
+
+################################# Account related views ###################################
+
+@method_decorator([login_required,transaction.atomic], name='dispatch')
+class AccountCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
+    model = Encashment
+    permission_required = ['rem.add_remmit','rem.allow_if_transaction_hour']
+    form_class = AccountForm
+    template_name = 'rem/forms/account_form.html'
+    success_message = "Account Created successfully"
+    success_url = reverse_lazy('index')
+
+    """def get_success_url(self):
+        return reverse('add_req', kwargs={'pk': self.object.id})"""
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        receiver = get_object_or_404(Receiver, pk=self.kwargs['pk'])
+        form.instance.receiver = receiver
+        #form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.02) if form.instance.cash_incentive_status=='P' else 0
+        self.object = form.save(commit=False)
+        # in case you want to modify the object before commit
+        """if self.object.remittance.get_encashment_room()<self.object.amount:
+            form.add_error('amount','Encashment limit exceeded')
+            return super().form_invalid(form)
+        if self.object.cashin_category=='P' and self.object.remittance.exchange.name=='SWIFT':
+            self.object.remittance.date_cash_incentive_paid=timezone.now()
+            self.object.remittance.cash_incentive_amount = self.object.amount*Decimal(0.02)
+        else:
+            self.object.cash_incentive_amount = 0"""
+        self.object.save()
+        return super().form_valid(form)
