@@ -582,7 +582,7 @@ class Encashment(models.Model):
 
 class CashIncentive(models.Model):
     remittance = models.ForeignKey(Remmit, on_delete=models.CASCADE,)
-    encashment = models.ForeignKey(Encashment, on_delete=models.CASCADE, null=True)
+    encashment = models.ForeignKey(Encashment, on_delete=models.CASCADE, null=True, blank=True)
     cash_incentive_amount = models.DecimalField("Amount of Cash Incentive",max_digits=20,decimal_places=2, validators=[validate_neg])
     date_cash_incentive_paid = models.DateTimeField("Date of Cash Incentive payment", null=True, blank= True)
     date_cash_incentive_settlement = models.DateField("Date of Cash Incentive Settlement", null=True, blank= True)
