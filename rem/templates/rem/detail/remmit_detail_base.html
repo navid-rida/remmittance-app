@@ -102,13 +102,33 @@
         </tr>
         <tr>
           <td>Benificiary Name</td>
-          <td>: <b>{{ object.receiver.name }}</b></td>
+          <td>: <b><a href="{% url 'receiver-profile' object.receiver.pk %}"> {{ object.receiver.name }}</a></b></td>
         </tr>
         <tr>
           <td>Value</td>
           <td>:<b class="text-danger"> {{object.currency.short}} {{object.amount|comma_seperated_bangla}} (Taka {{object.amount|number_to_word_bangla_style}})</b></td>
         </tr>
       </tbody>
+    </table>
+    <h4>Encashment Details</h4>
+    <table class="table table-hover table-sm">
+      <tbody>
+        <thead>
+          <th>Amount</th>
+          <th>Action</th>
+        </thead>
+        {% for item in object.encashment_set.all %}
+    
+        <tr>
+       
+          <td>{{item.amount}}</td>
+          <td>
+            <a class="btn btn-primary" href="{% url 'pay_unpaid__encashment_incentive' item.pk %}"> Pay unpaind cash incentive </a>
+          </td>
+        </tr>
+      </tbody>
+      
+      {% endfor %}
     </table>
   </div>
 </div>
@@ -128,6 +148,7 @@
     <a class="btn btn-primary" href="{% url 'download_trm' object.pk %}"> TRM Form </a>
     <a class="btn btn-primary" href="{% url 'download_voucher' object.pk %}"> Voucher </a>
     <a class="btn btn-primary" href="{% url 'download_undertaking' object.pk %}"> Letter of Undertakig </a>
+    <a class="btn btn-primary" href="{% url 'encashment-create-with-remittance' object.pk %}"> Encash </a>
   </div>
 </div>
 <br>

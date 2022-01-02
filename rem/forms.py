@@ -1,4 +1,4 @@
-from .models import Remmit, ExchangeHouse, Branch, Receiver, Requestpay, Country,Booth, Claim
+from .models import Remmit, ExchangeHouse, Branch, Receiver, Requestpay, Country,Booth, Claim, Encashment, Account
 from django.forms import ModelForm
 from django import forms
 from datetime import date, timedelta
@@ -68,6 +68,8 @@ class RemmitForm(ModelForm):
         exchange_list = ['WESTERN UNION','XPRESS MONEY','RIA MONEY TRANSFER','PLACID EXPRESS','MONEYGRAM']
         if (exchange.name in exchange_list) and (currency.name!='BANGLADESHI TAKA'):
             raise ValidationError('Only BDT can be selected for '+exchange.name )
+        if exchange.name=='SWIFT' and currency.name=='BANGLADESHI TAKA':
+            raise ValidationError('Only FC can be selected for '+exchange.name )
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
         return currency
@@ -78,6 +80,7 @@ class RemmitForm(ModelForm):
         exchange = cleaned_data.get("exchange")
         reference = cleaned_data.get("reference")
         cash_incentive_status = cleaned_data.get("cash_incentive_status")
+        receiver = cleaned_data.get("receiver")
         unpaid_cash_incentive_reason = cleaned_data.get("unpaid_cash_incentive_reason")
         #if 'cash_incentive_status' in form.changed_data:
         if exchange.name == 'WESTERN UNION':
@@ -129,6 +132,15 @@ class RemmitForm(ModelForm):
         elif exchange.name == 'CBL MONEY TRANSFER':
             try:
                 validate_cbl_ref(reference)
+            except ValidationError as err:
+                self.add_error('reference',err)
+        elif exchange.name == 'SWIFT':
+            #if not receiver.ac_no:
+                #self.add_error("Receiver must have an NRCB account for receiving remittance through SWIFT")
+            if cash_incentive_status=='P':
+                self.add_error('cash_incentive_status', "Cash Incentive against remittance received though SWIFT is not applicable before encashment in BDT")
+            try:
+                swift_re(reference)
             except ValidationError as err:
                 self.add_error('reference',err)
         else:
@@ -187,8 +199,11 @@ class RemittInfoForm(RemmitForm):
 
     def clean_entry_category(self):
         cash_incentive_status = self.cleaned_data['entry_category']
+        exchange = self.cleaned_data['exchange']
         if 'entry_category' in self.changed_data and cash_incentive_status=='U' and self.fields['entry_category'].initial=="":
             raise ValidationError('Validation error: A remittance cannot be marked unpaid once it is paid')
+        if cash_incentive_status=='P' and exchange.name=='SWIFT':
+            raise ValidationError('Cash Incentive against remittance received though SWIFT is not applicable before encashment in BDT')
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
         return cash_incentive_status
@@ -220,6 +235,83 @@ class RemittInfoForm(RemmitForm):
 
         return remit
 
+
+class EncashmentForm(ModelForm):
+    #date_sending = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
+    #account = forms.ModelChoiceField(queryset=ExchangeHouse.objects.all(),required=False)
+
+    class Meta:
+        model = Encashment
+        fields = ('amount','rate', 'cashin_category', 'reason', 'account')
+        #widgets = {
+            #'dob': forms.SelectDateWidget,
+            #'cash_incentive_status': forms.RadioSelect,
+            #'dob': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+            #'idissue': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+            #'idexpire': forms.DateInput(format['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+        #}
+
+    def __init__(self, *args, **kwargs):
+        receiver_id=kwargs.pop('pk')
+        rem = Remmit.objects.get(pk=receiver_id)
+        super(EncashmentForm, self).__init__(*args, **kwargs)
+        self.fields['account'].queryset = Account.objects.filter(receiver=rem.receiver)
+        self.helper = FormHelper(self)
+        #self.helper.render_unmentioned_fields= True
+        self.helper.layout = Layout(
+            'amount',
+            'rate',
+            'cashin_category',
+            'reason',
+            'account',
+            Submit('submit', 'Encash')
+        )
+
+
+    def clean_reason(self):
+        unpaid_cash_incentive_reason = self.cleaned_data['reason']
+        cashin_category  = self.cleaned_data['cashin_category'] if 'cashin_category' in self.cleaned_data else None
+        if cashin_category != 'P' and unpaid_cash_incentive_reason==None:
+            raise ValidationError('Reason is required if cash incentive status is unpaid')
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return unpaid_cash_incentive_reason
+
+class AccountForm(ModelForm):
+    #date_sending = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
+
+    class Meta:
+        model = Account
+        fields = ('number','title', 'branch', 'booth')
+        #widgets = {
+            #'dob': forms.SelectDateWidget,
+            #'cash_incentive_status': forms.RadioSelect,
+            #'dob': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+            #'idissue': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+            #'idexpire': forms.DateInput(format['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+        #}
+
+    def __init__(self, *args, **kwargs):
+        super(AccountForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        #self.helper.render_unmentioned_fields= True
+        self.helper.layout = Layout(
+            'number',
+            'title',
+            'branch',
+            'booth',
+            Submit('submit', 'Create')
+        )
+
+
+    def clean_reason(self):
+        unpaid_cash_incentive_reason = self.cleaned_data['reason']
+        cashin_category  = self.cleaned_data['cashin_category'] if 'cashin_category' in self.cleaned_data else None
+        if cashin_category != 'P' and unpaid_cash_incentive_reason==None:
+            raise ValidationError('Reason is required if cash incentive status is unpaid')
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return unpaid_cash_incentive_reason
 class ReceiverForm(ModelForm):
     dob = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="Date of Birth",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
     idissue = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="ID Issue Date",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'], required=False)

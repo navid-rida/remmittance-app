@@ -1,0 +1,22 @@
+{% extends "rem/base.html" %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% load rules %}
+{% load humanize %}
+{% load number_filters %}
+{% block title %} Payment Details {% endblock %}
+
+
+{% block content %}
+<h4>Receiver Details</h4><br>
+
+Name: {{ object.name }} <br>
+Mobile: {{ object.cell}}
+
+<div class="card">
+  <div class="card-header">
+    <a class="btn btn-primary" href="{% url 'account-create' object.pk %}"> Add account </a>
+    
+  </div>
+</div>
+{% endblock %}

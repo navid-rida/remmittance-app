@@ -99,11 +99,11 @@ passport_re = RegexValidator(
     code='invalid_bc',
 )
 
-"""swift_re = RegexValidator(
-    _lazy_re_compile(r'^^[0-9a-zA-Z]{50}$'),
+swift_re = RegexValidator(
+    _lazy_re_compile(r'^[a-zA-Z]+.{3,50}$'),
     message=_('Please enter a valid SWIFT code'),
     code='invalid',
-)"""
+)
 
 def validate_neg(value):
     if value < 0:
@@ -144,6 +144,7 @@ exchange_validators = {
     'NEC MONEY TRANSFER': necmoney_re,
     'NATIONAL EXCHANGE': necitaly_re,
     'CBL MONEY TRANSFER': cbl_re,
+    'SWIFT': swift_re,
 
 }
 
@@ -248,4 +249,4 @@ name = RegexValidator(r'^[a-zA-Z .-]*$', 'Only alphabets are allowed.')
 alpha = RegexValidator(r'^[a-zA-Z]*$', 'Only alphabets are allowed.')
 alpha_num = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only Alphabet and numeric characters are allowed.')
 western_union = RegexValidator(r'^[0-9]{10}$', 'Western union mtcn can contain only 10 digit numbers')
-nrbc_acc = RegexValidator(r'^01[0-7][0-9][2-3][0-9]{10}$', 'Please provide a valid NRBC account number')
+nrbc_acc = RegexValidator(r'^(0|5)[0-9][0-7][0-9][2-3][0-9]{10}$', 'Please provide a valid NRBC account number')

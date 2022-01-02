@@ -35,6 +35,7 @@ urlpatterns = [
     ########################## Details #########################################
     path('detail/req/<int:pk>/', views.RequestpayDetailView.as_view(), name='requestpay-detail'),
     path('detail/remittance/<int:pk>/', views.RemmitDetailView.as_view(), name='remitt-detail'),
+    path('detail/receiver/<int:pk>/', views.ReceiverDetailView.as_view(), name='receiver-profile'),
     path('detail/claim/<int:pk>/', views.ClaimDetailView.as_view(), name='claim-detail'),
     path('resubmit/req/<int:pk>/', views.request_resubmit, name='requestpay-resubmit'),
     path('detail/mark_paid/<int:pk>/', views.pay_unpaid_incentive, name='pay_unpaid_incentive'),
@@ -46,4 +47,9 @@ urlpatterns = [
     path('summary', views.summary_report, name='summary'),
     path('cash_incentive_bb_statement', views.monthly_cash_incentive_bb_statement, name='cash_incentive_bb_statement'),
     path('daily_remittance_bb_statement', views.daily_remittance_bb_statement, name='daily_remittance_bb'),
+    ############################## Encashment Related Views ############################################
+    path('add/encashment/<int:pk>/', views.EncashmentCreate.as_view(), name='encashment-create-with-remittance'), # partial or full encashment of SWIFT and Cash remittance
+    path('encashment/mark_paid/<int:pk>/', views.pay_unpaid__encashment_incentive, name='pay_unpaid__encashment_incentive'),
+    ############################## Account Related Views ############################################
+    path('add/account/<int:pk>/', views.AccountCreate.as_view(), name='account-create'), # partial or full encashment of SWIFT and Cash remittance
 ]
