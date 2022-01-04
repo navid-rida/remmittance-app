@@ -1140,7 +1140,7 @@ def change_receiver(request):
 @method_decorator([login_required,transaction.atomic], name='dispatch')
 class EncashmentCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
     model = Encashment
-    permission_required = ['rem.add_remmit','rem.allow_if_transaction_hour']
+    permission_required = ['rem.add_remmit','rem.allow_if_transaction_hour', 'rem.can_encash']
     form_class = EncashmentForm
     template_name = 'rem/forms/encashment_form.html'
     success_message = "Encashment information was submitted successfully"
@@ -1154,6 +1154,10 @@ class EncashmentCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
         kwargs = super(EncashmentCreate, self).get_form_kwargs()
         kwargs.update({'pk': self.kwargs['pk']})
         return kwargs
+    
+    def get_permission_object(self):
+        remittance = get_object_or_404(Remmit, pk=self.kwargs['pk'])
+        return remittance
 
     def form_valid(self, form):
         form.instance.createdby = self.request.user

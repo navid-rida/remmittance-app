@@ -145,10 +145,19 @@
 {% endif %}
 <div class="card">
   <div class="card-header">
+    {% has_perm 'rem.view_trm_form' user object as can_view_trm_voucher %}
+    {% if can_view_trm_voucher %}
     <a class="btn btn-primary" href="{% url 'download_trm' object.pk %}"> TRM Form </a>
     <a class="btn btn-primary" href="{% url 'download_voucher' object.pk %}"> Voucher </a>
+    {% endif %}
+    {% has_perm 'rem.can_view_cash_incentive_undertaking' user object as can_view_undertaking %}
+    {% if can_view_undertaking %}
     <a class="btn btn-primary" href="{% url 'download_undertaking' object.pk %}"> Letter of Undertakig </a>
+    {% endif %}
+    {% has_perm 'rem.can_encash' user object as can_encash %}
+    {% if can_encash %}
     <a class="btn btn-primary" href="{% url 'encashment-create-with-remittance' object.pk %}"> Encash </a>
+    {% endif %}
   </div>
 </div>
 <br>

@@ -31,6 +31,10 @@ def remittance_less_than_usd1500(user,remittance):
 def remittance_cash_incentive_paid(user,remittance):
     return not remittance.check_unpaid_cash_incentive()
 
+@rules.predicate
+def is_thirdparty_exchange_house(user,remittance):
+    return remittance.exchange.name != 'SWIFT'
+
 
 #is_branch_report_user = rules.is_group_member('branch user')
 is_branch_remittance_user = rules.is_group_member('Branch Remittance Info Submission User')
@@ -54,7 +58,7 @@ def is_same_domain_user(user,request):
 rules.add_perm('rem.change_remmit', is_entry_creator & is_same_branch_user)
 rules.add_perm('rem.add_remmit', is_branch_remittance_user | is_booth_remittance_user)
 rules.add_perm('rem.view_branch_remitt', is_branch_report_observer_user)
-rules.add_perm('rem.view_trm_form', (is_branch_remittance_user & is_same_branch_user)| (is_booth_remittance_user & is_same_booth_user) | is_ho_report_user | rules.is_superuser)
+rules.add_perm('rem.view_trm_form', ((is_branch_remittance_user & is_same_branch_user)| (is_booth_remittance_user & is_same_booth_user) | is_ho_report_user | rules.is_superuser) & is_thirdparty_exchange_house)
 rules.add_perm('rem.view_booth_remitt', is_booth_report_observer_user)
 rules.add_perm('rem.view_all_remitt', is_ho_report_user)
 rules.add_perm('rem.view_ho_br_booth_reports', is_ho_report_user)
@@ -72,7 +76,12 @@ rules.add_perm('rem.view_claim', (is_entry_creator & is_same_branch_user)| is_ho
 rules.add_perm('rem.change_claim', is_entry_creator & is_same_branch_user )
 rules.add_perm('rem.can_forward_claim', is_ho_settlement_user)
 
+#--------------------------Cash Incentive----------------------------------
 
+rules.add_perm('rem.is_thirdparty_remittance', is_thirdparty_exchange_house)
 #----------------------- API --------------------
 
 rules.add_perm('remapi.is_api_user', is_api_user)
+
+#-------------------------- Encachment------------------------------------
+rules.add_perm('rem.can_encash', ~is_thirdparty_exchange_house)
