@@ -23,11 +23,10 @@ for ix, row in df2.iterrows():
     for item in q:
         if item.ccy_id==row['CCY_ID'] and item.short != row['CURRENCY']:
             item.short = row['CURRENCY']
-                item.save()
+            item.save()
 
 
 for item in q:
-   ...:     if item.cur_code == 'nan':
-   ...:         item.cur_code = None
-   ...:         item.save()
-   ...:
+    if item.cur_code == 'nan':
+        item.cur_code = None
+        item.save()
