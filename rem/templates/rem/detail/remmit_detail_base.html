@@ -106,10 +106,34 @@
         </tr>
         <tr>
           <td>Value</td>
-          <td>:<b class="text-danger"> {{object.currency.short}} {{object.amount|comma_seperated_bangla}} (Taka {{object.amount|number_to_word_bangla_style}})</b></td>
+          <td>:<b class="text-danger"> {{object.currency.short}} {{object.amount|comma_seperated_bangla}} ({{object.currency.short}} {{object.amount|number_to_word_bangla_style}})</b></td>
         </tr>
       </tbody>
     </table>
+
+    <h4>Cash Incentive Details</h4>
+    <table class="table table-hover table-sm">
+      <tbody>
+        <thead>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Action</th>
+        </thead>
+        {% for item in object.cashincentive_set.all %}
+    
+        <tr>
+       
+          <td>{{item.date_cash_incentive_paid}}</td>
+          <td>{{item.amount}}</td>
+          <td>
+            <a class="btn btn-primary" href="{% url 'pay_unpaid__encashment_incentive' item.pk %}"> Pay unpaind cash incentive </a>
+          </td>
+        </tr>
+      </tbody>
+      
+      {% endfor %}
+    </table>
+
     <h4>Encashment Details</h4>
     <table class="table table-hover table-sm">
       <tbody>

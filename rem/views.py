@@ -380,8 +380,28 @@ class ReceiverCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
         return reverse('remmit-create-with-payment', kwargs={'pk': self.object.id})
 
     def form_valid(self, form):
+        number = form.cleaned_data['number']
+        title = form.cleaned_data['title']
+        branch = form.cleaned_data['branch']
+        booth = form.cleaned_data['booth']
         form.instance.created_by = self.request.user
+        self.object = form.save(commit=False)
+        self.object.save()
+        if number:
+            try:
+                account = Account.objects.create(receiver=self.object, number=number, title=title, branch=branch, booth=booth, created_by=self.request.user)
+            except Exception as e:
+                form.add_error(None, e)
+                return super().form_invalid(form)
+        
         return super().form_valid(form)
+
+    """def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #user = self.request.user
+        formset = AccountFormset()
+        context["formset"] = formset
+        return context"""
 
     """def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -716,6 +736,11 @@ class RemmitInfoCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
 
     """def get_success_url(self):
         return reverse('add_req', kwargs={'pk': self.object.id})"""
+    
+    def get_form_kwargs(self):
+        kw = super(RemmitInfoCreate, self).get_form_kwargs()
+        kw['request'] = self.request # the trick!
+        return kw
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -758,7 +783,11 @@ class RemmitInfoUpdate(PermissionRequiredMixin, SuccessMessageMixin, UpdateView)
     template_name = 'rem/forms/remmit_info_update_form.html'
     success_url = reverse_lazy('show_rem')
     success_message = "Remittance information was updated successfully"
-    
+
+    def get_form_kwargs(self):
+        kw = super(RemmitInfoUpdate, self).get_form_kwargs()
+        kw['request'] = self.request # the trick!
+        return kw
 
     def get_initial(self):
         entry_category = self.object.cashincentive_set.last().entry_category

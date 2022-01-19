@@ -3,7 +3,7 @@ from decimal import Decimal
 #from datetime import date
 from django.core.exceptions import ValidationError
 from django.db.models.fields.related import ForeignKey
-from .validators import validate_expire_date, validate_neg, validate_post_date, validate_mobile, numeric, name, alpha, alpha_num, western_union, nrbc_acc
+from .validators import validate_expire_date, validate_neg, validate_post_date, validate_mobile, numeric, name, alpha, alpha_num, western_union, nrbc_acc, swift_bic
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -210,7 +210,15 @@ class Receiver(models.Model):
     father_name = models.CharField("Father's name of Receiver", max_length=100, null=True, blank=True)
     mother_name = models.CharField("Mother's of Receiver", max_length=100)
     spouse_name = models.CharField("Spouse name",  max_length=100, null=True, blank=True)
-    profession = models.CharField("Profession", max_length=100)
+    SERVICE= 'S'
+    BUSINESS = 'B'
+    OTHER = 'O'
+    OCCUPATION_CHOICES = (
+        (SERVICE,'SERVICE'),
+        (BUSINESS, 'BUSINESS'),
+        (OTHER, 'OTHER'),
+        )
+    profession = models.CharField("Profession", max_length=100, choices=OCCUPATION_CHOICES)
     nationality = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Nationality',  default=Country.objects.get(name='BANGLADESH').id)
     ac_no = models.CharField("Account Number of the receiver (If any)", validators=[nrbc_acc], max_length=15, null=True, blank=True)
     address = models.TextField("Address of Receiver")
@@ -294,8 +302,8 @@ class ReceiverUpdateHistory(models.Model):
 
 class Account(models.Model):
     receiver = models.ForeignKey(Receiver, on_delete=models.PROTECT, verbose_name="Receiver")
-    number = models.CharField("Account Number (Full)", max_length=15, validators=[nrbc_acc], unique=True)
-    title = models.CharField("Account Ttile", max_length=100)
+    number = models.CharField("Account Number (15 Digit)", max_length=15, validators=[nrbc_acc], unique=True)
+    title = models.CharField("Account Title", max_length=100)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
@@ -355,21 +363,45 @@ class Remmit(models.Model):
         (OTHER, 'Other'),
         )
     sender_gender=models.CharField("Gender of the Remitter",max_length=1, choices=GENDER_CHOICES)
-    relationship = models.CharField("Relationship to Sender",max_length=50, null=True)
+
+    FAMILY='FM',
+    FRIEND = 'FR',
+    BUSINEESS_ASSOCIATE = 'BA',
+    CLIENT='CL',
+    EMPLOYEE ='EM',
+    EMPLOYER ='ER',
+    ACQUAINTANCE ='AC'
+
+    RELATIONSHIP_CHOICES = (
+        ('FM','Family'),
+        ('FR','Friend'),
+        ('BA','Business Associate'),
+        ('CL','Client'),
+        ('EM', 'Employee'),
+        ('ER', 'Employer'),
+        ('AC','Acquaintance'),
+    )
+
+    relationship = models.CharField("Benificiary\'s relationship to Sender", max_length=50, null=True, choices = RELATIONSHIP_CHOICES)
     purpose = models.CharField("Purpose of Transaction",max_length=50, null=True)
+    BOOL_CHOICES = ((True, 'Yes'), (False, 'No'))
+    mariner_status = models.BooleanField("Mariner/ Cabin Crew Remittance?",choices=BOOL_CHOICES, help_text="Mark yes if the remittance remitted by Foreign Shipping Lines/ Airlines/ UN or UN Bodies/ Foreign Missions")
     PAID= 'P'
     #HELD = 'H'
     UNPAID = 'U'
+    NOTAPPlICABLE='NA'
     CASHINC_CHOICES = (
-        (PAID,'Paid'),
+        (PAID,'Pay Now'),
         #(HELD, 'Held'),
-        (UNPAID, 'Unpaid'),
+        (UNPAID, 'Pay Later'),
+        (NOTAPPlICABLE, 'Not Applicable')
         )
-    cash_incentive_status = models.CharField("Cash Incentive Status", choices=CASHINC_CHOICES, max_length=1, )
+    cash_incentive_status = models.CharField("Cash Incentive Status", choices=CASHINC_CHOICES, max_length=2, )
     unpaid_cash_incentive_reason = models.CharField("Reason for not paying cash incentive", max_length=50, null=True, blank=True, help_text="This field is mandatory if you mark cash incentive as unpaid")
     receiver = models.ForeignKey(Receiver, on_delete=models.PROTECT, verbose_name="Receiver")
-    amount = models.DecimalField("Amount of Remittance",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Required documents must be collected and retained for paying inentive against Remittances valuing more than BDT 5,00,000.00")
+    amount = models.DecimalField("Amount of Remittance",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Required documents must be collected and retained for paying inentive against Remittances valuing more than BDT 5,00,000.00 or USD 5,000.00 or equivalent FC")
     cash_incentive_amount = models.DecimalField("Amount of Cash Incentive",max_digits=20,decimal_places=2, validators=[validate_neg])
+    account = models.ForeignKey(Account,verbose_name='Account of Benificiary', on_delete=models.PROTECT, null=True, blank = True)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, null=True, blank=True)
     date_sending = models.DateField("Date of Sending Remittance from Abroad")
@@ -377,8 +409,10 @@ class Remmit(models.Model):
     date_cash_incentive_settlement = models.DateField("Date of Cash Incentive Settlement", null=True, blank= True)
     date_create = models.DateTimeField("Date of posting", auto_now_add=True)
     date_edited = models.DateTimeField("Date of last modified", auto_now=True)
-    reference = models.CharField("Referene No./PIN/MTCN", max_length=16, unique=True)
+    reference = models.CharField("Referene No./PIN/MTCN", help_text='Referene No./PIN/MTCN/ For SWIFT - Sender\'s reference: F20A', max_length=16, unique=True)
     screenshot = models.ImageField("Agent Copy", default = 'images/None/no-img.jpg')
+    sender_bank = models.CharField("Sender's Bank/ Ordering Institution", max_length=100, null=True, blank=True, help_text='Ordering Institution: F52A for remittance through SWIFT')
+    sender_bank_swift = models.CharField("Sender's Bank's/ Ordering Institution's SWIFT BIC", max_length=11, validators=[swift_bic,], null=True, blank=True, help_text='Ordering Institution\'s SWIFT BIC: F52A for remittance through SWIFT')
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
     edited_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, related_name='editors')
     #REVIEW= 'RV'
@@ -432,8 +466,11 @@ class Remmit(models.Model):
             raise ValidationError({'cash_incentive_status': _('A remittance cannot be marked unpaid once it is paid')})
         if self.booth and self.booth.branch.code != self.branch.code:
             raise ValidationError(_('Branch/ Sub-branch Mismatch'))
-        if self.exchange.name=='SWIFT' and self.currency.name=='BANGLADESHI TAKA':
-            raise ValidationError(_('Currency must be FC for SWIFT or Cash Remttance'))
+        #if self.exchange.name=='SWIFT' and self.currency.name=='BANGLADESHI TAKA':
+            #raise ValidationError(_('Currency must be FC for SWIFT or Cash Remttance'))
+        #if (not self.branch.ad_fi_code) and self.exchange.name=='SWIFT':
+            #raise ValidationError(_('SWIFT remittance can only be posted by AD branches'))
+
         #if self.exchange.name == 'SWIFT' and (not self.receiver.ac_no):
             #raise ValidationError(_('Receiver acccount required'))
 
@@ -543,13 +580,13 @@ class RemittanceUpdateHistory(models.Model):
 class Encashment(models.Model):
     remittance = models.ForeignKey(Remmit, on_delete=models.CASCADE,)
     amount = models.DecimalField("Amount of Encashment",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Something ")
-    rate = models.DecimalField("Rate of Encashment",max_digits=6, decimal_places=2, validators=[validate_neg], help_text="Something ")
+    rate = models.DecimalField("Rate of Encashment",max_digits=8, decimal_places=4, validators=[validate_neg], help_text="Something ")
     PAYMENT= 'P'
     NONPAYMENT = 'U'
     NOTAPPLICABLE = 'NA'
     ENTRYCAT_CHOICES = (
-        (PAYMENT,'Paid'),
-        (NONPAYMENT, 'Not Paid'),
+        (PAYMENT,'Pay Now'),
+        (NONPAYMENT, 'Pay Later'),
         (NOTAPPLICABLE, 'Not Applicable'),
         )
     cashin_category = models.CharField("Cash Incentive Payment Status", choices=ENTRYCAT_CHOICES, max_length=2, )
@@ -591,11 +628,11 @@ class CashIncentive(models.Model):
     NONPAYMENT = 'U'
     NOTAPPLICABLE = 'NA'
     ENTRYCAT_CHOICES = (
-        (PAYMENT,'Paid'),
-        (NONPAYMENT, 'Not Paid'),
+        (PAYMENT,'Pay Now'),
+        (NONPAYMENT, 'Pay Later'),
         (NOTAPPLICABLE, 'Not Applicable'),
         )
-    entry_category = models.CharField("Payment Status", choices=ENTRYCAT_CHOICES, max_length=2, )
+    entry_category = models.CharField("Cash Incentive Payment Status", choices=ENTRYCAT_CHOICES, max_length=2, )
     partial_payment_status = models.BooleanField("Partial Cash Incentive Payment?", default=False)
 
     def __str__(self):

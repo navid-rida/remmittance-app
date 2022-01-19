@@ -1,5 +1,7 @@
+#from django.forms.fields import InvalidJSONInput
 from .models import Remmit, ExchangeHouse, Branch, Receiver, Requestpay, Country,Booth, Claim, Encashment, Account
 from django.forms import ModelForm
+#from django.forms.models import formset_factory
 from django import forms
 from datetime import date, timedelta
 from django.utils import timezone
@@ -18,11 +20,11 @@ from crispy_forms.layout import Layout, Field, Submit #, Fieldset, ButtonHolder,
 from django.conf import settings
 
 class RemmitForm(ModelForm):
-    date_sending = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
+    date_sending = forms.DateField(label="Date of Sending Remittance from Abroad", widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
 
     class Meta:
         model = Remmit
-        fields = ('exchange','rem_country','reference','sender','sender_gender','amount', 'currency','relationship', 'purpose','date_sending','sender_occupation')
+        fields = ('exchange','rem_country','reference','sender','sender_gender','amount', 'currency','relationship', 'purpose','mariner_status','date_sending','sender_occupation', 'sender_bank', 'sender_bank_swift', 'account')
         widgets = {
             #'dob': forms.SelectDateWidget,
             #'cash_incentive_status': forms.RadioSelect,
@@ -32,6 +34,7 @@ class RemmitForm(ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+            self.request = kwargs.pop('request')
             super(RemmitForm, self).__init__(*args, **kwargs)
             self.fields['rem_country'].queryset = Country.objects.exclude(name="BANGLADESH")
 
@@ -83,6 +86,7 @@ class RemmitForm(ModelForm):
         receiver = cleaned_data.get("receiver")
         unpaid_cash_incentive_reason = cleaned_data.get("unpaid_cash_incentive_reason")
         #if 'cash_incentive_status' in form.changed_data:
+        
         if exchange.name == 'WESTERN UNION':
             try:
                 validate_western_code(reference)
@@ -143,6 +147,8 @@ class RemmitForm(ModelForm):
                 swift_re(reference)
             except ValidationError as err:
                 self.add_error('reference',err)
+            if not self.request.user.employee.branch.ad_fi_code:
+                self.add_error('exchange', "SWIFT remittance can only be disbursed though ad branches")
         else:
             self.add_error('reference',"The reference number does not match with any known third party remittance services ")
         #form.add_error('reference', err)
@@ -158,9 +164,9 @@ class RemittInfoForm(RemmitForm):
     NOTAPPLICABLE = 'NA'
     ENTRYCAT_CHOICES = (
         ('', '-----------'),
-        (PAYMENT,'Paid'),
-        (NONPAYMENT, 'Not Paid'),
-        (NOTAPPLICABLE, 'Not Applicable'),
+        (PAYMENT,'Pay Now'),
+        (NONPAYMENT, 'Pay Later'),
+        (NOTAPPLICABLE, 'Cash Incentive Not Applicable'),
         )
     entry_category = forms.ChoiceField(label='Cash Incentive Payment Status',choices=ENTRYCAT_CHOICES, required=True)
 
@@ -172,12 +178,16 @@ class RemittInfoForm(RemmitForm):
             'exchange',
             'rem_country',
             'reference',
+            'account',
             'sender',
             'sender_gender',
-            'amount',
+            'sender_bank',
+            'sender_bank_swift',
             'currency',
+            'amount',
             'relationship', 
             'purpose',
+            'mariner_status',
             Field('date_sending', css_class="date"),
             #'unpaid_cash_incentive_reason', 
             #'cash_incentive_status',
@@ -312,14 +322,22 @@ class AccountForm(ModelForm):
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
         return unpaid_cash_incentive_reason
+
+#AccountFormset = formset_factory(AccountForm)
+
 class ReceiverForm(ModelForm):
     dob = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="Date of Birth",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
     idissue = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="ID Issue Date",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'], required=False)
     idexpire = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}),label="ID Expiry date",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'], required=False)
+    number = forms.CharField(label="Account Number (15 Digit)", max_length=15, validators=[nrbc_acc], help_text = "As per F 59 of MT103 for remittance received through SWIFT", required=False)
+    title = forms.CharField(label="Account Title", max_length=100, required=False, )
+    branch = forms.ModelChoiceField(label='Account Branch', queryset=Branch.objects.all(),required=False)
+    booth = forms.ModelChoiceField(label='Account Sub-branch', queryset=Booth.objects.all(),required=False)
+    #accounts = AccountFormset()
 
     class Meta:
         model = Receiver
-        exclude = ['created_by']
+        exclude = ['created_by','ac_no']
         widgets = {
             #'dob': forms.SelectDateWidget,
             'address': forms.Textarea(attrs={'rows':4, 'cols':45}),
@@ -347,12 +365,17 @@ class ReceiverForm(ModelForm):
             Field('idissue', css_class="date"),
             Field('idexpire', css_class="date"),
             'idno',
+            'number',
+            'title',
+            'branch',
+            'booth',
             Submit('submit', 'CREATE')
         )
 
     def clean_idno(self):
         idno = self.cleaned_data['idno']
         idtype = self.cleaned_data['idtype']
+        #idissue = self.cleaned_data['idissue']
         if idtype == 'NID':
             if len(idno)<13:
                 validate_smart_nid(idno)
@@ -360,6 +383,7 @@ class ReceiverForm(ModelForm):
                 validate_old_nid(idno)
         elif idtype=='PASSPORT':
             validate_passport(idno)
+            
         elif idtype=='DL':
             validate_alpha_num(idno)
         else:
@@ -368,14 +392,30 @@ class ReceiverForm(ModelForm):
         # this method didn't change it.
         return idno
 
-    def clean_idissue(self):
+    """def clean_idexpire(self):
+        idexpire = self.cleaned_data['idexpire']
         idissue = self.cleaned_data['idissue']
+        idtype = self.cleaned_data['idtype']
+        #idtype = self.cleaned_data['idtype']
+        
+       
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return idexpire"""
+
+    """def clean_idissue(self):
+        idissue = self.cleaned_data['idissue']
+        idtype = self.cleaned_data['idtype']
         #idtype = self.cleaned_data['idtype']
         if idissue and idissue > timezone.localtime().date():
             raise ValidationError('ID Issue date cannot be a future date')
+        if idtype == 'PASSPORT' and idissue:
+            raise ValidationError('ID Issue date is mandatory for Passports')
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
-        return idissue
+        return idissue"""
+
+    
 
     def clean_father_name(self):
         father = self.cleaned_data["father_name"]
@@ -402,12 +442,36 @@ class ReceiverForm(ModelForm):
         father = cleaned_data.get("father_name")
         spouse = cleaned_data.get("spouse_name")
         gender = cleaned_data.get("gender")
+        number = cleaned_data.get("number")
+        branch = cleaned_data.get("branch")
+        booth = cleaned_data.get("booth")
+        idissue = cleaned_data.get("idissue")
+        idtype = cleaned_data.get("idtype")
+        idexpire = cleaned_data.get("idexpire")
+        br_prefix = number[0:4] if number else None
         #unpaid_cash_incentive_reason = cleaned_data.get("unpaid_cash_incentive_reason")
         #if 'cash_incentive_status' in form.changed_data:
+        if idissue and idissue > timezone.localtime().date():
+            raise ValidationError('ID Issue date cannot be a future date')
+        if idtype == 'PASSPORT' and not (idissue and idexpire):
+            raise ValidationError('ID Issue date/ Expiry Date is mandatory for Passports')
+        if idtype == 'PASSPORT' and idexpire > idissue + timezone.timedelta(days=10*365):
+            self.add_error('idexpire','Passport expiry period cannot be more than ten years')
         if gender=='F' and (father==None and spouse==None):
              raise forms.ValidationError(
                     "Either father name or husbands name is required"
                 )
+        if number and not (branch or booth):
+            self.add_error('number','Branch or booth cannot be left blank for accounts')
+        if booth:
+            if br_prefix!=booth.code:
+                self.add_error('number','Sub-branch prefix mismatch')
+            if booth.branch!=branch:
+                self.add_error('booth','Branch/Sub-branch mismatch')
+        else:
+            if br_prefix and br_prefix!=branch.code:
+                self.add_error('number','Branch prefix mismatch')
+        
 
 class ReceiverSearchForm(forms.Form):
     #cell = forms.CharField(label="Enter Customer's Cell No.", validators=[validate_mobile])

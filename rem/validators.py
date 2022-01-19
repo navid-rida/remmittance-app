@@ -100,7 +100,7 @@ passport_re = RegexValidator(
 )
 
 swift_re = RegexValidator(
-    _lazy_re_compile(r'^[a-zA-Z]+.{3,50}$'),
+    _lazy_re_compile(r'^[0-9a-zA-Z]+.{3,50}$'),
     message=_('Please enter a valid SWIFT code'),
     code='invalid',
 )
@@ -250,3 +250,4 @@ alpha = RegexValidator(r'^[a-zA-Z]*$', 'Only alphabets are allowed.')
 alpha_num = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only Alphabet and numeric characters are allowed.')
 western_union = RegexValidator(r'^[0-9]{10}$', 'Western union mtcn can contain only 10 digit numbers')
 nrbc_acc = RegexValidator(r'^(0|5)[0-9][0-7][0-9][2-3][0-9]{10}$', 'Please provide a valid NRBC account number')
+swift_bic = RegexValidator(r'^[0-9A-Z]{11}$', 'Please provide a valid SWIFT BIC')
