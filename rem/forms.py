@@ -24,7 +24,7 @@ class RemmitForm(ModelForm):
 
     class Meta:
         model = Remmit
-        fields = ('exchange','rem_country','reference','sender','sender_gender','amount', 'currency','relationship', 'purpose','mariner_status','date_sending','sender_occupation', 'sender_bank', 'sender_bank_swift', 'account')
+        fields = ('exchange','rem_country','reference','sender','sender_gender','amount', 'currency','relationship', 'purpose','mariner_status','date_sending','sender_occupation', 'account', 'sender_bank')
         widgets = {
             #'dob': forms.SelectDateWidget,
             #'cash_incentive_status': forms.RadioSelect,
@@ -37,6 +37,7 @@ class RemmitForm(ModelForm):
             self.request = kwargs.pop('request')
             super(RemmitForm, self).__init__(*args, **kwargs)
             self.fields['rem_country'].queryset = Country.objects.exclude(name="BANGLADESH")
+            self.fields['exchange'].queryset = ExchangeHouse.objects.exclude(name="MONEYGRAM")
 
     def clean_unpaid_cash_incentive_reason(self):
         unpaid_cash_incentive_reason = self.cleaned_data['unpaid_cash_incentive_reason']
@@ -168,7 +169,7 @@ class RemittInfoForm(RemmitForm):
         (NONPAYMENT, 'Pay Later'),
         (NOTAPPLICABLE, 'Cash Incentive Not Applicable'),
         )
-    entry_category = forms.ChoiceField(label='Cash Incentive Payment Status',choices=ENTRYCAT_CHOICES, required=True)
+    entry_category = forms.ChoiceField(label='Cash Incentive',choices=ENTRYCAT_CHOICES, required=True)
 
     def __init__(self, *args, **kwargs):
         super(RemittInfoForm, self).__init__(*args, **kwargs)
@@ -176,13 +177,12 @@ class RemittInfoForm(RemmitForm):
         #self.helper.render_unmentioned_fields= True
         self.helper.layout = Layout(
             'exchange',
+            'sender_bank',
             'rem_country',
             'reference',
             'account',
             'sender',
             'sender_gender',
-            'sender_bank',
-            'sender_bank_swift',
             'currency',
             'amount',
             'relationship', 
@@ -455,6 +455,8 @@ class ReceiverForm(ModelForm):
             raise ValidationError('ID Issue date cannot be a future date')
         if idtype == 'PASSPORT' and not (idissue and idexpire):
             raise ValidationError('ID Issue date/ Expiry Date is mandatory for Passports')
+        if idissue >= idexpire:
+            self.add_error('idexpire','ID Expiry Date cannot be on or before issue date')
         if idtype == 'PASSPORT' and idexpire > idissue + timezone.timedelta(days=10*365):
             self.add_error('idexpire','Passport expiry period cannot be more than ten years')
         if gender=='F' and (father==None and spouse==None):
@@ -494,6 +496,18 @@ class ReceiverChangeForm(forms.Form):
 class MultipleSearchForm(forms.Form):
     #cell = forms.CharField(label="Enter Customer's Cell No.", validators=[validate_mobile])
     keyword = forms.CharField(label="Enter reference number, name or phone no")
+
+    def __init__(self, *args, **kwargs):
+        super(MultipleSearchForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        #self.helper.render_unmentioned_fields= True
+        self.helper.layout = Layout(
+            Field('keyword', css_class="form-control form-control-dark w-100", type="text", placeholder="Search", aria_label="Search"),
+            #'unpaid_cash_incentive_reason', 
+            #'cash_incentive_status',
+            Submit('submit', 'CREATE')
+        )
+
 
 class SettlementForm(forms.Form):
     SETTLE_CHOICES= (('remittance','Remittance Settlement'),('cash_incentive','Cash Incentive Settlement'))
