@@ -788,6 +788,7 @@ class RemmitInfoUpdate(PermissionRequiredMixin, SuccessMessageMixin, UpdateView)
     def get_form_kwargs(self):
         kw = super(RemmitInfoUpdate, self).get_form_kwargs()
         kw['request'] = self.request # the trick!
+        kw['receiver'] = get_object_or_404(Receiver, pk=self.kwargs['pk'])
         return kw
 
     def get_initial(self):
