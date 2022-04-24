@@ -1,4 +1,4 @@
-from tkinter.tix import Tree
+#from tkinter.tix import Tree
 from django.db import models
 from decimal import Decimal
 from django.urls import reverse_lazy,reverse
