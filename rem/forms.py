@@ -1,5 +1,5 @@
 #from django.forms.fields import InvalidJSONInput
-from .models import Remmit, ExchangeHouse, Branch, Receiver, Requestpay, Country,Booth, Claim, Encashment, Account
+from .models import Foreignbank, Remmit, ExchangeHouse, Branch, Receiver, Requestpay, Country,Booth, Claim, Encashment, Account
 from django.forms import ModelForm
 #from django.forms.models import formset_factory
 from django import forms
@@ -25,19 +25,21 @@ class RemmitForm(ModelForm):
     class Meta:
         model = Remmit
         fields = ('exchange','rem_country','reference','sender','sender_gender','amount', 'currency','relationship', 'purpose','mariner_status','date_sending','sender_occupation', 'account', 'sender_bank')
-        widgets = {
+        #widgets = {
             #'dob': forms.SelectDateWidget,
             #'cash_incentive_status': forms.RadioSelect,
             #'dob': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
             #'idissue': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
             #'idexpire': forms.DateInput(format['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
-        }
+        #}
 
     def __init__(self, *args, **kwargs):
             self.request = kwargs.pop('request')
+            self.receiver = kwargs.pop('receiver')
             super(RemmitForm, self).__init__(*args, **kwargs)
             self.fields['rem_country'].queryset = Country.objects.exclude(name="BANGLADESH")
-            self.fields['exchange'].queryset = ExchangeHouse.objects.exclude(name="MONEYGRAM")
+            #self.fields['exchange'].queryset = ExchangeHouse.objects.exclude(name="MONEYGRAM")
+            self.fields['account'].queryset = self.receiver.account_set.all()
 
     def clean_unpaid_cash_incentive_reason(self):
         unpaid_cash_incentive_reason = self.cleaned_data['unpaid_cash_incentive_reason']
@@ -70,10 +72,10 @@ class RemmitForm(ModelForm):
         currency = self.cleaned_data['currency']
         exchange = self.cleaned_data['exchange']
         exchange_list = ['WESTERN UNION','XPRESS MONEY','RIA MONEY TRANSFER','PLACID EXPRESS','MONEYGRAM']
-        if (exchange.name in exchange_list) and (currency.name!='BANGLADESHI TAKA'):
+        if (exchange.name!='SWIFT' and exchange.name != 'CASH DEPOSIT') and (currency.name!='BANGLADESHI TAKA'):
             raise ValidationError('Only BDT can be selected for '+exchange.name )
-        if exchange.name=='SWIFT' and currency.name=='BANGLADESHI TAKA':
-            raise ValidationError('Only FC can be selected for '+exchange.name )
+        if (exchange.name=='SWIFT' or exchange.name == 'CASH DEPOSIT') and currency.name=='BANGLADESHI TAKA':
+            raise ValidationError('Only FC can be selected for '+ exchange.name )
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
         return currency
@@ -84,8 +86,8 @@ class RemmitForm(ModelForm):
         exchange = cleaned_data.get("exchange")
         reference = cleaned_data.get("reference")
         cash_incentive_status = cleaned_data.get("cash_incentive_status")
-        receiver = cleaned_data.get("receiver")
-        unpaid_cash_incentive_reason = cleaned_data.get("unpaid_cash_incentive_reason")
+        sender_bank = cleaned_data.get("sender_bank")
+        account = cleaned_data.get("account")
         #if 'cash_incentive_status' in form.changed_data:
         
         if exchange.name == 'WESTERN UNION':
@@ -148,10 +150,32 @@ class RemmitForm(ModelForm):
                 swift_re(reference)
             except ValidationError as err:
                 self.add_error('reference',err)
-            if not self.request.user.employee.branch.ad_fi_code:
-                self.add_error('exchange', "SWIFT remittance can only be disbursed though ad branches")
+            if not self.request.user.has_perm('rem.can_swift_cash_deposit_remit'):
+                self.add_error('exchange', "SWIFT remittance can only be disbursed though ad branch user")
+            if not sender_bank:
+                self.add_error('sender_bank', "You must select a sender's bank for SWIFT remittances")
+            if not account:
+                self.add_error('account', 'Benificiary account is mandatory for SWIFT remittances')
+
+        elif exchange.name == 'CASH DEPOSIT':
+            #if not receiver.ac_no:
+                #self.add_error("Receiver must have an NRCB account for receiving remittance through SWIFT")
+            if cash_incentive_status=='P' or cash_incentive_status=='U':
+                self.add_error('cash_incentive_status', "Cash Incentive is not applicable for cash deposits")
+            if not self.request.user.has_perm('rem.can_swift_cash_deposit_remit'):
+                self.add_error('exchange', "Cash deposit remittance can only be disbursed though ad branches")
+            if account:
+                try:
+                    nrbc_fc_acc(account.number)
+                except ValidationError as err:
+                    self.add_error('account',err)
+            else:
+                self.add_error('account', 'Benificiary account is mandatory for Cash deposit remittances')
+
         else:
             self.add_error('reference',"The reference number does not match with any known third party remittance services ")
+        if sender_bank and exchange.name!='SWIFT':
+            self.add_error('sender_bank',"Sender's bank is applicable only for SWIFT remittances")
         #form.add_error('reference', err)
 
         return cleaned_data
@@ -170,6 +194,7 @@ class RemittInfoForm(RemmitForm):
         (NOTAPPLICABLE, 'Cash Incentive Not Applicable'),
         )
     entry_category = forms.ChoiceField(label='Cash Incentive',choices=ENTRYCAT_CHOICES, required=True)
+    sender_bank = forms.ModelChoiceField(queryset=Foreignbank.objects.all(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(RemittInfoForm, self).__init__(*args, **kwargs)
@@ -214,6 +239,8 @@ class RemittInfoForm(RemmitForm):
             raise ValidationError('Validation error: A remittance cannot be marked unpaid once it is paid')
         if cash_incentive_status=='P' and exchange.name=='SWIFT':
             raise ValidationError('Cash Incentive against remittance received though SWIFT is not applicable before encashment in BDT')
+        if (cash_incentive_status=='P' or cash_incentive_status == 'U') and exchange.name=='CASH DEPOSIT':
+            raise ValidationError('Cash Incentive is not applicable in Cash deposit')
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
         return cash_incentive_status
@@ -324,6 +351,41 @@ class AccountForm(ModelForm):
         return unpaid_cash_incentive_reason
 
 #AccountFormset = formset_factory(AccountForm)
+
+class ForeignBankForm(ModelForm):
+    #date_sending = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
+
+    class Meta:
+        model = Foreignbank
+        fields = ('name','swift_bic', 'country')
+        #widgets = {
+            #'dob': forms.SelectDateWidget,
+            #'cash_incentive_status': forms.RadioSelect,
+            #'dob': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+            #'idissue': forms.DateInput(format = ['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+            #'idexpire': forms.DateInput(format['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d']),
+        #}
+
+    def __init__(self, *args, **kwargs):
+        super(ForeignBankForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        #self.helper.render_unmentioned_fields= True
+        self.helper.layout = Layout(
+            'name',
+            'swift_bic',
+            'country',
+            Submit('submit', 'Create')
+        )
+
+
+    """def clean_reason(self):
+        unpaid_cash_incentive_reason = self.cleaned_data['reason']
+        cashin_category  = self.cleaned_data['cashin_category'] if 'cashin_category' in self.cleaned_data else None
+        if cashin_category != 'P' and unpaid_cash_incentive_reason==None:
+            raise ValidationError('Reason is required if cash incentive status is unpaid')
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return unpaid_cash_incentive_reason"""
 
 class ReceiverForm(ModelForm):
     dob = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'dd/mm/yy'}), label="Date of Birth",input_formats=['%d/%m/%Y','%d-%m-%Y','%Y-%m-%d'])
