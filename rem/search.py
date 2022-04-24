@@ -19,7 +19,7 @@ def is_mobile_no(keyword):
 def remittance_search(word,q=None):
     result=q.none()
     if q:
-        if is_ref_no(word):
+        if not is_mobile_no(word):
             result = q.filter(reference=word)
         if is_mobile_no(word):
             result = result | q.filter(receiver__cell__contains=word)

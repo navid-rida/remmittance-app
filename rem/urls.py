@@ -52,4 +52,6 @@ urlpatterns = [
     path('encashment/mark_paid/<int:pk>/', views.pay_unpaid__encashment_incentive, name='pay_unpaid__encashment_incentive'),
     ############################## Account Related Views ############################################
     path('add/account/<int:pk>/', views.AccountCreate.as_view(), name='account-create'), # partial or full encashment of SWIFT and Cash remittance
+    ############################## Foreign Bank Related Views ############################################
+    path('add/fbank', views.ForeignbankCreate.as_view(), name='fbank-create'), # partial or full encashment of SWIFT and Cash remittance
 ]

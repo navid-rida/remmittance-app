@@ -1,9 +1,12 @@
 {% extends "rem/base.html" %}
 {% load widget_tweaks %}
 {% block title %} Add/ Select Receiver {% endblock %}
+{% block content_title %}
+    <h1>Submit Remittance Information</h1>
+{% endblock %}
 {% block content %}
 <br>
-<h4>Search Receiver</h4>
+
 <p>Please enter your receiver's Photo ID No. (NID, Passport, Birth Certificate)</p>
 <form method="post" class="form-inline">
     {% csrf_token %}

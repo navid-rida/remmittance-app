@@ -106,6 +106,28 @@
                 });
             }
         });
+        $('#selecctall_10').click(function(event) {
+            if (this.checked) {
+                $('.jqselect_10').each(function() { //loop through each checkbox
+                    $(this).prop('checked', true); //check
+                });
+            } else {
+                $('.jqselect_10').each(function() { //loop through each checkbox
+                    $(this).prop('checked', false); //uncheck
+                });
+            }
+        });
+        $('#selecctall_11').click(function(event) {
+            if (this.checked) {
+                $('.jqselect_11').each(function() { //loop through each checkbox
+                    $(this).prop('checked', true); //check
+                });
+            } else {
+                $('.jqselect_11').each(function() { //loop through each checkbox
+                    $(this).prop('checked', false); //uncheck
+                });
+            }
+        });
     });
 </script>
 

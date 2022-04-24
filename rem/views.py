@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 from django.shortcuts import render,redirect, get_object_or_404#, render_to_response
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-from .forms import ReceiverChangeForm, RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm, SettlementForm, MultipleSearchForm, ClaimForm, EncashmentForm, AccountForm
+from .forms import ReceiverChangeForm, RemmitForm, SearchForm, ReceiverSearchForm, ReceiverForm, PaymentForm, SignUpForm, RemittInfoForm, SettlementForm, MultipleSearchForm, ClaimForm, EncashmentForm, AccountForm, ForeignBankForm
 from django.contrib.auth.decorators import login_required,user_passes_test
-from .models import Remmit, Requestpay, Payment, Receiver,Employee, ReceiverUpdateHistory,RemittanceUpdateHistory, Branch, Booth, Claim, CashIncentive, Encashment, Account
+from .models import Remmit, Requestpay, Payment, Receiver,Employee, ReceiverUpdateHistory,RemittanceUpdateHistory, Branch, Booth, Claim, CashIncentive, Encashment, Account, Foreignbank
 from django.db.models import Sum, Count
 #import datetime
 from .DataModels import *
@@ -221,7 +221,7 @@ def select_rem_list(request):
             filt['requestpay__remittance__branch'] = form.cleaned_data['branch']
             filt['status'] = 'U'
             filter_args = {k:v for k,v in filt.items() if v is not None}
-            rem_list = Payment.objects.filter(**filter_args).order_by('requestpay__remittance__exchange','-dateresolved','requestpay__remittance__branch__code')
+            rem_list = Payment.objects.filter(**filter_args).exclude(requestpay__remittance__exchange__name__in=['SWIFT','CASH DEPOSIT']).order_by('requestpay__remittance__exchange','-dateresolved','requestpay__remittance__branch__code') 
             if rem_list:
                 #df = qset_to_df(rem_list)
                 #ids = list(df['id'][df.duplicated(['amount','branch_id','exchange_id'],keep=False)==True].values)
@@ -740,6 +740,7 @@ class RemmitInfoCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
     def get_form_kwargs(self):
         kw = super(RemmitInfoCreate, self).get_form_kwargs()
         kw['request'] = self.request # the trick!
+        kw['receiver'] = get_object_or_404(Receiver, pk=self.kwargs['pk'])
         return kw
 
     def form_valid(self, form):
@@ -836,7 +837,7 @@ def pay_unpaid__encashment_incentive(request, pk):
     result = e.pay_unpaid_cash_incentive()
     if result:
         #update = RemittanceUpdateHistory()
-        #update.remittance= result
+        #update.remittance= result.remittance
         #update.createdby = request.user
         #update.ip = get_client_ip(request)
         #update.save()
@@ -1173,10 +1174,10 @@ class EncashmentCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
     form_class = EncashmentForm
     template_name = 'rem/forms/encashment_form.html'
     success_message = "Encashment information was submitted successfully"
-    success_url = reverse_lazy('index')
+    #success_url = reverse_lazy('index')
 
-    """def get_success_url(self):
-        return reverse('add_req', kwargs={'pk': self.object.id})"""
+    def get_success_url(self):
+        return reverse('remitt-detail', kwargs={'pk': self.object.remittance.id})
 
 
     def get_form_kwargs(self):
@@ -1230,6 +1231,40 @@ class AccountCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
         form.instance.created_by = self.request.user
         receiver = get_object_or_404(Receiver, pk=self.kwargs['pk'])
         form.instance.receiver = receiver
+        #form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.02) if form.instance.cash_incentive_status=='P' else 0
+        self.object = form.save(commit=False)
+        # in case you want to modify the object before commit
+        """if self.object.remittance.get_encashment_room()<self.object.amount:
+            form.add_error('amount','Encashment limit exceeded')
+            return super().form_invalid(form)
+        if self.object.cashin_category=='P' and self.object.remittance.exchange.name=='SWIFT':
+            self.object.remittance.date_cash_incentive_paid=timezone.now()
+            self.object.remittance.cash_incentive_amount = self.object.amount*Decimal(0.02)
+        else:
+            self.object.cash_incentive_amount = 0"""
+        self.object.save()
+        return super().form_valid(form)
+
+
+
+##################################### Foreign Bank related views ####################################
+
+@method_decorator([login_required,transaction.atomic], name='dispatch')
+class ForeignbankCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
+    model = Foreignbank
+    permission_required = ['rem.add_remmit','rem.allow_if_transaction_hour']
+    form_class = ForeignBankForm
+    template_name = 'rem/forms/foreignbank_form.html'
+    success_message = "Foreign Bank Added Successfully"
+    success_url = reverse_lazy('index')
+
+    """def get_success_url(self):
+        return reverse('add_req', kwargs={'pk': self.object.id})"""
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        #receiver = get_object_or_404(Receiver, pk=self.kwargs['pk'])
+        #form.instance.receiver = receiver
         #form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.02) if form.instance.cash_incentive_status=='P' else 0
         self.object = form.save(commit=False)
         # in case you want to modify the object before commit

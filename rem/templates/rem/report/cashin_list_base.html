@@ -62,6 +62,72 @@
                 });
             }
         });
+        $('#selecctall_6').click(function(event) {
+            if (this.checked) {
+                $('.jqselect_6').each(function() { //loop through each checkbox
+                    $(this).prop('checked', true); //check
+                });
+            } else {
+                $('.jqselect_6').each(function() { //loop through each checkbox
+                    $(this).prop('checked', false); //uncheck
+                });
+            }
+        });
+        $('#selecctall_7').click(function(event) {
+            if (this.checked) {
+                $('.jqselect_7').each(function() { //loop through each checkbox
+                    $(this).prop('checked', true); //check
+                });
+            } else {
+                $('.jqselect_7').each(function() { //loop through each checkbox
+                    $(this).prop('checked', false); //uncheck
+                });
+            }
+        });
+        $('#selecctall_8').click(function(event) {
+            if (this.checked) {
+                $('.jqselect_8').each(function() { //loop through each checkbox
+                    $(this).prop('checked', true); //check
+                });
+            } else {
+                $('.jqselect_8').each(function() { //loop through each checkbox
+                    $(this).prop('checked', false); //uncheck
+                });
+            }
+        });
+        $('#selecctall_9').click(function(event) {
+            if (this.checked) {
+                $('.jqselect_9').each(function() { //loop through each checkbox
+                    $(this).prop('checked', true); //check
+                });
+            } else {
+                $('.jqselect_9').each(function() { //loop through each checkbox
+                    $(this).prop('checked', false); //uncheck
+                });
+            }
+        });
+        $('#selecctall_10').click(function(event) {
+            if (this.checked) {
+                $('.jqselect_10').each(function() { //loop through each checkbox
+                    $(this).prop('checked', true); //check
+                });
+            } else {
+                $('.jqselect_10').each(function() { //loop through each checkbox
+                    $(this).prop('checked', false); //uncheck
+                });
+            }
+        });
+        $('#selecctall_11').click(function(event) {
+            if (this.checked) {
+                $('.jqselect_11').each(function() { //loop through each checkbox
+                    $(this).prop('checked', true); //check
+                });
+            } else {
+                $('.jqselect_11').each(function() { //loop through each checkbox
+                    $(this).prop('checked', false); //uncheck
+                });
+            }
+        });
     });
 </script>
 
@@ -129,9 +195,9 @@
 
                 <th scope="col">Cash Incentive Settle Date</th>
 
-                <th scope="col">Posting Date</th>
+                <th scope="col">Cashincentive Payment Date</th>
 
-                <th scope="col">Request Posted By</th>
+                
                 <th scope="col">Action</th>
 
 
@@ -157,12 +223,12 @@
                 <td>{{entry.remittance.reference}}</td>
                 <td>{{entry.remittance.sender.title}}</td>
                 <td>{{entry.remittance.receiver.name.title}}</td>
-                <td>{{entry.remittance.amount|intcomma}}</td>
-                <td>{{entry.remittance.cash_incentive_amount|intcomma}} ({{entry.remittance.get_cash_incentive_status_display}})</td>
+                <td>{{entry.remittance.currency.short}} {{entry.remittance.amount|intcomma}}</td>
+                <td>{{entry.cash_incentive_amount|intcomma}} ({{entry.get_entry_category_display}})</td>
 
-                <td>{{entry.remittance.date_cash_incentive_settlement}}</td>
-                <td>{{entry.remittance.date_create|localtime}}</td>
-                <td>{{entry.created_by}} <br>Cell: {{entry.created_by.employee.cell}}</td>
+                <td>{{entry.date_cash_incentive_settlement}}</td>
+                <td>{{entry.date_cash_incentive_paid}}</td>
+                
 
                 <td><a class="btn btn-success btn-sm" href="{% url 'remitt-detail' entry.remittance.pk %}"><i class="fas fa-info-square"></i> Details</a></td>
             </tr>

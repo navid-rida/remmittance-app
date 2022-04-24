@@ -61,13 +61,15 @@
           <td>: {{ object.purpose }}</td>
         </tr>
         <tr>
-          <td>Cash Incentive Amount</td>
-          <td>: BDT {{ object.cash_incentive_amount|comma_seperated_bangla }}</td>
+          <td>Total Cash Incentive Amount</td>
+          <td>: BDT {{ object.get_total_paid_cash_incentive_sum|comma_seperated_bangla }} (Total {{object.get_paid_cash_incentives_number}} cash incentives)</td>
         </tr>
         <tr>
           <td>Cash Incentive Status</td>
           <td>
-            : {{ object.get_cash_incentive_status_display }}
+            : {% for item  in object.get_paid_cash_incentives %}
+                {{ item.get_entry_category_display}}
+              {%endfor%}
             {% if object.date_cash_incentive_settlement %}
             (Settled on: {{object.date_cash_incentive_settlement}})
             {% else %}
@@ -110,50 +112,47 @@
         </tr>
       </tbody>
     </table>
-
-    <h4>Cash Incentive Details</h4>
-    <table class="table table-hover table-sm">
-      <tbody>
-        <thead>
-          <th>Date</th>
-          <th>Amount</th>
-          <th>Action</th>
-        </thead>
-        {% for item in object.cashincentive_set.all %}
-    
-        <tr>
-       
-          <td>{{item.date_cash_incentive_paid}}</td>
-          <td>{{item.amount}}</td>
-          <td>
-            <a class="btn btn-primary" href="{% url 'pay_unpaid__encashment_incentive' item.pk %}"> Pay unpaind cash incentive </a>
-          </td>
-        </tr>
-      </tbody>
-      
-      {% endfor %}
-    </table>
-
+{% if object.exchange.name == 'SWIFT' %}
     <h4>Encashment Details</h4>
     <table class="table table-hover table-sm">
       <tbody>
         <thead>
           <th>Amount</th>
+          <th>Rate Applied</th>
+          <th>Encashment Amount (BDT)</th>
+          <th>Cash Incentive Amount</th>
+          <th>Account</th>
           <th>Action</th>
         </thead>
         {% for item in object.encashment_set.all %}
     
         <tr>
-       
-          <td>{{item.amount}}</td>
+          <td>{{item.remittance.currency.short}} {{item.amount}}</td>
+          <td>{{item.rate|floatformat:2}}</td>
+          <td>{{ item.encashment_amount_in_bdt|floatformat:2 }}</td>
+          <td>BDT {{ item.cashincentive.cash_incentive_amount }}
+            {% if item.check_cash_incnetive_payment_status == "P" %}
+              (Paid)
+            {% endif %}
+            {% if item.check_cash_incnetive_payment_status == "U" %}
+              (To be Paid)
+            {% endif %}
+            {% if item.check_cash_incnetive_payment_status == "NA" %}
+              (Not Applicable)
+            {% endif %}
+          </td>
+          <td>{{ item.account}}</td>
           <td>
-            <a class="btn btn-primary" href="{% url 'pay_unpaid__encashment_incentive' item.pk %}"> Pay unpaind cash incentive </a>
+            {% if item.check_cash_incnetive_payment_status == "U" %}
+            <a class="btn btn-primary" href="{% url 'pay_unpaid__encashment_incentive' item.pk %}"> Pay unpaid cash incentive </a>
+            {% endif %}
           </td>
         </tr>
       </tbody>
       
       {% endfor %}
     </table>
+  {% endif %}
   </div>
 </div>
 

@@ -1,5 +1,7 @@
+from tkinter.tix import Tree
 from django.db import models
 from decimal import Decimal
+from django.urls import reverse_lazy,reverse
 #from datetime import date
 from django.core.exceptions import ValidationError
 from django.db.models.fields.related import ForeignKey
@@ -7,6 +9,7 @@ from .validators import validate_expire_date, validate_neg, validate_post_date, 
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 import datetime
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -28,10 +31,11 @@ from schedules.models import District, Currency, Bank
 ######################### Custom Managers ###############################
 # Create your models here.
 
+
 class Branch(models.Model):
     name = models.CharField("Name of The branch", max_length=20,default='Principal')
     code = models.CharField("Branch Code", validators=[numeric], max_length=4,default='0101', unique=True)
-    ad_fi_code = models.CharField("AD Code", validators=[numeric], max_length=4, null=True, blank=True, unique=True)
+    ad_fi_code = models.CharField("AD FI Code", validators=[numeric], max_length=4, null=True, blank=True, unique=True)
     district = models.ForeignKey(District, on_delete=models.CASCADE, verbose_name='District', null=True)
     address = models.TextField("Address of the branch")
 
@@ -118,6 +122,17 @@ class Country(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Foreignbank(models.Model):
+    name = models.CharField('Name of the FI', max_length=60, unique=True, help_text='Ordering Institution: F52A for remittance through SWIFT')
+    swift_bic = models.CharField('SWIFT BIC', max_length=11, unique=True, validators=[swift_bic,], help_text='Ordering Institution\'s SWIFT BIC: F52A for remittance through SWIFT')
+    country = models.ForeignKey(Country, on_delete=models.PROTECT, verbose_name='Country of the Bank')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_create = models.DateTimeField("Date of Creation", auto_now_add=True)
+
+    def __str__(self):
+        return self.name+" "+self.swift_bic
 
 
 class Employee(models.Model):
@@ -339,9 +354,12 @@ class ExchangeHouse(models.Model):
     def __str__(self):
         return self.name
 
+fbank_url = reverse_lazy('fbank-create')
 
 class Remmit(models.Model):
     exchange = models.ForeignKey(ExchangeHouse,on_delete=models.CASCADE, verbose_name='Channel of Remittance')
+    #ordering_bank_name = models.CharField('F50K: Name of Ordering Institution', max_length=60, null=True,)
+    #ordering_bank_swift = models.CharField('F50K: SWIFT BIC of Ordering Institution', max_length=11, null=True,)
     currency = models.ForeignKey(Currency,on_delete=models.CASCADE, verbose_name='Currency of Remittance', default=Currency.objects.get(name='BANGLADESHI TAKA').id)
     rem_country = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Remitting Country')
     sender = models.CharField("Name of Remitter", validators=[name], max_length=50)
@@ -380,6 +398,7 @@ class Remmit(models.Model):
         ('EM', 'Employee'),
         ('ER', 'Employer'),
         ('AC','Acquaintance'),
+        ('SL','Self'),
     )
 
     relationship = models.CharField("Benificiary\'s relationship to Sender", max_length=50, null=True, choices = RELATIONSHIP_CHOICES)
@@ -411,8 +430,9 @@ class Remmit(models.Model):
     date_edited = models.DateTimeField("Date of last modified", auto_now=True)
     reference = models.CharField("Referene No./PIN/MTCN", help_text='Referene No./PIN/MTCN/ For SWIFT - Sender\'s reference: F20A', max_length=16, unique=True)
     screenshot = models.ImageField("Agent Copy", default = 'images/None/no-img.jpg')
-    sender_bank = models.CharField("Sender's Bank/ Ordering Institution", max_length=100, null=True, blank=True, help_text='Ordering Institution: F52A for remittance through SWIFT')
-    sender_bank_swift = models.CharField("Sender's Bank's/ Ordering Institution's SWIFT BIC", max_length=11, validators=[swift_bic,], null=True, blank=True, help_text='Ordering Institution\'s SWIFT BIC: F52A for remittance through SWIFT')
+    sender_bank = models.ForeignKey(Foreignbank, on_delete=models.CASCADE, verbose_name="Sender's Bank/ Ordering Institution", help_text="Ordering Institution: F52A for remittance through SWIFT. If not listed, you can add foreign bank", null=True)
+    #sender_bank = models.ForeignKey(Bank, on_delete=models.CASCADE, verbose_name="Sender's Bank/ Ordering Institution", null=True, blank=True, help_text='Ordering Institution: F52A for remittance through SWIFT')
+    #sender_bank_swift = models.CharField("Sender's Bank's/ Ordering Institution's SWIFT BIC", max_length=11, validators=[swift_bic,], null=True, blank=True, help_text='Ordering Institution\'s SWIFT BIC: F52A for remittance through SWIFT')
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
     edited_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, related_name='editors')
     #REVIEW= 'RV'
@@ -460,7 +480,7 @@ class Remmit(models.Model):
             return room
         else:
             return 0
-
+    ##################################################
     def clean(self):
         if self.cash_incentive_status=='U' and self.date_cash_incentive_paid is not None:
             raise ValidationError({'cash_incentive_status': _('A remittance cannot be marked unpaid once it is paid')})
@@ -498,6 +518,9 @@ class Remmit(models.Model):
 
     def get_paid_cash_incentives(self):
         return self.cashincentive_set.filter(entry_category='P')
+    
+    def get_paid_cash_incentives_number(self):
+        return self.cashincentive_set.filter(entry_category='P').count()
 
 
     def pay_previously_unpaid_cash_incentive(self):
@@ -556,7 +579,7 @@ class Remmit(models.Model):
 
     def get_total_paid_cash_incentive_sum(self):
         ###Returns the sum of all paid cash incentives
-        q = self.get_paid_cash_incentives(self)
+        q = self.get_paid_cash_incentives()
         total = 0
         for e in q:
             total = total + e.cash_incentive_amount
@@ -566,6 +589,12 @@ class Remmit(models.Model):
         self.receiver = new_receiver
         self.save()
         return self
+
+    def is_thirdparty_remittance(self):
+        # returns true if the remittance is from third party exchange house
+        return self.exchange.name != 'SWIFT' and self.exchange.name != 'CASH DEPOSIT'
+    
+    
 
 class RemittanceUpdateHistory(models.Model):
     remittance=models.ForeignKey(Remmit, on_delete=models.CASCADE, verbose_name= "Remittance Entry")
@@ -579,8 +608,8 @@ class RemittanceUpdateHistory(models.Model):
     
 class Encashment(models.Model):
     remittance = models.ForeignKey(Remmit, on_delete=models.CASCADE,)
-    amount = models.DecimalField("Amount of Encashment",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Something ")
-    rate = models.DecimalField("Rate of Encashment",max_digits=8, decimal_places=4, validators=[validate_neg], help_text="Something ")
+    amount = models.DecimalField("Amount of Encashment in FC",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Something ")
+    rate = models.DecimalField("Rate of Encashment to BDT",max_digits=8, decimal_places=4, validators=[validate_neg], help_text="Something ")
     PAYMENT= 'P'
     NONPAYMENT = 'U'
     NOTAPPLICABLE = 'NA'
@@ -605,21 +634,38 @@ class Encashment(models.Model):
             #raise ValidationError({'amount': _('Encashment limit exceeded')})
     
     def calculate_cash_incentive(self):
-        return self.amount*Decimal(0.025)
+        return self.amount*self.rate*Decimal(0.025)
+
+    def check_cash_incnetive_payment_status(self):
+        #Returns true if cash incentive is paid
+        if self.cashincentive.entry_category == 'P' and self.cashin_category=='P':
+            return "P"
+        elif self.cashincentive.entry_category == 'NA' or self.cashin_category=='NA':
+            return "NA"
+        else:
+            return "U"
 
     def pay_unpaid_cash_incentive(self):
-        q = CashIncentive.objects.filter(encashment=self, entry_category='P').exists()
-        if self.cashin_category=='U' and (not q):
-            ci = CashIncentive.objects.create(remittance = self.remittance, encashment=self, cash_incentive_amount= self.calculate_cash_incentive(), date_cash_incentive_paid=timezone.now(), entry_category=self.cashin_category)
-            return ci
+        #q = CashIncentive.objects.filter(encashment=self, entry_category='P').exists()
+        if self.check_cash_incnetive_payment_status() == "U":
+            self.cashincentive.cash_incentive_amount= self.calculate_cash_incentive()
+            self.cashincentive.date_cash_incentive_paid=timezone.now()
+            self.cashincentive.entry_category='P'
+            self.cashin_category='P'
+            self.save()
+            self.cashincentive.save()
+            return self
         else:
             return False
+
+    def encashment_amount_in_bdt(self):
+        return self.amount*self.rate
 
 
 
 class CashIncentive(models.Model):
     remittance = models.ForeignKey(Remmit, on_delete=models.CASCADE,)
-    encashment = models.ForeignKey(Encashment, on_delete=models.CASCADE, null=True, blank=True)
+    encashment = models.OneToOneField(Encashment, on_delete=models.CASCADE, null=True, blank=True)
     cash_incentive_amount = models.DecimalField("Amount of Cash Incentive",max_digits=20,decimal_places=2, validators=[validate_neg])
     date_cash_incentive_paid = models.DateTimeField("Date of Cash Incentive payment", null=True, blank= True)
     date_cash_incentive_settlement = models.DateField("Date of Cash Incentive Settlement", null=True, blank= True)
@@ -637,6 +683,14 @@ class CashIncentive(models.Model):
 
     def __str__(self):
         return self.remittance.reference +" "+ self.entry_category + " Encashment ID: "+ (str(self.encashment.id) if self.encashment else " No Encashment")
+
+    def get_entry_category_display(self):
+        if self.entry_category=='P':
+            return "Paid"
+        if self.entry_category=='U':
+            return "Unpaid"
+        if self.entry_category=='NA':
+            return "Not Applicable"
 
     def check_if_paid(self):
         if self.entry_category=='P':
@@ -777,7 +831,7 @@ class Payment(models.Model):
 
     def settle_remittance(self,user):
         """Checks and settles a Payment and return the payment object. returns false if already settled"""
-        if not self.is_settled():
+        if not self.is_settled() and self.requestpay.remittance.is_thirdparty_remittance():
             self.status = 'S'
             self.date_settle = timezone.now()
             self.settled_by=user
