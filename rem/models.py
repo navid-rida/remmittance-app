@@ -430,7 +430,7 @@ class Remmit(models.Model):
     date_edited = models.DateTimeField("Date of last modified", auto_now=True)
     reference = models.CharField("Referene No./PIN/MTCN", help_text='Referene No./PIN/MTCN/ For SWIFT - Sender\'s reference: F20A', max_length=16, unique=True)
     screenshot = models.ImageField("Agent Copy", default = 'images/None/no-img.jpg')
-    sender_bank = models.ForeignKey(Foreignbank, on_delete=models.CASCADE, verbose_name="Sender's Bank/ Ordering Institution", help_text="Ordering Institution: F52A for remittance through SWIFT. If not listed, you can add foreign bank", null=True)
+    sender_bank = models.ForeignKey(Foreignbank, on_delete=models.CASCADE, verbose_name="Sender's Bank/ Ordering Institution", help_text="Ordering Institution: F52A for remittance through SWIFT. If not listed, you can add foreign bank", null=True, blank=True)
     #sender_bank = models.ForeignKey(Bank, on_delete=models.CASCADE, verbose_name="Sender's Bank/ Ordering Institution", null=True, blank=True, help_text='Ordering Institution: F52A for remittance through SWIFT')
     #sender_bank_swift = models.CharField("Sender's Bank's/ Ordering Institution's SWIFT BIC", max_length=11, validators=[swift_bic,], null=True, blank=True, help_text='Ordering Institution\'s SWIFT BIC: F52A for remittance through SWIFT')
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
