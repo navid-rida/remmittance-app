@@ -14,6 +14,14 @@ def create_cash_incentive(sender, instance, created, **kwargs):
             CashIncentive.objects.create(remittance = instance, cash_incentive_amount= 0, entry_category=instance._entry_cat, unpaid_cash_incentive_reason=instance._reason_a)
         else:
             pass
+    else:
+        if instance.cash_incentive_status=='P' and instance.is_thirdparty_remittance():
+            if not instance.cashincentive_set.filter(entry_category='P').exists():
+                CashIncentive.objects.create(remittance = instance, cash_incentive_amount= instance.calculate_cash_incentive(), date_cash_incentive_paid=timezone.now(), entry_category=instance.cash_incentive_status )
+            else:
+                raise Exception("Cash incentive already exists")
+
+
     """else:
         #This section should be removed after implementing seperate Cash Incentive Table
         if instance._entry_cat and instance._entry_cat=='P' and (not instance.check_if_cash_incentive_paid()):
