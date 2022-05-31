@@ -24,6 +24,7 @@
           <td>Exchange House</td>
           <td>: {{ object.exchange }}</td>
         </tr>
+        
         <tr>
           <td>Date and time</td>
           <td>: {{ object.date_create|date:'d/m/Y P' }}</td>
@@ -105,6 +106,10 @@
         <tr>
           <td>Benificiary Name</td>
           <td>: <b><a href="{% url 'receiver-profile' object.receiver.pk %}"> {{ object.receiver.name }}</a></b></td>
+        </tr>
+        <tr class="table-info">
+          <td>Mariner Status</td>
+          <td>: {{ object.mariner_status }}</td>
         </tr>
         <tr>
           <td>Value</td>

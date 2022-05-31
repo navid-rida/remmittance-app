@@ -105,6 +105,13 @@ swift_re = RegexValidator(
     code='invalid',
 )
 
+
+cash_deposit_reference_re = RegexValidator(
+    _lazy_re_compile(r'^C(0|5)[0-9][0-8][0-9]-20[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}$'),
+    message=_('Please enter a valid cash deposit remittance reference'),
+    code='invalid_cdr',
+)
+
 def validate_neg(value):
     if value < 0:
         raise ValidationError(

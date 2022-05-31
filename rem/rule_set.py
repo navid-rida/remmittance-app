@@ -20,7 +20,7 @@ def is_same_branch_as_creator(user,receiver):
     return receiver.created_by.employee.branch == user.employee.branch
 
 @rules.predicate
-def is_ad_branch_user(user):
+def is_ad_branch_user(user, remittance):
     return user.employee.branch.ad_fi_code
 
 @rules.predicate
@@ -63,6 +63,7 @@ def is_same_domain_user(user,request):
 
 rules.add_perm('rem.change_remmit', is_entry_creator & is_same_branch_user)
 rules.add_perm('rem.add_remmit', is_branch_remittance_user | is_booth_remittance_user | (is_branch_fx_user & is_ad_branch_user))
+rules.add_perm('rem.add_third_party_remmit', is_branch_remittance_user | is_booth_remittance_user)
 rules.add_perm('rem.view_branch_remitt', is_branch_report_observer_user)
 rules.add_perm('rem.view_trm_form', ((is_branch_remittance_user & is_same_branch_user)| (is_booth_remittance_user & is_same_booth_user) | is_ho_report_user | rules.is_superuser) & is_thirdparty_exchange_house)
 rules.add_perm('rem.view_booth_remitt', is_booth_report_observer_user)
@@ -94,4 +95,10 @@ rules.add_perm('rem.can_encash', ~is_thirdparty_exchange_house)
 
 #-------------------------- SWIFt and Cash deposrit------------------------------------
 
-rules.add_perm('rem.can_swift_cash_deposit_remit', is_ad_branch_user & is_branch_fx_user)
+rules.add_perm('rem.can_add_swift_cash_deposit_remit', is_branch_fx_user & is_ad_branch_user)
+
+#-------------------------- Branch Operations------------------------------------
+rules.add_perm('rem.can_view_branch_options', is_branch_remittance_user | is_booth_remittance_user | (is_branch_fx_user & is_ad_branch_user))
+
+#-------------------------- HO Operations------------------------------------
+rules.add_perm('rem.can_view_ho_options',is_ho_report_user | is_ho_settlement_user)

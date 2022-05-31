@@ -163,7 +163,7 @@ def make_cash_incentive_df(list,category,columns,cis):
             #br_name.append("Head Office")
         #br_name.append(pay.requestpay.remittance.branch.name)
         type.append(dr_cr)
-        amount.append(ci.remittance.cash_incentive_amount)
+        amount.append(ci.cash_incentive_amount)
 
         if dr_cr == 'C':
             br_sub_br = ci.remittance.booth.code if ci.remittance.booth else ci.remittance.branch.code

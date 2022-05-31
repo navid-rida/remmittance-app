@@ -101,6 +101,7 @@
                 <th scope="col">Cash Incentive Amount</th>
                 <th scope="col">Cash Incentive Status</th>
                 <th scope="col">Cash Incentive Settlement Date</th>
+                <th scope="col">Mariner Status</th>
                 <th scope="col">Posted By</th>
             </tr>
         </thead>
@@ -119,7 +120,8 @@
                 <td>{{entry.cash_incentive_amount|comma_seperated_bangla}}</td>
                 <td>{{entry.get_cash_incentive_status_display}}</td>
                 <td>{{entry.date_cash_incentive_settlement}}</td>
-                <td>{{entry.created_by}}</td>
+                <td>{{entry.mariner_status}}</td>
+                <td>{{entry.created_by}} <br> On {{entry.date_create}}</td>
                 {% block button %}
 
                 {% endblock %}

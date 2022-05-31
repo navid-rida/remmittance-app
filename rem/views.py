@@ -140,7 +140,9 @@ def show_rem(request):
                  'sender','sender_occupation','relationship','purpose','cash_incentive_status', \
                  'unpaid_cash_incentive_reason','receiver__name','receiver__idno', \
                  'amount','cash_incentive_amount','date_sending','date_cash_incentive_paid', \
-                 'date_cash_incentive_settlement','date_create','reference','created_by')))
+                 'date_cash_incentive_settlement','date_create','reference','mariner_status','created_by')))
+                df['date_create'] = df['date_create'].dt.tz_convert('Asia/Dhaka').dt.tz_localize(None)
+                df['date_cash_incentive_paid'] = df['date_cash_incentive_paid'].dt.tz_convert('Asia/Dhaka').dt.tz_localize(None)
                 xlsx_data = excel_output(df)
                 response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
                 time = str(timezone.now().date())
@@ -251,7 +253,7 @@ def select_cash_incentive_list(request):
             filt['entry_category'] = 'P'
             filt['date_cash_incentive_settlement__isnull'] = True
             filter_args = {k:v for k,v in filt.items() if v is not None}
-            rem_list = CashIncentive.objects.filter(**filter_args).order_by('remittance__exchange','-date_cash_incentive_paid','remittance__branch__code')
+            rem_list = CashIncentive.objects.filter(**filter_args).exclude(remittance__exchange__name='CASH DEPOSIT').order_by('remittance__exchange','-date_cash_incentive_paid','remittance__branch__code',)
             if rem_list:
                 #df = qset_to_df(rem_list)
                 #ids = list(df['id'][df.duplicated(['amount','branch_id','exchange_id'],keep=False)==True].values)
@@ -1077,9 +1079,9 @@ def monthly_cash_incentive_bb_statement(request):
         if form.is_valid():
             date_from = form.cleaned_data['date_from']
             date_to = form.cleaned_data['date_to']
-            query_set = Remmit.objects.all()
+            query_set = CashIncentive.objects.all()
             #q = filter_remittance(query_set, start_date=date_from, end_date= date_to, cash_incentive_status='P', cash_incentive_settlement_done=True)
-            q = query_set.filter(date_cash_incentive_settlement__range=(date_from,date_to),cash_incentive_status='P',date_cash_incentive_settlement__isnull=False)
+            q = query_set.filter(date_cash_incentive_settlement__range=(date_from,date_to),entry_category='P',date_cash_incentive_settlement__isnull=False)
             statement = cash_incentive_bb_statement(qset=q)
             if '_show' in request.POST:
                 context = {'form':form, 'df': statement, }
@@ -1110,7 +1112,7 @@ def daily_remittance_bb_statement(request):
         if form.is_valid():
             date_from = form.cleaned_data['date_from']
             date_to = form.cleaned_data['date_to']
-            query_set = Payment.objects.all()
+            query_set = Payment.objects.exclude(requestpay__remittance__mariner_status=True)
             if date_from and date_to:
                 query_set = query_set.filter(dateresolved__date__range=(date_from,date_to))
             #q = filter_remittance(query_set,start_date=date_from, end_date= date_to)
@@ -1253,7 +1255,7 @@ class AccountCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
 @method_decorator([login_required,transaction.atomic], name='dispatch')
 class ForeignbankCreate(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
     model = Foreignbank
-    permission_required = ['rem.add_remmit','rem.allow_if_transaction_hour']
+    permission_required = ['rem.can_add_swift_cash_deposit_remit','rem.allow_if_transaction_hour']
     form_class = ForeignBankForm
     template_name = 'rem/forms/foreignbank_form.html'
     success_message = "Foreign Bank Added Successfully"

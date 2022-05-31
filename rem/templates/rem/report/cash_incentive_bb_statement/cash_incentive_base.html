@@ -45,33 +45,14 @@
   </div>
   <div class='form-row'>
     <div class="col-auto">
+      <button type="submit" class="btn btn-primary btn-sm mb-2 element_margin" value="Show" name="_show">Show</button>
+    </div>
+    <div class="col-auto">
       <button type="submit" class="btn btn-primary btn-sm mb-2 element_margin" value="Download" name="_download">Download</button>
     </div>
   </div>
 </form>
 </br>
-{{ test }}
-{%if df %}
-<table class="table table-hover table-sm">
-  <thead>
-    <tr>
-      <th scope="col">Branch Code</th>
-      <th scope="col">Branch Name</th>
-      <th scope="col">Number of Remittance</th>
-      <th scope="col">Amount of Remittance</th>
-    </tr>
-  </thead>
-  <tbody>
-{% for value in df %}
-    <tr>
-      <td>{{value.code}}</td>
-      <td>{{value.name}}</td>
-      <td>{{value.count}}</td>
-      <td>{{value.sum}}</td>
-    </tr>
-{% endfor%}
-</tbody>
-</table>
-{%endif%}
+{{ df.to_html|safe}}
 {% block error %}{% endblock %}
 {% endblock %}

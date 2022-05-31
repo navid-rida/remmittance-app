@@ -88,6 +88,9 @@ class RemmitForm(ModelForm):
         cash_incentive_status = cleaned_data.get("cash_incentive_status")
         sender_bank = cleaned_data.get("sender_bank")
         account = cleaned_data.get("account")
+        rem_country = cleaned_data.get("rem_country")
+        mariner_status = cleaned_data.get("mariner_status")
+        
         #if 'cash_incentive_status' in form.changed_data:
         
         if exchange.name == 'WESTERN UNION':
@@ -150,20 +153,26 @@ class RemmitForm(ModelForm):
                 swift_re(reference)
             except ValidationError as err:
                 self.add_error('reference',err)
-            if not self.request.user.has_perm('rem.can_swift_cash_deposit_remit'):
-                self.add_error('exchange', "SWIFT remittance can only be disbursed though ad branch user")
+            #if not self.request.user.has_perm('rem.can_add_swift_cash_deposit_remit'):
+                #self.add_error('exchange', "SWIFT remittance can only be disbursed though ad branch user")
             if not sender_bank:
-                self.add_error('sender_bank', "You must select a sender's bank for SWIFT remittances")
+                self.add_error('sender_bank', "You must select a sender's Bank for SWIFT remittances")
             if not account:
                 self.add_error('account', 'Benificiary account is mandatory for SWIFT remittances')
+            if (sender_bank and rem_country) and sender_bank.country != rem_country:
+                self.add_error('sender_bank', "\"Remittiting Country\" and \"Country of Sender's Bank\" mismatch")
 
         elif exchange.name == 'CASH DEPOSIT':
             #if not receiver.ac_no:
                 #self.add_error("Receiver must have an NRCB account for receiving remittance through SWIFT")
+            try:
+                cash_deposit_reference_re(reference)
+            except ValidationError as err:
+                self.add_error('reference',err)
             if cash_incentive_status=='P' or cash_incentive_status=='U':
                 self.add_error('cash_incentive_status', "Cash Incentive is not applicable for cash deposits")
-            if not self.request.user.has_perm('rem.can_swift_cash_deposit_remit'):
-                self.add_error('exchange', "Cash deposit remittance can only be disbursed though ad branches")
+            #if not self.request.user.has_perm('rem.can_add_swift_cash_deposit_remit'):
+                #self.add_error('exchange', "Cash deposit remittance can only be disbursed though ad branches")
             if account:
                 try:
                     nrbc_fc_acc(account.number)
@@ -175,7 +184,13 @@ class RemmitForm(ModelForm):
         else:
             self.add_error('reference',"The reference number does not match with any known third party remittance services ")
         if sender_bank and exchange.name!='SWIFT':
-            self.add_error('sender_bank',"Sender's bank is applicable only for SWIFT remittances")
+            self.add_error('sender_bank',"Sender's Bank is applicable only for SWIFT remittances")
+        if mariner_status == True and exchange.name!='SWIFT':
+            self.add_error('mariner_status',"Mariner remittance is applicable only for SWIFT remittances")
+        if exchange.name!='SWIFT' and exchange.name!='CASH DEPOSIT' and not self.request.user.has_perm('rem.add_third_party_remmit'):
+            self.add_error('exchange', 'You do not have permissions to add third party exchange house remittance')
+        if (exchange.name =='SWIFT' or exchange.name =='CASH DEPOSIT') and not self.request.user.has_perm('rem.can_add_swift_cash_deposit_remit'):
+            self.add_error('exchange', 'You do not have permissions to add swift remittance')
         #form.add_error('reference', err)
 
         return cleaned_data
@@ -183,7 +198,7 @@ class RemmitForm(ModelForm):
 
 class RemittInfoForm(RemmitForm):
     screenshot = forms.ImageField(required=settings.IMAGE_UPLOAD_REQUIRED)
-    reason_a = forms.CharField(label='Reason for not paying cash incentive', required=False)
+    reason_a = forms.CharField(label='Reason for not paying cash incentive', required=False, )
     PAYMENT= 'P'
     NONPAYMENT = 'U'
     NOTAPPLICABLE = 'NA'
@@ -194,7 +209,7 @@ class RemittInfoForm(RemmitForm):
         (NOTAPPLICABLE, 'Cash Incentive Not Applicable'),
         )
     entry_category = forms.ChoiceField(label='Cash Incentive',choices=ENTRYCAT_CHOICES, required=True)
-    sender_bank = forms.ModelChoiceField(queryset=Foreignbank.objects.all(), required=False)
+    sender_bank = forms.ModelChoiceField(queryset=Foreignbank.objects.all(), required=False, label="Sender's Bank/ Ordering Institution", help_text="Ordering Institution: F52A for remittance through SWIFT. If not listed, you can add foreign bank")
 
     def __init__(self, *args, **kwargs):
         super(RemittInfoForm, self).__init__(*args, **kwargs)

@@ -1,4 +1,5 @@
 #from tkinter.tix import Tree
+from locale import currency
 from django.db import models
 from decimal import Decimal
 from django.urls import reverse_lazy,reverse
@@ -26,7 +27,7 @@ import rem.rule_set
 import rules
 from rules.contrib.models import RulesModel
 ################################### Other app models ##################
-from schedules.models import District, Currency, Bank
+from schedules.models import District, Currency, Bank, Rate
 
 ######################### Custom Managers ###############################
 # Create your models here.
@@ -223,7 +224,7 @@ class Receiver(models.Model):
         )
     gender=models.CharField("Gender of Receiver",max_length=1, choices=GENDER_CHOICES)
     father_name = models.CharField("Father's name of Receiver", max_length=100, null=True, blank=True)
-    mother_name = models.CharField("Mother's of Receiver", max_length=100)
+    mother_name = models.CharField("Mother's Name of Receiver", max_length=100)
     spouse_name = models.CharField("Spouse name",  max_length=100, null=True, blank=True)
     SERVICE= 'S'
     BUSINESS = 'B'
@@ -428,7 +429,7 @@ class Remmit(models.Model):
     date_cash_incentive_settlement = models.DateField("Date of Cash Incentive Settlement", null=True, blank= True)
     date_create = models.DateTimeField("Date of posting", auto_now_add=True)
     date_edited = models.DateTimeField("Date of last modified", auto_now=True)
-    reference = models.CharField("Referene No./PIN/MTCN", help_text='Referene No./PIN/MTCN/ For SWIFT - Sender\'s reference: F20A', max_length=16, unique=True)
+    reference = models.CharField("Referene No./PIN/MTCN", help_text='Referene No./PIN/MTCN/ For SWIFT - Sender\'s reference: F20A, <br> For Cash FC Deposit Remittance: C[BRANCH CODE]-YYYY-MM-DD-[Serial No (2 Digit)] e.g. C0101-2022-16-05-01', max_length=20, unique=True)
     screenshot = models.ImageField("Agent Copy", default = 'images/None/no-img.jpg')
     sender_bank = models.ForeignKey(Foreignbank, on_delete=models.CASCADE, verbose_name="Sender's Bank/ Ordering Institution", help_text="Ordering Institution: F52A for remittance through SWIFT. If not listed, you can add foreign bank", null=True, blank=True)
     #sender_bank = models.ForeignKey(Bank, on_delete=models.CASCADE, verbose_name="Sender's Bank/ Ordering Institution", null=True, blank=True, help_text='Ordering Institution: F52A for remittance through SWIFT')
@@ -572,10 +573,30 @@ class Remmit(models.Model):
 
     def get_ci_trn_type(self):
         #returns cash incentive transaction type for RIT
-        return "CASH-PICKUP(OTC)"
+        if self.is_thirdparty_remittance():
+            return "SUBAGENT_CASHPICKUP"
+        elif self.exchange.name=='SWIFT':
+            return "OWN BANK ACC CREDIT"
+        return None
 
-    def get_exchange_rate(self):
-        return self.currency.get_latest_rate(self.date_create)
+    """def get_exchange_rate(self, type = 'TTC'):
+        if Rate.objects.get(currency=self.currency, rate_type=type, date = self.date_create.date).exists():
+            rate = Rate.objects.get(currency=self.currency, rate_type=type, date = self.date_create.date)
+            return rate
+        else:
+            return "DNE"""
+
+    def get_fc_amount(self):
+        ## FC value for total remittance regardless the encashment 
+        if self.currency.short == 'BDT':
+            currency = Currency.objects.get(short='USD')
+            if currency.get_exchange_rate(date=self.date_create.date(), type = 'TTC') != 'DNE':
+                rate = currency.get_exchange_rate(date=self.date_create.date(), type = 'TTC').rate
+                return self.amount/rate
+            else:
+                return "No Rate"
+        else:
+            return self.amount
 
     def get_total_paid_cash_incentive_sum(self):
         ###Returns the sum of all paid cash incentives
@@ -593,6 +614,15 @@ class Remmit(models.Model):
     def is_thirdparty_remittance(self):
         # returns true if the remittance is from third party exchange house
         return self.exchange.name != 'SWIFT' and self.exchange.name != 'CASH DEPOSIT'
+    
+    def get_schedule_code(self):
+        if self.is_thirdparty_remittance():
+            return "24"
+        if self.exchange.name == 'SWIFT':
+            return "23"
+        if self.exchange.name == 'CASH DEPOSIT':
+            return "25"
+        
     
     
 
@@ -659,7 +689,10 @@ class Encashment(models.Model):
             return False
 
     def encashment_amount_in_bdt(self):
-        return self.amount*self.rate
+        if self.remittance.currency.short != 'BDT':
+            return self.amount*self.rate
+        else:
+            return self.amount
 
 
 
@@ -683,6 +716,63 @@ class CashIncentive(models.Model):
 
     def __str__(self):
         return self.remittance.reference +" "+ self.entry_category + " Encashment ID: "+ (str(self.encashment.id) if self.encashment else " No Encashment")
+
+    def get_fc_amount(self):
+        """Get fc value of the remittance for which the cash incentive paid.
+        In case of complete encashment gets total FC Value. In case of partial
+        encashment gets only the FC value for encashed amount"""
+        if self.remittance.is_thirdparty_remittance():
+            return self.remittance.get_fc_amount()
+        else:
+            if self.encashment:
+                return self.encashment.amount
+            else:
+                return None
+
+    def get_bdt_amount(self):
+        """Get bdt value of the remittance for which the cash incentive paid.
+        In case of complete encashment gets total bdt Value. In case of partial
+        encashment gets only the bdt value for encashed amount"""
+        if self.remittance.is_thirdparty_remittance() and self.remittance.currency.short=='BDT':
+            return self.remittance.amount
+        else:
+            if self.encashment and self.remittance.currency.short != 'BDT':
+                return self.encashment.encashment_amount_in_bdt()
+            else:
+                return None
+
+    def get_exchange_rate(self):
+        """ Return TT Clean rate of the date create of Remittance
+            Return TT Clean of encashment date for partial encashment"""
+        if self.remittance.is_thirdparty_remittance():
+            if self.remittance.currency.short=='BDT':
+                currency = Currency.objects.get(short='USD')
+                date = self.remittance.date_create.date()
+        else:
+            if self.encashment:
+                currency = self.remittance.currency
+                date = self.encashment.date_create.date()
+            else:
+                return "Encashment entry not found"
+        return currency.get_exchange_rate(date=date).rate if currency.get_exchange_rate(date=date) != 'DNE' else 'Rate not Found'
+    
+    def get_usd_amount(self):
+        """ Return USD value of the remittance of CI
+            In case of partial encashment, returns USD 
+            value of only encashed part """
+        if self.remittance.currency.short == 'USD':
+            return self.remittance.amount if self.remittance.is_thirdparty_remittance() else self.encashment.amount
+        else:
+            date = None
+            if self.remittance.is_thirdparty_remittance():
+                date = self.remittance.date_create.date()
+            else:
+                if self.encashment:
+                    date = self.encashment.date_create.date()
+            amount_bdt = self.get_bdt_amount()
+            currency = Currency.objects.get(short='USD')
+            usd_rate = currency.get_exchange_rate(date=date)
+            return amount_bdt/usd_rate.rate if usd_rate != 'DNE' else 'Rate not Found'
 
     def get_entry_category_display(self):
         if self.entry_category=='P':

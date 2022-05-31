@@ -45,6 +45,7 @@
     </tbody>
 </table>
   <a class="btn btn-primary btn-sm mb-2" href = "{% url 'remmit-create-with-payment' pk=receiver.id %}">Proceed with this client</a>
+  <a class="btn btn-primary btn-sm mb-2" href = "{% url 'receiver-profile' receiver.id %}">Customer Profile</a>
   <a class="btn btn-primary btn-sm mb-2" href = "{% url 'receiver_update' pk=receiver.id %}">Edit client</a>
 {% endif %}
 {% comment %}

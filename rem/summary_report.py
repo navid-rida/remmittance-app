@@ -46,7 +46,7 @@ def cash_incentive_bb_statement(qset):
     date_sending_remittance=[]
     fc_amount=[]
     exchange_rate=[]
-    lc_amount=[]
+    bdt_amount=[]
     trn_type=[]
     cash_incentive_amount=[]
     date_remittance_paid=[]
@@ -56,25 +56,25 @@ def cash_incentive_bb_statement(qset):
     dealing_offical=[]
     dealing_cell=[]
     for r in q:
-        ben_name_address.append(r.receiver.name.upper())
-        ben_id.append(r.receiver.idno)
-        ben_acc.append(r.receiver.ac_no)
+        ben_name_address.append(r.remittance.receiver.name.upper())
+        ben_id.append(r.remittance.receiver.idno)
+        ben_acc.append(r.remittance.receiver.ac_no) #to change
         bank_name.append("NRB COMMERCIAL BANK LTD.")
-        sender_name.append(r.sender.upper())
-        sender_occupation.append(r.sender_occupation.upper() if r.sender_occupation else None)
-        exchange_house.append(r.exchange.name)
-        date_sending_remittance.append(r.date_sending)
-        fc_amount.append(None)
-        exchange_rate.append(None)
-        lc_amount.append(r.amount)
-        trn_type.append('CASH PICKUP')
+        sender_name.append(r.remittance.sender.upper())
+        sender_occupation.append(r.remittance.get_sender_occupation_display().upper() if r.remittance.sender_occupation else None)
+        exchange_house.append(r.remittance.exchange.name if r.remittance.is_thirdparty_remittance() else r.remittance.sender_bank.name)
+        date_sending_remittance.append(r.remittance.date_sending)
+        fc_amount.append(r.get_fc_amount()) #to be changed mandatory status
+        exchange_rate.append(r.get_exchange_rate()) #to be changed mandatory status
+        bdt_amount.append(r.get_bdt_amount()) #to_change
+        trn_type.append(r.remittance.get_ci_trn_type())
         cash_incentive_amount.append(r.cash_incentive_amount)
         date_remittance_paid.append(r.date_cash_incentive_settlement)
         remarks.append('')
-        reference.append(r.reference)
-        branch.append(r.branch.name.upper())
-        dealing_offical.append(r.created_by.first_name.upper()+" "+r.created_by.last_name.upper())
-        dealing_cell.append(r.created_by.employee.cell)
+        reference.append(r.remittance.reference)
+        branch.append(r.remittance.branch.name.upper())
+        dealing_offical.append(r.remittance.created_by.first_name.upper()+" "+r.remittance.created_by.last_name.upper())
+        dealing_cell.append(r.remittance.created_by.employee.cell)
     dct = {"Benificiary Name & Address": ben_name_address,
             "Identification": ben_id,
             "Benificiary Account": ben_acc,
@@ -85,7 +85,7 @@ def cash_incentive_bb_statement(qset):
             "Date of Sending Remittance":date_sending_remittance,
             "FC Amount":fc_amount,
             "Exchange rate": exchange_rate,
-            "BDT Amount": lc_amount,
+            "BDT Amount": bdt_amount,
             "Type":trn_type,
             "Incentive Amount": cash_incentive_amount,
             "Date of Payment": date_remittance_paid,

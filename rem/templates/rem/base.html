@@ -14,97 +14,218 @@
   <link rel="stylesheet" href="{% static "css/login.css" %}">
   <link rel="stylesheet" href="{% static "css/style.css" %}">
   <link rel="stylesheet" href="{% static "css/jquery-ui.css" %}">
-  {% comment %} <link rel="stylesheet" type="text/css" href="{% static "DataTables/css/jquery.dataTables.css" %}" />{% endcomment %} 
+
+  <!-- Custom CSS for Dashboard -->
+  <link rel="stylesheet" href="{% static "css/dashboard/dashboard.css" %}">
+
+  <!-- Custom CSS for Dashboard -->
+  <link rel="stylesheet" href="{% static "css/dashboard/dashboard.css" %}">
+  {% comment %}
+  <link rel="stylesheet" type="text/css" href="{% static "DataTables/css/jquery.dataTables.css" %}" />
+  {% endcomment %}
   <style type="text/css">
-    {% comment %} #body { background: #C2C2C2 !important; } /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */{% endcomment %}
-    body { background-image: "url({% get_media_prefix %}images/background.jpg" !important; } /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
-    .container { background: #FFFFFF !important; } /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
+    {% comment %}
+
+    #body {
+      background: #C2C2C2 !important;
+    }
+
+    /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
+    {% endcomment %}
+
+    body {
+      background-image: "url({% get_media_prefix %}images/background.jpg" !important;
+    }
+
+    /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
+    .container {
+      background: #FFFFFF !important;
+    }
+
+    /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
   </style>
+
+  <style type="text/css">
+    /* Chart.js */
+    @-webkit-keyframes chartjs-render-animation {
+      from {
+        opacity: 0.99
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    @keyframes chartjs-render-animation {
+      from {
+        opacity: 0.99
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    .chartjs-render-monitor {
+      -webkit-animation: chartjs-render-animation 0.001s;
+      animation: chartjs-render-animation 0.001s;
+    }
+  </style>
+
 
   <title>{% block title %}Welcome to Central Foreign Remittance Database{% endblock %}</title>
 </head>
 
-<body style="background-image:url({% get_media_prefix %}images/background.jpg)">
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">NRBCB Central Foreign Remittance Database</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Pending Reports</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Reports</a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="{% url 'show_rem'%}">Remmittance List</a>
-            <a class="dropdown-item" href="{% url 'show_claim'%}">Cash Incentive Claim List</a>
-            <a class="dropdown-item" href="{% url 'summary'%}">Exchange House wise Summary Report (Remittance)</a>
-            {% comment %}<a class="dropdown-item" href="{% url 'show_req'%}">Request List</a>{% endcomment %}
-            {% comment %}{% for group in request.user.groups.all %}
-            {% if group.name == "HO Settlement User" %}{% endcomment %}
-            {% has_perm 'rem.view_ho_br_booth_reports' user as can_view_summary_report_menu %}
-              {% if can_view_summary_report_menu %}
-
-                <a class="dropdown-item" href="{% url 'cash_incentive_bb_statement'%}">Cash Incentive Statemment (BB)</a>
-                <a class="dropdown-item" href="{% url 'daily_remittance_bb'%}">Daily Statemment (BB)</a>
-              {% endif %}
-            {% has_perm 'rem.can_settle_remitts_cash_incentive' user as can_settle %}
-            {% if can_settle %}
-            <a class="dropdown-item" href="{% url 'select_rem_list'%}">Remmittance Excel Download</a>
-            <a class="dropdown-item" href="{% url 'select-cash-incentive'%}">Cash Incentive Excel Download</a>
-
-            <a class="dropdown-item" href="{% url 'mark_settle_all'%}">Mark Settle (All)</a>
-            <a class="dropdown-item" href="{% url 'add_rate'%}">Add Exchange Rate</a>
-            <a class="dropdown-item" href="{% url 'download_rit'%}">Download RIT</a>
-            <a class="dropdown-item" href="{% url 'change_client'%}">Change Receiver of Existing Remittance</a>
-            {% endif %}
-            {% comment %}<div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">Export Import Summary</a>{% endcomment %}
-            {% comment %}{% endif%}
-            {% endfor%}{% endcomment %}
-          </div>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Upload Data
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            {% comment %}<a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Request</a>{% endcomment %}
-            <a class="dropdown-item" href="{% url 'search_client'%}">Submit Payment Information</a>
-            <a class="dropdown-item" href="{% url 'add_claim'%}">Submit Incentive Claim (A/C Cr)</a>
-            {% if can_view_summary_report_menu %}
-              <a class="dropdown-item" href="{% url 'search_remittance'%}">Search Remittance</a>
-            {% endif %}
-            {% comment %}<a class="dropdown-item" href="{% url 'remmit-create'%}">Remmittance Entry</a>
-            <a class="dropdown-item" href="#">Quarterly Meeting minutes</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">Export Import Summary</a> {% endcomment %}
-          </div>
-        </li>
-      </ul>
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item justify-content-end">
-          <a class="nav-link" href="{% url 'logout'%}"><i class="fas fa-sign-out-alt"></i> Sign out ({{ request.user }})</a>
-        </li>
-      </ul>
-      {% comment %}
-      <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-      </form>
-      {% endcomment %}
-    </div>
+<body>
+  <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Central Foreign Remittance Database</a>
+    <form method="post" action="{% url 'search_remittance'%}">
+      {% csrf_token %}
+     <input class="form-control form-control-dark w-500" name="keyword" type="text" placeholder="Search" aria-label="Search">
+    </form>
+    
+    <ul class="navbar-nav px-3">
+      <li class="nav-item text-nowrap">
+        <a class="nav-link" href="{% url 'logout'%}">Sign out</a>
+      </li>
+    </ul>
   </nav>
 
-  <div id="content">
-    <div class="container">
-      {% if messages %}
+  <div class="container-fluid">
+    <div class="row">
+      <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <div class="sidebar-sticky">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link active" href=#>
+                <i data-feather="home"></i>
+                Dashboard <span class="sr-only">(current)</span>
+              </a>
+            </li>
+            {% has_perm 'rem.can_view_branch_options' user as can_view_branch_option %}
+            {% if can_view_branch_option %}
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+              <span>Branch Operations</span>
+              <a class="d-flex align-items-center text-muted" href="#"></a>
+            </h6>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'search_client'%}">
+                <i data-feather="upload-cloud"></i>
+                Submit Foreign Remittance Information
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'add_claim'%}">
+                <i data-feather="upload-cloud"></i>
+                Submit Incentive Claim
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'fbank-create'%}">
+                <i data-feather="upload-cloud"></i>
+                Add Foreign Bank
+              </a>
+            </li>
+            {% endif %}
+            {% has_perm 'rem.can_view_ho_options' user as can_view_ho_options %}
+            {% if can_view_ho_options %}
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+              <span>Head Office Operations</span>
+              <a class="d-flex align-items-center text-muted" href="#"></a>
+            </h6>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'change_client'%}">
+                <i data-feather="user-check"></i>
+                Change Receiver of Existing Remittance
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'add_rate'%}">
+                <i data-feather="dollar-sign"></i>
+                Add Exchange Rate
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'mark_settle_all'%}">
+                <i data-feather="layers"></i>
+                Mark Settle (All)
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+
+          <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+            <span>Reports</span>
+            <a class="d-flex align-items-center text-muted" href="#"></a>
+          </h6>
+          <ul class="nav flex-column mb-2">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'show_rem'%}">
+                <i data-feather="file-text"></i>
+                Remmittance List
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'show_claim'%}">
+                <i data-feather="file-text"></i>
+                List of Cash Incentive Claim against A/C Credit from Other Banks
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'summary'%}">
+                <i data-feather="file-text"></i>
+                Exchange House wise Summary Report (Remittance)
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'cash_incentive_bb_statement'%}">
+                <i data-feather="file-text"></i>
+                Monthly Statement of Cash Incentive (BB Form Kha)
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'daily_remittance_bb'%}">
+                <i data-feather="file-text"></i>
+                T_ME_D_REMITTANCE (Daily Remittance RIT BB)
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'select_rem_list'%}">
+                <i data-feather="file-text"></i>
+                Remmittance Settlement Batch File Download
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'select-cash-incentive'%}">
+                <i data-feather="file-text"></i>
+                Cash Incentive Settlement Batch File Download
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'download_rit'%}">
+                <i data-feather="file-text"></i>
+                T_ME_M_REMIT_INCEN (Monthly Cash Incentive RIT BB)
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+        <div class="chartjs-size-monitor"
+          style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">
+          <div class="chartjs-size-monitor-expand"
+            style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;">
+            <div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div>
+          </div>
+          <div class="chartjs-size-monitor-shrink"
+            style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;">
+            <div style="position:absolute;width:200%;height:200%;left:0; top:0"></div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+          {% if messages %}
       <ul class="messages">
         {% for message in messages %}
         {% if message.level_tag == "info" %}
@@ -113,45 +234,53 @@
         {% endfor %}
       </ul>
       {% endif %}
-      {% block content %}
-      <div class="card" style="width: 18rem;">
-        <div class="card-body">
-          <h5 class="card-title">Notice</h5>
-          <h6 class="card-subtitle mb-2 text-muted">CFRD Transaction Time Change</h6>
-          <p class="card-text">During the ongoing lock-down, CFRD is open for remittance reporting from 10:00 AM to 04:00 PM.</p>
+      {% block content_title %}
+          <!--<h1 class="h2">Dashboard</h1>-->
+      {% endblock %}
           
         </div>
-      </div>
-      <div class="card" style="width: 18rem;">
-        <div class="card-body">
-          <h5 class="card-title">Notice</h5>
-          <h6 class="card-subtitle mb-2 text-muted">MoneyGram Payments Available Again</h6>
-          <p class="card-text">You can process MoneyGram payments now like before from the URL: https://mg.nccbank.com.bd/mgca/apps/login  (also available in our Homepage)</p>
+        {% block content %}
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Notice</h5>
+            <h6 class="card-subtitle mb-2 text-muted">CFRD Transaction Time Change</h6>
+            <p class="card-text">CFRD is open for remittance reporting from 09:30 AM to
+              02:30 PM.</p>
 
+          </div>
         </div>
-      </div>
-      {% endblock %}
-    </div>
-  </div>
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Notice</h5>
+            <h6 class="card-subtitle mb-2 text-muted">MoneyGram Payments Available Again</h6>
+            <p class="card-text">You can process MoneyGram payments now like before from the URL: https://mg.nccbank.com.bd/mgca/apps/login  (also available in our Homepage)</p>
 
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+          </div>
+        </div>
+        {% endblock %}
 
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
+       
 
 
   <!--  <script src="{%static "js/jquery-3.3.1.slim.min.js" %}"></script>-->
   <script src="{%static "js/jquery-1.7.2.min.js" %}"></script>
   <script src="{%static "js/jquery-ui.min.js" %}"></script>
   <script src="{%static "js/bootstrap.bundle.min.js" %}"></script>
-  <script type="text/javascript" src="{%static "js/bootstrap.bundle.min.js" %}" ></script>
-  {% comment %} <script type="text/javascript" src="{%static "DataTables/js/jquery.dataTables.js"" %}" ></script>{% endcomment %} 
+  <script type="text/javascript" src="{%static "js/bootstrap.bundle.min.js" %}"></script>
+
+  <!-- Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script>
+    feather.replace()
+  </script>
+
+
+  {% comment %}
+  <script type="text/javascript" src="{%static "DataTables/js/jquery.dataTables.js"" %}"></script>{% endcomment %}
   {% block js %}{% endblock %}
 
   <script>
-    $(function() {
+    $(function () {
       $(".date").datepicker({
         dateFormat: "dd/mm/yy"
       });
@@ -178,11 +307,11 @@
         "Education/Training",
         "Legal Obligation",
       ];
-      $( "#id_relationship" ).autocomplete({
+      $("#id_relationship").autocomplete({
         source: relationship,
         minLength: 0,
       });
-      $( "#id_purpose" ).autocomplete({
+      $("#id_purpose").autocomplete({
         source: purpose,
         minLength: 0,
       });

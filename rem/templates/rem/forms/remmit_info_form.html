@@ -3,11 +3,14 @@
 {% load widget_tweaks %}
 
 {% block title %} Remittance Entry {% endblock %}
+{% block content_title %}
+<h4 class="element_margin">Add Remmittance details</h4>
+{% endblock %}
 {% block content %}
 
 <div class="row">
   <div class="col-md-6 offset-3">
-    <h4 class="element_margin">Add Remmittance details</h4>
+    
     <form enctype="multipart/form-data" method="post">
       {% csrf_token %}
 

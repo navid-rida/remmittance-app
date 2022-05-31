@@ -12,8 +12,13 @@ class Currency(models.Model):
     def __str__(self):
         return self.name
     
-    def get_latest_rate(self,date=timezone.now().date()):
-        return self.rate_set.filter(date__lte=date).last()
+    def get_exchange_rate(self,date=timezone.now().date(), type = 'TTC'):
+        try:
+           rate = Rate.objects.get(currency=self, date=date, rate_type=type)
+           return rate
+        except:
+            # Rate does not exists
+            return "DNE"
 
 
 class District(models.Model):
