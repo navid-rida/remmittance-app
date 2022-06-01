@@ -557,8 +557,8 @@ class ReceiverSearchForm(forms.Form):
     identification = forms.CharField(label="Enter NID/Passport/ Birth Certificate No.")
 
 class ReceiverChangeForm(forms.Form):
-    reference = forms.CharField(label="Referene No./PIN/MTCN", max_length=17)
-    identification = forms.CharField(label="Enter NID/Passport/ Birth Certificate No. of New Receiver", max_length=16)
+    reference = forms.CharField(label="Referene No./PIN/MTCN", max_length=16)
+    identification = forms.CharField(label="Enter NID/Passport/ Birth Certificate No. of New Receiver", max_length=17)
 
     def __init__(self, *args, **kwargs):
         super(ReceiverChangeForm, self).__init__(*args, **kwargs)
