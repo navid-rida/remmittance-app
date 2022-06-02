@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Foreignbank, Remmit, Branch,ExchangeHouse, Employee, Country, Receiver, Requestpay,Payment, Booth,Claim, CashIncentive,  Encashment, Account, Foreignbank
+from .models import Foreignbank, Remmit, Branch,ExchangeHouse, Employee, Country, Receiver, Requestpay,Payment, Booth,Claim, CashIncentive,  Encashment, Account, Foreignbank, RemittanceUpdateHistory
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User, Permission
 # Register your models here.
@@ -42,7 +42,7 @@ admin.site.register(Receiver,ReceiverAdmin)
 admin.site.register(Requestpay, RequestpayAdmin)
 admin.site.register(Payment, PaymentAdmin)
 #admin.site.register(ReceiverUpdateHistory)
-#admin.site.register(RemittanceUpdateHistory)
+admin.site.register(RemittanceUpdateHistory, RemittanceUpdateHistoryAdmin)
 admin.site.register(Booth)
 admin.site.register(Claim)
 admin.site.register(CashIncentive, CashIncentiveAdmin)
