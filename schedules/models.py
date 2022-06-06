@@ -49,7 +49,7 @@ class Rate(models.Model):
     rate = models.DecimalField("Exchange Rate in BDT", max_digits=7,decimal_places=4, validators=[validate_neg],)
 
     class Meta:
-        unique_together = ('date', 'rate_type',)
+        unique_together = ('currency', 'rate_type',)
 
     def __str__(self):
         return self.currency.name
