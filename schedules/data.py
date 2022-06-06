@@ -5,7 +5,7 @@ from pathlib import Path
 import datetime
 
 ###################### paths ###########################################
-folder_path = "F:\\Projects\\Return RIT\\2021\\RIT-SEPTEMBER-2021"
+folder_path = "F:\\Projects\\Return RIT\\2022\\RIT-MARCH-2022"
 export_text_file = 'exprecpt.txt'
 import_payment_text_file = 'imppaynt.txt'
 invisible_payment_text_file = 'invpaynt.txt'
@@ -22,7 +22,7 @@ def get_currency_df():
     pass
 
 ############################ Reference path and DFs #########################################################
-"""ref_file_path = Path('REFERENCE_FILE_new.xlsm')
+ref_file_path = Path('REFERENCE_FILE_new.xlsm')
 ref_additional_data_path = Path('ref_additional_data.xlsx')
 zero_matrix_path = Path('zero matrix_August 2021.xls')
 
@@ -175,7 +175,7 @@ def rit_all_df(exp_rec,imp_pay,inv_pay,inv_rec,wage_remit):
     return df
 
 
-final_df = rit_all_df(exp_df,imp_pay_df,invisible_pay_df,invisible_rec_df,wage_remit_df)"""
+final_df = rit_all_df(exp_df,imp_pay_df,invisible_pay_df,invisible_rec_df,wage_remit_df)
 
 
 ########################################### Remittance Reports from DB ########################################
@@ -204,17 +204,17 @@ def get_daily_bb_remittance(qset):
         fi_name.append("NRB COMMERCIAL BANK LTD.")
         sl.append(str(i))
         i=i+1
-        ad_fi_br.append("0102")
+        ad_fi_br.append(r.requestpay.remittance.branch.ad_fi_code if not r.requestpay.remittance.is_thirdparty_remittance() else "0102")
         report_type.append("WAGE REMITTANCE")
-        schedule_code.append("24")
+        schedule_code.append(r.requestpay.remittance.get_schedule_code())
         type_code.append("4")
         purpose_code.append("")
-        currency.append("USD")
+        currency.append("USD" if r.requestpay.remittance.is_thirdparty_remittance() else r.requestpay.remittance.currency.short )
         country.append(r.requestpay.remittance.rem_country)
         district.append(r.requestpay.remittance.branch.district.name)
         nid.append(r.requestpay.remittance.receiver.get_nid())
         passport.append(r.requestpay.remittance.receiver.get_passport_no())
-        amt_fcy.append(r.requestpay.remittance.amount)
+        amt_fcy.append(r.requestpay.remittance.get_fc_amount())
         ref.append(r.requestpay.remittance.reference)
         exchange.append(r.requestpay.remittance.exchange)
         branch.append(r.requestpay.remittance.branch.name)
