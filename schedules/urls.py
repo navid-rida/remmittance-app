@@ -7,5 +7,6 @@ urlpatterns = [
     
     path('add/rates', views.RateCreate.as_view(), name='add_rate'),
     path('report/rit', views.remittance_rit_list, name='download_rit'),
+    path('report/rate_list', views.currency_rate_list, name='rate_list'),
     
 ]

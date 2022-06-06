@@ -1,0 +1,69 @@
+{% extends "rem/base.html" %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block js %}
+
+
+{% endblock %}
+{% block title %} Cash Incentive RIT {% endblock %}
+{% block content %}
+
+<br>
+<form method="post">
+  {% csrf_token %}
+  <div class='form-row'>
+    <div class="col-auto">
+      {% for error in form.date_from.errors %}
+      <div class="alert alert-danger" role="alert">{{ error}}</div>
+      {% endfor %}
+      {{form.date_from.label_tag}}
+      {{form.date_from|add_class:"form-control date"}}
+    </div>
+    <div class="col-auto">
+      {% for error in form.date_to.errors %}
+      <div class="alert alert-danger" role="alert">{{ error}}</div>
+      {% endfor %}
+      {{form.date_to.label_tag}}
+      {{form.date_to|add_class:"form-control date"}}
+    </div>
+
+  </div>
+  <div class='form-row'>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary btn-sm mb-2 element_margin" value="Show" name="_show">Show</button>
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary btn-sm mb-2 element_margin" value="Download" name="_download">Download</button>
+    </div>
+  </div>
+</form>
+</br>
+{{ df|safe}}
+
+{% if q %}
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+      <th scope="col">Date</th>
+      <th scope="col">Currency</th>
+      <th scope="col">Rate Type</th>
+      <th scope="col">Amount</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for e in q %}
+  <tr>
+      <td>{{ e.date }}</td>
+      <td>{{e.currency.short }}</td>
+      <td>{{e.get_rate_type_display }}</td>
+      <td>{{e.rate}}</td>
+  </tr>
+    
+  {% endfor%}
+</tbody>
+</table>
+{% endif%}
+
+
+{% block error %}{% endblock %}
+{% endblock %}

@@ -41,12 +41,15 @@ class Rate(models.Model):
     BC_SELLING = 'BCS'
     TT_CLEAN = 'TTC'
     RATE_TYPE_CHOICES = (
+        (TT_CLEAN, 'TT CLEAN'),
         (BC_SELLING,'BC SELLING'),
-        (TT_CLEAN, 'TT CLEAN')
         )
     rate_type = models.CharField("Type of Exchange Rate", choices=RATE_TYPE_CHOICES, max_length=3)
     date = models.DateField("Date of Entry")
     rate = models.DecimalField("Exchange Rate in BDT", max_digits=7,decimal_places=2, validators=[validate_neg],)
+
+    class Meta:
+        unique_together = ('date', 'rate_type',)
 
     def __str__(self):
         return self.currency.name
