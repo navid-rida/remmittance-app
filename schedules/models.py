@@ -46,7 +46,7 @@ class Rate(models.Model):
         )
     rate_type = models.CharField("Type of Exchange Rate", choices=RATE_TYPE_CHOICES, max_length=3)
     date = models.DateField("Date of Entry")
-    rate = models.DecimalField("Exchange Rate in BDT", max_digits=7,decimal_places=2, validators=[validate_neg],)
+    rate = models.DecimalField("Exchange Rate in BDT", max_digits=7,decimal_places=4, validators=[validate_neg],)
 
     class Meta:
         unique_together = ('date', 'rate_type',)
