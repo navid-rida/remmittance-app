@@ -195,6 +195,7 @@ def get_daily_bb_remittance(qset):
     nid=[]
     passport=[]
     amt_fcy=[]
+    amt_bdt=[]
     ref=[]
     exchange=[]
     branch=[]
@@ -215,6 +216,7 @@ def get_daily_bb_remittance(qset):
         nid.append(r.requestpay.remittance.receiver.get_nid())
         passport.append(r.requestpay.remittance.receiver.get_passport_no())
         amt_fcy.append(r.requestpay.remittance.get_fc_amount())
+        amt_bdt.append(r.requestpay.remittance.get_bdt_amount())
         ref.append(r.requestpay.remittance.reference)
         exchange.append(r.requestpay.remittance.exchange)
         branch.append(r.requestpay.remittance.branch.name)
@@ -232,6 +234,7 @@ def get_daily_bb_remittance(qset):
             "NID": nid,
             "PASSPORT":passport,
             "AMOUNT FCY": amt_fcy,
+            "Amount in BDT": amt_bdt,
             "Reference": ref,
             "Exchange": exchange,
             "Branch": branch,

@@ -598,6 +598,15 @@ class Remmit(models.Model):
         else:
             return self.amount
 
+    def get_bdt_amount(self):
+        """Get bdt value of the remittance (Full)"""
+        if self.is_thirdparty_remittance() and self.currency.short=='BDT':
+            return self.amount
+        else:
+            if self.currency.short != 'BDT':
+                rate = self.currency.get_exchange_rate(date=self.date_create.date(), type = 'TTC').rate
+                return self.amount*rate
+
     def get_total_paid_cash_incentive_sum(self):
         ###Returns the sum of all paid cash incentives
         q = self.get_paid_cash_incentives()

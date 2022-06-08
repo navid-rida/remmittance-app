@@ -60,6 +60,7 @@
       <th scope="col">NID</th>
       <th scope="col">PASSPORT</th>
       <th scope="col">AMOUNT FCY</th>
+      <th scope="col">AMOUNT BDT</th>
       <th scope="col">REFERENCE</th>
       <th scope="col">EXCHANGE</th>
       <th scope="col">BRANCH</th>
@@ -70,7 +71,7 @@
     {% for key, value in v.items%}
       <td>
         {% if value %}
-          {% if key == "AMOUNT FCY" %}
+          {% if key == "AMOUNT FCY" or key == "AMOUNT Amount in BDT" %}
             {{value|floatformat:2}}
           {% else %}
             {{value}}
