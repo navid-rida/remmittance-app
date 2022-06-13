@@ -68,9 +68,14 @@
         <tr>
           <td>Cash Incentive Status</td>
           <td>
-            : {% for item  in object.get_paid_cash_incentives %}
+            :
+            {% if object.is_thirdparty_remittance %}
+              {{ object.get_paid_cash_incentives.get_entry_category_display}}
+            {% else %}
+            {% for item  in object.get_paid_cash_incentives %}
                 {{ item.get_entry_category_display}}
               {%endfor%}
+            {% endif %}
             {% if object.date_cash_incentive_settlement %}
             (Settled on: {{object.date_cash_incentive_settlement}})
             {% else %}

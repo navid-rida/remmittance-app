@@ -879,7 +879,7 @@ def download_trm(request, pk):
 def download_voucher(request, pk):
     rem = get_object_or_404(Remmit, pk=pk)
     taka, ps = (str(int(rem.amount//1)), "0"+str(int(Decimal(rem.amount%1)*100)) if int(Decimal(rem.amount%1)*100)<10 else str(int(Decimal(rem.amount%1)*100)) )
-    cash_incentive_taka, cash_incentive_ps = (str(int(rem.cash_incentive_amount//1)), "0"+str(int(Decimal(rem.cash_incentive_amount%1)*100)) if int(Decimal(rem.cash_incentive_amount%1)*100)<10 else str(int(Decimal(rem.cash_incentive_amount%1)*100))) if not rem.check_unpaid_cash_incentive() else (0,0)
+    cash_incentive_taka, cash_incentive_ps = (str(int(rem.get_paid_cash_incentives().cash_incentive_amount//1)), "0"+str(int(Decimal(rem.get_paid_cash_incentives().cash_incentive_amount%1)*100)) if int(Decimal(rem.get_paid_cash_incentives().cash_incentive_amount%1)*100)<10 else str(int(Decimal(rem.get_paid_cash_incentives().cash_incentive_amount%1)*100))) if not rem.check_unpaid_cash_incentive() else (0,0)
     context = {'rem': rem, 'taka':taka, 'ps':ps, 'cash_incentive_taka': cash_incentive_taka, 'cash_incentive_ps': cash_incentive_ps, 'user':request.user}
     response = HttpResponse(content_type="application/pdf")
     response['Content-Disposition'] = "inline; filename={date}-{name}-voucher.pdf".format(

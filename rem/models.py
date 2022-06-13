@@ -1,6 +1,7 @@
 #from tkinter.tix import Tree
 from locale import currency
 from django.db import models
+from django.db.models.query import QuerySet
 from decimal import Decimal
 from django.urls import reverse_lazy,reverse
 #from datetime import date
@@ -518,7 +519,13 @@ class Remmit(models.Model):
         return False
 
     def get_paid_cash_incentives(self):
-        return self.cashincentive_set.filter(entry_category='P')
+        if self.is_thirdparty_remittance(): #If thrid party remittance
+            if self.get_paid_cash_incentives_number()>1:
+                return "multiple incentive against third pary exchange house payment" #Thirparty remittance cannot have multple incentive
+            else:
+                return self.cashincentive_set.get(entry_category='P') #Return one instance
+        else:
+            return self.cashincentive_set.filter(entry_category='P') # Return queryset if not third party remittance
     
     def get_paid_cash_incentives_number(self):
         return self.cashincentive_set.filter(entry_category='P').count()
@@ -611,9 +618,13 @@ class Remmit(models.Model):
         ###Returns the sum of all paid cash incentives
         q = self.get_paid_cash_incentives()
         total = 0
-        for e in q:
-            total = total + e.cash_incentive_amount
-        return total
+        if isinstance(q, QuerySet):
+            for e in q:
+                total = total + e.cash_incentive_amount
+            return total
+        if isinstance(q, CashIncentive):
+            total = q.cash_incentive_amount
+            return total
 
     def change_receiver(self, new_receiver):
         self.receiver = new_receiver
