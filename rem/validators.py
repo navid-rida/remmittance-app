@@ -94,7 +94,7 @@ bc_re = RegexValidator(
 )
 
 passport_re = RegexValidator(
-    _lazy_re_compile(r'^[a-zA-Z]{2}[0-9]{7}$'),
+    _lazy_re_compile(r'^[a-zA-Z]{1}[0-9a-zA-Z]{1}[0-9]{7}$'),
     message=_('Please enter a valid passport number'),
     code='invalid_bc',
 )
