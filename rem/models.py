@@ -1,4 +1,5 @@
 #from tkinter.tix import Tree
+from genericpath import exists
 from locale import currency
 from django.db import models
 from django.db.models.query import QuerySet
@@ -510,6 +511,13 @@ class Remmit(models.Model):
         else:
             return False
 
+    """def check_if_not_applicable_cash_incentive(self):
+        #This one checks the cash incentive in remmit table
+        if self.cash_incentive_status=='U' and self.date_cash_incentive_paid is None and self.date_create.date()>datetime.date(2019,6,30):
+            return True
+        else:
+            return False"""
+
     def check_if_cash_incentive_paid(self):
         #This one checks the cash incentive in seperate CashIncentive Table
         q = self.cashincentive_set.all()
@@ -523,7 +531,10 @@ class Remmit(models.Model):
             if self.get_paid_cash_incentives_number()>1:
                 return "multiple incentive against third pary exchange house payment" #Thirparty remittance cannot have multple incentive
             else:
-                return self.cashincentive_set.get(entry_category='P') #Return one instance
+                try:
+                    return self.cashincentive_set.get(entry_category='P') #Return one instance
+                except:
+                    return None
         else:
             return self.cashincentive_set.filter(entry_category='P') # Return queryset if not third party remittance
     
@@ -825,6 +836,13 @@ class CashIncentive(models.Model):
         else:
             return False
 
+    def get_decimal_right(self):
+        n = str(self.cash_incentive_amount).split('.')[1]
+        return n if n else '0'
+    
+    def get_decimal_left(self):
+        n = str(self.cash_incentive_amount).split('.')[0]
+        return n if n else '0'
 
     def create_entry_from_remittance(self, remitt):
         if remitt.check_unpaid_cash_incentive():
