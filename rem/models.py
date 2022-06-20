@@ -9,7 +9,7 @@ from django.urls import reverse_lazy,reverse
 from django.core.exceptions import ValidationError
 from django.db.models.fields.related import ForeignKey
 from .validators import validate_expire_date, validate_neg, validate_post_date, validate_mobile, numeric, name, alpha, alpha_num, western_union, nrbc_acc, swift_bic
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MaxValueValidator
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -421,8 +421,8 @@ class Remmit(models.Model):
     cash_incentive_status = models.CharField("Cash Incentive Status", choices=CASHINC_CHOICES, max_length=2, )
     unpaid_cash_incentive_reason = models.CharField("Reason for not paying cash incentive", max_length=50, null=True, blank=True, help_text="This field is mandatory if you mark cash incentive as unpaid")
     receiver = models.ForeignKey(Receiver, on_delete=models.PROTECT, verbose_name="Receiver")
-    amount = models.DecimalField("Amount of Remittance",max_digits=20,decimal_places=2, validators=[validate_neg], help_text="Required documents must be collected and retained for paying inentive against Remittances valuing more than BDT 5,00,000.00 or USD 5,000.00 or equivalent FC")
-    cash_incentive_amount = models.DecimalField("Amount of Cash Incentive",max_digits=20,decimal_places=2, validators=[validate_neg])
+    amount = models.DecimalField("Amount of Remittance",max_digits=20,decimal_places=2, validators=[validate_neg, MaxValueValidator(1000000.00)], help_text="Required documents must be collected and retained for paying inentive against Remittances valuing more than BDT 5,00,000.00 or USD 5,000.00 or equivalent FC")
+    cash_incentive_amount = models.DecimalField("Amount of Cash Incentive",max_digits=20,decimal_places=2, validators=[validate_neg, MaxValueValidator(25000.00)])
     account = models.ForeignKey(Account,verbose_name='Account of Benificiary', on_delete=models.PROTECT, null=True, blank = True)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, null=True, blank=True)
@@ -730,7 +730,7 @@ class Encashment(models.Model):
 class CashIncentive(models.Model):
     remittance = models.ForeignKey(Remmit, on_delete=models.CASCADE,)
     encashment = models.OneToOneField(Encashment, on_delete=models.CASCADE, null=True, blank=True)
-    cash_incentive_amount = models.DecimalField("Amount of Cash Incentive",max_digits=20,decimal_places=2, validators=[validate_neg])
+    cash_incentive_amount = models.DecimalField("Amount of Cash Incentive",max_digits=20,decimal_places=2, validators=[validate_neg, MaxValueValidator(25000.00)])
     date_cash_incentive_paid = models.DateTimeField("Date of Cash Incentive payment", null=True, blank= True)
     date_cash_incentive_settlement = models.DateField("Date of Cash Incentive Settlement", null=True, blank= True)
     unpaid_cash_incentive_reason = models.CharField("Reason for not paying cash incentive", max_length=50, null=True, blank=True, help_text="This field is mandatory if you mark cash incentive as unpaid")

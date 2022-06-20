@@ -28,8 +28,16 @@ def is_transaction_hour(user):
     return time(9,29)<timezone.localtime().time()<time(21,00)
 
 @rules.predicate
+def is_same_day(user,remittance):
+    return remittance.date_create.date()==timezone.now().date()
+
+@rules.predicate
 def remittance_less_than_usd1500(user,remittance):
     return remittance.amount < 150000
+
+@rules.predicate
+def remittance_is_settled(user,remittance):
+    return remittance.requestpay.payment.is_settled()
 
 @rules.predicate
 def remittance_cash_incentive_paid(user,remittance):
@@ -61,7 +69,7 @@ def is_same_domain_user(user,request):
     return branch == user.employee.branch"""
 
 
-rules.add_perm('rem.change_remmit', is_entry_creator & is_same_branch_user)
+rules.add_perm('rem.change_remmit', is_entry_creator & is_same_branch_user & is_same_day & ~remittance_is_settled)
 rules.add_perm('rem.add_remmit', is_branch_remittance_user | is_booth_remittance_user | (is_branch_fx_user & is_ad_branch_user))
 rules.add_perm('rem.add_third_party_remmit', is_branch_remittance_user | is_booth_remittance_user)
 rules.add_perm('rem.view_branch_remitt', is_branch_report_observer_user)
