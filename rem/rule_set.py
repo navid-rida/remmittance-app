@@ -37,7 +37,7 @@ def remittance_less_than_usd1500(user,remittance):
 
 @rules.predicate
 def remittance_is_settled(user,remittance):
-    return remittance.requestpay.payment.is_settled()
+    return remittance.get_completed_payment().is_settled()
 
 @rules.predicate
 def remittance_cash_incentive_paid(user,remittance):
