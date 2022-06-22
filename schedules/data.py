@@ -5,7 +5,7 @@ from pathlib import Path
 import datetime
 
 ###################### paths ###########################################
-"""folder_path = "F:\\Projects\\Return RIT\\2022\\RIT-MARCH-2022"
+"""folder_path = "F:\\Projects\\Return RIT\\2022\\RIT-MAY-2022"
 export_text_file = 'exprecpt.txt'
 import_payment_text_file = 'imppaynt.txt'
 invisible_payment_text_file = 'invpaynt.txt'
@@ -209,7 +209,7 @@ def get_daily_bb_remittance(qset):
         report_type.append("WAGE REMITTANCE")
         schedule_code.append(r.requestpay.remittance.get_schedule_code())
         type_code.append("4")
-        purpose_code.append("")
+        purpose_code.append(r.requestpay.remittance.get_purpose_code())
         currency.append("USD" if r.requestpay.remittance.is_thirdparty_remittance() else r.requestpay.remittance.currency.short )
         country.append(r.requestpay.remittance.rem_country)
         district.append(r.requestpay.remittance.branch.district.name)
