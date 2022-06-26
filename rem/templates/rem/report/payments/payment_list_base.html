@@ -116,7 +116,7 @@
                 <td>{{entry.reference}}</td>
                 <td>{{entry.sender.title}}</td>
                 <td>{{entry.receiver}}</td>
-                <td>{{entry.amount|comma_seperated_bangla}}</td>
+                <td>{{entry.currency.short}} {{entry.amount|comma_seperated_bangla}}</td>
                 <td>BDT {{entry.get_total_paid_cash_incentive_sum|comma_seperated_bangla }} (Total {{entry.get_paid_cash_incentives_number}} cash incentives)</td>
                 <td>{{entry.get_cash_incentive_status_display}}</td>
                 <td>{{entry.date_cash_incentive_settlement}}</td>
