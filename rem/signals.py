@@ -19,7 +19,7 @@ def create_cash_incentive(sender, instance, created, **kwargs):
         else:
             pass
     else:
-        if instance.is_thirdparty_remittance() and instance._entry_cat:
+        if instance.is_thirdparty_remittance() and hasattr(instance, '_entry_cat'):
             if instance.cashincentive_set.all().exists():
                 ci = instance.cashincentive_set.all().last()
                 if instance._entry_cat=='P':
