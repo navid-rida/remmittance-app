@@ -20,7 +20,7 @@ from django.conf import settings
 import pandas as pd
 from rem.DataModels import cash_incentive_df, filter_remittance, filter_claim
 ########################## aggregate functions ###############################
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, CheckConstraint, F
 ################# import for validation errrors ##############################
 from django.utils.translation import gettext_lazy as _
 
@@ -458,7 +458,10 @@ class Remmit(models.Model):
          #}\
         #permissions = 
         """constraints = [
-            models.CheckConstraint(check=models.Q)
+            CheckConstraint(
+                check = Q(cash_incentive_amount = F('amount')*Decimal(0.025)), 
+                name = 'check_incentive_is_correct',
+            ),
         ]"""
 
     def __str__(self):
@@ -587,7 +590,7 @@ class Remmit(models.Model):
 
 
     def calculate_cash_incentive(self):
-        return self.amount*Decimal(0.025)
+        return self.amount*Decimal(0.025) #change 
 
     def get_ci_trn_type(self):
         #returns cash incentive transaction type for RIT
@@ -750,6 +753,14 @@ class CashIncentive(models.Model):
         )
     entry_category = models.CharField("Cash Incentive Payment Status", choices=ENTRYCAT_CHOICES, max_length=2, )
     partial_payment_status = models.BooleanField("Partial Cash Incentive Payment?", default=False)
+
+    """class Meta:
+        constraints = [
+            CheckConstraint(
+                check = Q(cash_incentive_amount = F('remittance__amount')*Decimal(0.025)), 
+                name = 'check_incentive_is_correct',
+            ),
+        ]"""
 
     def __str__(self):
         return self.remittance.reference +" "+ self.entry_category + " Encashment ID: "+ (str(self.encashment.id) if self.encashment else " No Encashment")

@@ -802,7 +802,10 @@ class RemmitInfoUpdate(PermissionRequiredMixin, SuccessMessageMixin, UpdateView)
         form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.025)
         self.object = form.save(commit=False)
         # in case you want to modify the object before commit
-        self.object.save()
+        if self.object.is_thirdparty_remittance() and  (self.object.get_paid_cash_incentives_number()>1 or self.object.cashincentive_set.all().count()>1):
+            raise ValidationError('Third party remittance cannot have multiple cash incentive. Please contact Admin')
+        else:
+            self.object.save()
         payment = self.object.get_completed_payment()
         payment.agent_screenshot = self.request.FILES.get('screenshot',False)
         payment.save()

@@ -224,7 +224,7 @@
                 <td>{{entry.requestpay.remittance.sender.title}}</td>
                 <td>{{entry.requestpay.remittance.receiver.name.title}}</td>
                 <td>{{entry.requestpay.remittance.amount|intcomma}}</td>
-                <td>{{entry.requestpay.remittance.cash_incentive_amount|intcomma}} ({{entry.requestpay.remittance.get_cash_incentive_status_display}})</td>
+                <td>BDT {{entry.requestpay.remittance.get_total_paid_cash_incentive_sum|comma_seperated_bangla }} (Total {{object.get_paid_cash_incentives_number}} cash incentives)</td>
 
                 <td>{{entry.requestpay.remittance.date_cash_incentive_settlement}}</td>
                 <td>{{entry.requestpay.remittance.date_create|localtime}}</td>
