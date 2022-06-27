@@ -637,7 +637,7 @@ class Remmit(models.Model):
                 total = total + e.cash_incentive_amount
             return total
         if isinstance(q, CashIncentive):
-            total = q.cash_incentive_amount
+            total = q.cash_incentive_amount if q.cash_incentive_amount else 0
             return total
 
     def change_receiver(self, new_receiver):
