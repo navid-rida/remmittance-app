@@ -5,7 +5,7 @@ register = template.Library()
 
 
 def comma_seperated_bangla(value):
-    s = str(value)
+    s = str(value) if value else '0.00'
     dec_right = s.split('.')[1] if len(s.split('.'))>1 else '' #Number after decimal point
     dec_left = s.split('.')[0] #Number of the left side of decimal
     if len(dec_left)<=3:
