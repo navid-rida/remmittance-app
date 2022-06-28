@@ -100,7 +100,7 @@ passport_re = RegexValidator(
 )
 
 swift_re = RegexValidator(
-    _lazy_re_compile(r'^[0-9a-zA-Z]+.{3,50}$'),
+    _lazy_re_compile(r'^[0-9a-zA-Z-]+.{3,50}$'),
     message=_('Please enter a valid SWIFT code'),
     code='invalid',
 )
