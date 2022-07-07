@@ -507,7 +507,8 @@ def mark_settle_all(request):
             if clean_settlement_df(df):
                 lst = clean_settlement_df(df)
                 for n in lst:
-                    messages.error(request, "Row "+str(n+1)+" have missing element in one or more cells")
+                    row_no = n+1
+                    messages.error(request, "Row "+str(row_no)+" have missing element in one or more cells")
                 return redirect('mark_settle_all')
             df['reference'] = df['narrations'].apply(get_reference_no_from_narration)
             lst = get_reference_no_list_from_df(df)
