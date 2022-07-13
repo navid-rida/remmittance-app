@@ -534,7 +534,7 @@ class ReceiverForm(ModelForm):
             raise ValidationError('ID Issue date/ Expiry Date is mandatory for Passports')
         if idissue and idexpire and idissue >= idexpire:
             self.add_error('idexpire','ID Expiry Date cannot be on or before issue date')
-        if idtype == 'PASSPORT' and idexpire > idissue + timezone.timedelta(days=10*365):
+        if idtype == 'PASSPORT' and idexpire > idissue + timezone.timedelta(days=10*365+10):
             self.add_error('idexpire','Passport expiry period cannot be more than ten years')
         if gender=='F' and (father==None and spouse==None):
              raise forms.ValidationError(
