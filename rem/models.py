@@ -658,7 +658,7 @@ class Remmit(models.Model):
             return "25"
 
     def get_purpose_code(self):
-        if not self.is_thirdparty_remittance():
+        if self.exchange.name == 'SWIFT' and self.mariner_status == False:
             return "5123"
         else:
             return None
