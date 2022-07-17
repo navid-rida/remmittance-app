@@ -505,8 +505,8 @@ def mark_settle_all(request):
             settlement_type = request.POST['settlemnt_type']
             df = pd.read_excel(file,names=['date', 'branch_code', 'ac_no', 'type', 'amount', 'narrations', 'flags'], header=None)
             if clean_settlement_df(df):
-                lst = clean_settlement_df(df)
-                for n in lst:
+                ls = clean_settlement_df(df)
+                for n in ls:
                     row_no = n+1
                     messages.error(request, "Row "+str(row_no)+" have missing element in one or more cells")
                 return redirect('mark_settle_all')
@@ -795,9 +795,10 @@ class RemmitInfoUpdate(PermissionRequiredMixin, SuccessMessageMixin, UpdateView)
         return kw
 
     def get_initial(self):
-        entry_category = self.object.cashincentive_set.last().entry_category
-        reason_a = self.object.cashincentive_set.last().unpaid_cash_incentive_reason
-        return {'entry_category': entry_category, 'reason_a': reason_a}
+        if self.object.is_thirdparty_remittance():
+            entry_category = self.object.cashincentive_set.last().entry_category
+            reason_a = self.object.cashincentive_set.last().unpaid_cash_incentive_reason
+            return {'entry_category': entry_category, 'reason_a': reason_a}
 
     def form_valid(self, form):
         form.instance.cash_incentive_amount = form.instance.amount*Decimal(0.025)
