@@ -47,11 +47,11 @@ EMAIL_PORT = 465
 #EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'cfrd.support@nrbcommercialbank.com'
-EMAIL_HOST_PASSWORD = 'Usa@1234'
+EMAIL_HOST_PASSWORD = 'Usa@7890'
 DEFAULT_FROM_EMAIL='cfrd.support@nrbcommercialbank.com'
 #ADMINS=[('Navid', 'kazinavidanzum@nrbcommercialbank.com'), ('Chakibbai', 'nazmussaqib@nrbcommercialbank.com')]
 #MANAGERS=[('Navid', 'kazinavidanzum@nrbcommercialbank.com'), ('Chakibbai', 'nazmussaqib@nrbcommercialbank.com')]
 
 
 ################################ Configurations #########################################
-IMAGE_UPLOAD_REQUIRED = True
+IMAGE_UPLOAD_REQUIRED = False
