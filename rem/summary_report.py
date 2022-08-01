@@ -64,7 +64,7 @@ def cash_incentive_bb_statement(qset):
         sender_occupation.append(r.remittance.get_sender_occupation_display().upper() if r.remittance.sender_occupation else None)
         exchange_house.append(r.remittance.exchange.name if r.remittance.is_thirdparty_remittance() else r.remittance.sender_bank.name)
         date_sending_remittance.append(r.remittance.date_sending)
-        fc_amount.append(r.get_fc_amount()) #to be changed mandatory status
+        fc_amount.append(float(r.get_fc_amount())) #to be changed mandatory status
         exchange_rate.append(r.get_exchange_rate()) #to be changed mandatory status
         bdt_amount.append(r.get_bdt_amount()) #to_change
         trn_type.append(r.remittance.get_ci_trn_type())
@@ -96,6 +96,7 @@ def cash_incentive_bb_statement(qset):
             "Cell Phone": dealing_cell,
             }
     df = pd.DataFrame(dct)
+    df['FC Amount'] = df['FC Amount'].round(2)
     return df
 
 #def daily_remittance_bb_statement(qset):
