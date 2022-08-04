@@ -54,4 +54,4 @@ DEFAULT_FROM_EMAIL='cfrd.support@nrbcommercialbank.com'
 
 
 ################################ Configurations #########################################
-IMAGE_UPLOAD_REQUIRED = False
+IMAGE_UPLOAD_REQUIRED = True
