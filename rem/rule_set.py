@@ -25,7 +25,7 @@ def is_ad_branch_user(user, remittance):
 
 @rules.predicate
 def is_transaction_hour(user):
-    return time(9,29)<timezone.localtime().time()<time(21,00)
+    return time(8,58)<timezone.localtime().time()<time(21,00)
 
 @rules.predicate
 def is_same_day(user,remittance):
