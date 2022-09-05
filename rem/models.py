@@ -434,6 +434,7 @@ class Remmit(models.Model):
     reference = models.CharField("Referene No./PIN/MTCN", help_text='Referene No./PIN/MTCN/ For SWIFT - Sender\'s reference: F20A, <br> For Cash FC Deposit Remittance: C[BRANCH CODE]-YYYY-MM-DD-[Serial No (2 Digit)] e.g. C0101-2022-16-05-01', max_length=20, unique=True)
     screenshot = models.ImageField("Agent Copy", default = 'images/None/no-img.jpg')
     sender_bank = models.ForeignKey(Foreignbank, on_delete=models.CASCADE, verbose_name="Sender's Bank/ Ordering Institution", help_text="Ordering Institution: F52A for remittance through SWIFT. If not listed, you can add foreign bank", null=True, blank=True)
+    fdd_bank = models.ForeignKey(Bank, on_delete=models.CASCADE, verbose_name="FDD Issuing Bank", help_text="Mandatory for remittance through FDD", null=True, blank=True)
     #sender_bank = models.ForeignKey(Bank, on_delete=models.CASCADE, verbose_name="Sender's Bank/ Ordering Institution", null=True, blank=True, help_text='Ordering Institution: F52A for remittance through SWIFT')
     #sender_bank_swift = models.CharField("Sender's Bank's/ Ordering Institution's SWIFT BIC", max_length=11, validators=[swift_bic,], null=True, blank=True, help_text='Ordering Institution\'s SWIFT BIC: F52A for remittance through SWIFT')
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
@@ -613,7 +614,8 @@ class Remmit(models.Model):
             currency = Currency.objects.get(short='USD')
             if currency.get_exchange_rate(date=self.date_create.date(), type = 'TTC') != 'DNE':
                 rate = currency.get_exchange_rate(date=self.date_create.date(), type = 'TTC').rate
-                return self.amount/rate
+                fc_amount = self.amount/rate
+                return fc_amount.quantize(Decimal('1.00'))
             else:
                 return "No Rate"
         else:
@@ -820,7 +822,8 @@ class CashIncentive(models.Model):
             amount_bdt = self.get_bdt_amount()
             currency = Currency.objects.get(short='USD')
             usd_rate = currency.get_exchange_rate(date=date)
-            return amount_bdt/usd_rate.rate if usd_rate != 'DNE' else 'Rate not Found'
+            usd_amount = amount_bdt/usd_rate.rate
+            return usd_amount.quantize(Decimal('1.00')) if usd_rate != 'DNE' else 'Rate not Found'
 
     def get_entry_category_display(self):
         if self.entry_category=='P':
