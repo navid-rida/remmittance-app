@@ -123,7 +123,7 @@ def cash_incentive_rit(qset):
         sender_gender.append(r.remittance.get_sender_gender_display())
         sender_occupation.append(r.remittance.get_sender_occupation_display().upper() if r.remittance.sender_occupation else None)
         source_country.append(r.remittance.rem_country.name)
-        exchange_house.append(r.remittance.exchange.name if r.remittance.is_thirdparty_remittance() else "Other")
+        exchange_house.append(r.remittance.exchange.verbose_name if r.remittance.is_thirdparty_remittance() else "Other")
         date_sending_remittance.append(r.remittance.date_sending)
         fc_amount.append(r.get_fc_amount()) #to be changed mandatory status
         currency.append("USD" if r.remittance.currency.short=='BDT' else r.remittance.currency.short)
