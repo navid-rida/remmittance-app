@@ -112,6 +112,12 @@ cash_deposit_reference_re = RegexValidator(
     code='invalid_cdr',
 )
 
+fdd_number_re = RegexValidator(
+    _lazy_re_compile(r'^[0-9]{8}$'),
+    message=_('Please enter a valid FDD number'),
+    code='invalid_cdr',
+)
+
 def validate_neg(value):
     if value < 0:
         raise ValidationError(
