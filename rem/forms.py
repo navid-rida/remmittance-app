@@ -24,7 +24,7 @@ class RemmitForm(ModelForm):
 
     class Meta:
         model = Remmit
-        fields = ('exchange','rem_country','reference','sender','sender_gender','amount', 'currency','relationship', 'purpose','mariner_status','date_sending','sender_occupation', 'account', 'sender_bank')
+        fields = ('exchange','rem_country','reference','sender','sender_gender','amount', 'currency','relationship', 'purpose','mariner_status','date_sending','sender_occupation', 'account', 'sender_bank', 'fdd_bank')
         #widgets = {
             #'dob': forms.SelectDateWidget,
             #'cash_incentive_status': forms.RadioSelect,
@@ -72,9 +72,9 @@ class RemmitForm(ModelForm):
         currency = self.cleaned_data['currency']
         exchange = self.cleaned_data['exchange']
         exchange_list = ['WESTERN UNION','XPRESS MONEY','RIA MONEY TRANSFER','PLACID EXPRESS','MONEYGRAM']
-        if (exchange.name!='SWIFT' and exchange.name != 'CASH DEPOSIT') and (currency.name!='BANGLADESHI TAKA'):
+        if (exchange.name!='SWIFT' and exchange.name != 'CASH DEPOSIT' and exchange.name != 'FDD DEPOSIT') and (currency.name!='BANGLADESHI TAKA'):
             raise ValidationError('Only BDT can be selected for '+exchange.name )
-        if (exchange.name=='SWIFT' or exchange.name == 'CASH DEPOSIT') and currency.name=='BANGLADESHI TAKA':
+        if (exchange.name=='SWIFT' or exchange.name == 'CASH DEPOSIT' or exchange.name == 'FDD DEPOSIT') and currency.name=='BANGLADESHI TAKA':
             raise ValidationError('Only FC can be selected for '+ exchange.name )
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
@@ -87,6 +87,7 @@ class RemmitForm(ModelForm):
         reference = cleaned_data.get("reference")
         cash_incentive_status = cleaned_data.get("cash_incentive_status")
         sender_bank = cleaned_data.get("sender_bank")
+        fdd_bank = cleaned_data.get("fdd_bank")
         account = cleaned_data.get("account")
         rem_country = cleaned_data.get("rem_country")
         mariner_status = cleaned_data.get("mariner_status")
@@ -161,6 +162,31 @@ class RemmitForm(ModelForm):
                 self.add_error('account', 'Benificiary account is mandatory for SWIFT remittances')
             if (sender_bank and rem_country) and sender_bank.country != rem_country:
                 self.add_error('sender_bank', "\"Remittiting Country\" and \"Country of Sender's Bank\" mismatch")
+        
+        elif exchange.name == 'FDD DEPOSIT':
+            #if not receiver.ac_no:
+                #self.add_error("Receiver must have an NRCB account for receiving remittance through SWIFT")
+            if cash_incentive_status=='P':
+                self.add_error('cash_incentive_status', "Cash Incentive against remittance received though FDD is not applicable before encashment in BDT")
+            try:
+                fdd_number_re(reference)
+            except ValidationError as err:
+                self.add_error('reference',err)
+            #if not self.request.user.has_perm('rem.can_add_swift_cash_deposit_remit'):
+                #self.add_error('exchange', "SWIFT remittance can only be disbursed though ad branch user")
+            #if not sender_bank:
+                #self.add_error('sender_bank', "You must select a sender's Bank for remittances through FDD")
+            if account:
+                try:
+                    nrbc_fc_acc(account.number)
+                except ValidationError as err:
+                    self.add_error('account',err)
+            else:
+                self.add_error('account', 'Benificiary account is mandatory for remittances through FDD')
+            if not fdd_bank:
+                self.add_error('fdd_bank', "FDD issuer Bank is mandatory for deposit through FDD")
+            #if (sender_bank and rem_country) and sender_bank.country != rem_country:
+                #self.add_error('sender_bank', "\"Remittiting Country\" and \"Country of Sender's Bank\" mismatch")
 
         elif exchange.name == 'CASH DEPOSIT':
             #if not receiver.ac_no:
@@ -187,10 +213,12 @@ class RemmitForm(ModelForm):
             self.add_error('sender_bank',"Sender's Bank is applicable only for SWIFT remittances")
         if mariner_status == True and exchange.name!='SWIFT':
             self.add_error('mariner_status',"Mariner remittance is applicable only for SWIFT remittances")
-        if exchange.name!='SWIFT' and exchange.name!='CASH DEPOSIT' and not self.request.user.has_perm('rem.add_third_party_remmit'):
+        if exchange.name!='SWIFT' and exchange.name!='CASH DEPOSIT' and exchange.name!='FDD DEPOSIT' and not self.request.user.has_perm('rem.add_third_party_remmit'):
             self.add_error('exchange', 'You do not have permissions to add third party exchange house remittance')
-        if (exchange.name =='SWIFT' or exchange.name =='CASH DEPOSIT') and not self.request.user.has_perm('rem.can_add_swift_cash_deposit_remit'):
-            self.add_error('exchange', 'You do not have permissions to add swift remittance')
+        if (exchange.name =='SWIFT' or exchange.name =='CASH DEPOSIT' or exchange.name =='FDD DEPOSIT') and not self.request.user.has_perm('rem.can_add_swift_cash_deposit_remit'):
+            self.add_error('exchange', 'You do not have permissions to add swift/cash FC/FDD remittance')
+        if fdd_bank and exchange.name != 'FDD DEPOSIT':
+            self.add_error('fdd_bank', "FDD issuer Bank is only applicable for remittance through FDD")
         #form.add_error('reference', err)
 
         return cleaned_data
@@ -218,6 +246,7 @@ class RemittInfoForm(RemmitForm):
         self.helper.layout = Layout(
             'exchange',
             'sender_bank',
+            'fdd_bank',
             'rem_country',
             'reference',
             'account',
@@ -252,8 +281,8 @@ class RemittInfoForm(RemmitForm):
         exchange = self.cleaned_data['exchange']
         if 'entry_category' in self.changed_data and cash_incentive_status=='U' and self.fields['entry_category'].initial=="":
             raise ValidationError('Validation error: A remittance cannot be marked unpaid once it is paid')
-        if cash_incentive_status=='P' and exchange.name=='SWIFT':
-            raise ValidationError('Cash Incentive against remittance received though SWIFT is not applicable before encashment in BDT')
+        if cash_incentive_status=='P' and (exchange.name=='SWIFT' or exchange.name=='FDD DEPOSIT'):
+            raise ValidationError('Cash Incentive against remittance received though SWIFT/FDD Deposit is not applicable before encashment in BDT')
         if (cash_incentive_status=='P' or cash_incentive_status == 'U') and exchange.name=='CASH DEPOSIT':
             raise ValidationError('Cash Incentive is not applicable in Cash deposit')
         # Always return a value to use as the new cleaned data, even if
@@ -318,6 +347,16 @@ class EncashmentForm(ModelForm):
             'account',
             Submit('submit', 'Encash')
         )
+
+    def clean_account(self):
+        account = self.cleaned_data['account']
+        if account:
+            try:
+                nrbc_fc_acc(account.number)
+                self.add_error('account',"FC Accounts are not eligible for encashments")
+            except ValidationError:
+                pass
+        return account
 
 
     def clean_reason(self):

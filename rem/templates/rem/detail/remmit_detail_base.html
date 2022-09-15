@@ -122,7 +122,7 @@
         </tr>
       </tbody>
     </table>
-{% if object.exchange.name == 'SWIFT' %}
+{% if object.exchange.name == 'SWIFT' or  object.exchange.name == 'FDD DEPOSIT' %}
     <h4>Encashment Details</h4>
     <table class="table table-hover table-sm">
       <tbody>
@@ -172,7 +172,7 @@
 
 
 {% has_perm 'rem.can_mark_paid_remittance' user object as can_mark_paid %}
-{% if can_mark_paid and object.check_unpaid_cash_incentive %}
+{% if can_mark_paid and object.check_unpaid_cash_incentive and object.is_thirdparty_remittance %}
 <td><a class="btn btn-success" href="{% url 'pay_unpaid_incentive' object.pk %}"><i class="far fa-info-square"></i>Pay
     Cash Incentive</a></td>
 {% endif %}

@@ -113,7 +113,7 @@ cash_deposit_reference_re = RegexValidator(
 )
 
 fdd_number_re = RegexValidator(
-    _lazy_re_compile(r'^[0-9]{8}$'),
+    _lazy_re_compile(r'^[0-9]{1,8}$'),
     message=_('Please enter a valid FDD number'),
     code='invalid_cdr',
 )

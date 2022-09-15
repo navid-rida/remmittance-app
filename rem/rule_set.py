@@ -45,7 +45,7 @@ def remittance_cash_incentive_paid(user,remittance):
 
 @rules.predicate
 def is_thirdparty_exchange_house(user,remittance):
-    return remittance.exchange.name != 'SWIFT' and remittance.exchange.name != 'CASH DEPOSIT'
+    return remittance.exchange.name != 'SWIFT' and remittance.exchange.name != 'CASH DEPOSIT' and remittance.exchange.name != 'FDD DEPOSIT'
 
 
 #is_branch_report_user = rules.is_group_member('branch user')
