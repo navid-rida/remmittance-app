@@ -137,10 +137,10 @@
         {% for item in object.encashment_set.all %}
     
         <tr>
-          <td>{{item.remittance.currency.short}} {{item.amount}}</td>
-          <td>{{item.rate|floatformat:2}}</td>
-          <td>{{ item.encashment_amount_in_bdt|floatformat:2 }}</td>
-          <td>BDT {{ item.cashincentive.cash_incentive_amount }}
+          <td>{{item.remittance.currency.short}} {{item.amount|comma_seperated_bangla}}</td>
+          <td>{{item.rate|floatformat:4}}</td>
+          <td>{{ item.encashment_amount_in_bdt|floatformat:2|comma_seperated_bangla }}</td>
+          <td>BDT {{ item.cashincentive.cash_incentive_amount|comma_seperated_bangla }}
             {% if item.check_cash_incnetive_payment_status == "P" %}
               (Paid)
             {% endif %}
