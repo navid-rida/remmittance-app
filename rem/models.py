@@ -473,12 +473,7 @@ class Remmit(models.Model):
     def get_thirdparty_ci_status_display(self):
         if self.is_thirdparty_remittance():
             ci = self.cashincentive_set.last()
-            if ci.check_cash_incnetive_payment_status == "P":
-                return "Paid"
-            if ci.check_cash_incnetive_payment_status == "U":
-                return "To be paid"
-            if ci.check_cash_incnetive_payment_status == "NA":
-                return "Not Apllicable"
+            return ci.get_entry_category_display()
         else:
             return "Remittance is not a third party exchange house remittance"
             
@@ -489,7 +484,7 @@ class Remmit(models.Model):
 
 
     def get_total_encashment_value(self):
-        total_encashment = self.encashment_set.aggregate(sum=Sum('amount'))
+        total_encashment = self.encashment_set.filter(cashin_category='P').aggregate(sum=Sum('amount'))
         if total_encashment['sum']:
             return total_encashment['sum']
         else:
@@ -503,16 +498,22 @@ class Remmit(models.Model):
         else:
             return 0
 
-    def get_encashment_status_display(self):
+    def get_cashincentive_status_display(self):
         if not self.is_thirdparty_remittance() and self.exchange.name != "CASH DEPOSIT":
-            if self.get_encashment_room() > 0 and self.get_total_encashment_value()>0:
-                return "Partially encashed"
-            elif self.get_encashment_room() == 0 and self.get_total_encashment_value()==self.amount:
-                return "Paid"
+            encashment_set = self.encashment_set
+            if not encashment_set.filter(cashin_category='P').exists():
+                return "Not Paid"
             else:
-                return "status cannot be determined"
+                if self.get_encashment_room() > 0:
+                    return "Partially Paid"
+                else:
+                    if encashment_set.exclude(cashin_category='P').exists():
+                        return "Partially Paid"
+                    else:
+                        return "Paid"
+
         elif self.exchange.name == "CASH DEPOSIT":
-            return "Cash Incentive Not Applicable"
+            return "Not Applicable"
         else:
             return self.get_thirdparty_ci_status_display()
     ##################################################
