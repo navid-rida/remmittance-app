@@ -469,6 +469,21 @@ class Remmit(models.Model):
         return self.reference+" on "+self.branch.name
 
 
+    ####################### Cash incentive related #######################
+    def get_thirdparty_ci_status_display(self):
+        if self.is_thirdparty_remittance():
+            ci = self.cashincentive_set.last()
+            if ci.check_cash_incnetive_payment_status == "P":
+                return "Paid"
+            if ci.check_cash_incnetive_payment_status == "U":
+                return "To be paid"
+            if ci.check_cash_incnetive_payment_status == "NA":
+                return "Not Apllicable"
+        else:
+            return "Remittance is not a third party exchange house remittance"
+            
+
+
 
     #################### Encashment Related Methods ######################
 
@@ -487,6 +502,19 @@ class Remmit(models.Model):
             return room
         else:
             return 0
+
+    def get_encashment_status_display(self):
+        if not self.is_thirdparty_remittance() and self.exchange.name != "CASH DEPOSIT":
+            if self.get_encashment_room() > 0 and self.get_total_encashment_value()>0:
+                return "Partially encashed"
+            elif self.get_encashment_room() == 0 and self.get_total_encashment_value()==self.amount:
+                return "Paid"
+            else:
+                return "status cannot be determined"
+        elif self.exchange.name == "CASH DEPOSIT":
+            return "Cash Incentive Not Applicable"
+        else:
+            return self.get_thirdparty_ci_status_display()
     ##################################################
     def clean(self):
         if self.cash_incentive_status=='U' and self.date_cash_incentive_paid is not None:
@@ -652,18 +680,25 @@ class Remmit(models.Model):
         return self.exchange.name != 'SWIFT' and self.exchange.name != 'CASH DEPOSIT' and self.exchange.name != 'FDD DEPOSIT'
     
     def get_schedule_code(self):
-        if self.is_thirdparty_remittance() or self.exchange.name == 'FDD DEPOSIT':
+        if self.is_thirdparty_remittance():
             return "24"
         if self.exchange.name == 'SWIFT':
             return "23"
-        if self.exchange.name == 'CASH DEPOSIT':
+        if self.exchange.name == 'CASH DEPOSIT' or self.exchange.name == 'FDD DEPOSIT':
             return "25"
+    
+    def get_type_code(self):
+        if self.exchange == 'FDD DEPOSIT':
+            return "3"
+        else:
+            return "4"
 
     def get_purpose_code(self):
         if self.exchange.name == 'SWIFT' and self.mariner_status == False:
             return "5123"
         else:
             return None
+
         
     
     
