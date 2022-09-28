@@ -5,7 +5,7 @@ from pathlib import Path
 import datetime
 
 ###################### paths ###########################################
-folder_path = "F:\\Projects\\Return RIT\\2022\\RIT-AUG-2022"
+"""folder_path = "F:\\Projects\\Return RIT\\2022\\RIT-AUG-2022"
 export_text_file = 'exprecpt.txt'
 import_payment_text_file = 'imppaynt.txt'
 invisible_payment_text_file = 'invpaynt.txt'
@@ -175,7 +175,7 @@ def rit_all_df(exp_rec,imp_pay,inv_pay,inv_rec,wage_remit):
     return df
 
 
-final_df = rit_all_df(exp_df,imp_pay_df,invisible_pay_df,invisible_rec_df,wage_remit_df)
+final_df = rit_all_df(exp_df,imp_pay_df,invisible_pay_df,invisible_rec_df,wage_remit_df)"""
 
 
 ########################################### Remittance Reports from DB ########################################
