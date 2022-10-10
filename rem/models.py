@@ -222,7 +222,7 @@ class Receiver(models.Model):
     GENDER_CHOICES = (
         (MALE,'MALE'),
         (FEMALE, 'FEMALE'),
-        (OTHER, 'Other'),
+        (OTHER, 'Others'),
         )
     gender=models.CharField("Gender of Receiver",max_length=1, choices=GENDER_CHOICES)
     father_name = models.CharField("Father's name of Receiver", max_length=100, null=True, blank=True)
@@ -234,7 +234,7 @@ class Receiver(models.Model):
     OCCUPATION_CHOICES = (
         (SERVICE,'SERVICE'),
         (BUSINESS, 'BUSINESS'),
-        (OTHER, 'OTHER'),
+        (OTHER, 'OTHERS'),
         )
     profession = models.CharField("Profession", max_length=100, choices=OCCUPATION_CHOICES)
     nationality = models.ForeignKey(Country,on_delete=models.CASCADE, verbose_name='Nationality',  default=Country.objects.get(name='BANGLADESH').id)
@@ -372,7 +372,7 @@ class Remmit(models.Model):
     OCCUPATION_CHOICES = (
         (SERVICE,'SERVICE'),
         (BUSINESS, 'BUSINESS'),
-        (OTHER, 'OTHER'),
+        (OTHER, 'OTHERS'),
         )
     sender_occupation = models.CharField("Occupation of Remitter", help_text="Service/ Business etc.",choices=OCCUPATION_CHOICES, validators=[alpha], max_length=50)
     MALE= 'M'
@@ -381,7 +381,7 @@ class Remmit(models.Model):
     GENDER_CHOICES = (
         (MALE,'MALE'),
         (FEMALE, 'FEMALE'),
-        (OTHER, 'Other'),
+        (OTHER, 'Others'),
         )
     sender_gender=models.CharField("Gender of the Remitter",max_length=1, choices=GENDER_CHOICES)
 
