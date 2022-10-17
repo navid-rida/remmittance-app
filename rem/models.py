@@ -678,18 +678,18 @@ class Remmit(models.Model):
 
     def is_thirdparty_remittance(self):
         # returns true if the remittance is from third party exchange house
-        return self.exchange.name != 'SWIFT' and self.exchange.name != 'CASH DEPOSIT' and self.exchange.name != 'FDD DEPOSIT'
+        return self.exchange.name != 'SWIFT' and self.exchange.name != 'CASH DEPOSIT' and self.exchange.name != 'FDD/RTGS DEPOSIT'
     
     def get_schedule_code(self):
         if self.is_thirdparty_remittance():
             return "24"
         if self.exchange.name == 'SWIFT':
             return "23"
-        if self.exchange.name == 'CASH DEPOSIT' or self.exchange.name == 'FDD DEPOSIT':
+        if self.exchange.name == 'CASH DEPOSIT' or self.exchange.name == 'FDD/RTGS DEPOSIT':
             return "25"
     
     def get_type_code(self):
-        if self.exchange == 'FDD DEPOSIT':
+        if self.exchange == 'FDD/RTGS DEPOSIT':
             return "3"
         else:
             return "4"

@@ -72,9 +72,9 @@ class RemmitForm(ModelForm):
         currency = self.cleaned_data['currency']
         exchange = self.cleaned_data['exchange']
         exchange_list = ['WESTERN UNION','XPRESS MONEY','RIA MONEY TRANSFER','PLACID EXPRESS','MONEYGRAM']
-        if (exchange.name!='SWIFT' and exchange.name != 'CASH DEPOSIT' and exchange.name != 'FDD DEPOSIT') and (currency.name!='BANGLADESHI TAKA'):
+        if (exchange.name!='SWIFT' and exchange.name != 'CASH DEPOSIT' and exchange.name != 'FDD/RTGS DEPOSIT') and (currency.name!='BANGLADESHI TAKA'):
             raise ValidationError('Only BDT can be selected for '+exchange.name )
-        if (exchange.name=='SWIFT' or exchange.name == 'CASH DEPOSIT' or exchange.name == 'FDD DEPOSIT') and currency.name=='BANGLADESHI TAKA':
+        if (exchange.name=='SWIFT' or exchange.name == 'CASH DEPOSIT' or exchange.name == 'FDD/RTGS DEPOSIT') and currency.name=='BANGLADESHI TAKA':
             raise ValidationError('Only FC can be selected for '+ exchange.name )
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
@@ -163,7 +163,7 @@ class RemmitForm(ModelForm):
             if (sender_bank and rem_country) and sender_bank.country != rem_country:
                 self.add_error('sender_bank', "\"Remittiting Country\" and \"Country of Sender's Bank\" mismatch")
         
-        elif exchange.name == 'FDD DEPOSIT':
+        elif exchange.name == 'FDD/RTGS DEPOSIT':
             #if not receiver.ac_no:
                 #self.add_error("Receiver must have an NRCB account for receiving remittance through SWIFT")
             if cash_incentive_status=='P':
@@ -213,11 +213,11 @@ class RemmitForm(ModelForm):
             self.add_error('sender_bank',"Sender's Bank is applicable only for SWIFT remittances")
         if mariner_status == True and exchange.name!='SWIFT':
             self.add_error('mariner_status',"Mariner remittance is applicable only for SWIFT remittances")
-        if exchange.name!='SWIFT' and exchange.name!='CASH DEPOSIT' and exchange.name!='FDD DEPOSIT' and not self.request.user.has_perm('rem.add_third_party_remmit'):
+        if exchange.name!='SWIFT' and exchange.name!='CASH DEPOSIT' and exchange.name!='FDD/RTGS DEPOSIT' and not self.request.user.has_perm('rem.add_third_party_remmit'):
             self.add_error('exchange', 'You do not have permissions to add third party exchange house remittance')
-        if (exchange.name =='SWIFT' or exchange.name =='CASH DEPOSIT' or exchange.name =='FDD DEPOSIT') and not self.request.user.has_perm('rem.can_add_swift_cash_deposit_remit'):
+        if (exchange.name =='SWIFT' or exchange.name =='CASH DEPOSIT' or exchange.name =='FDD/RTGS DEPOSIT') and not self.request.user.has_perm('rem.can_add_swift_cash_deposit_remit'):
             self.add_error('exchange', 'You do not have permissions to add swift/cash FC/FDD remittance')
-        if fdd_bank and exchange.name != 'FDD DEPOSIT':
+        if fdd_bank and exchange.name != 'FDD/RTGS DEPOSIT':
             self.add_error('fdd_bank', "FDD issuer Bank is only applicable for remittance through FDD")
         #form.add_error('reference', err)
 
@@ -281,8 +281,8 @@ class RemittInfoForm(RemmitForm):
         exchange = self.cleaned_data['exchange']
         if 'entry_category' in self.changed_data and cash_incentive_status=='U' and self.fields['entry_category'].initial=="":
             raise ValidationError('Validation error: A remittance cannot be marked unpaid once it is paid')
-        if cash_incentive_status=='P' and (exchange.name=='SWIFT' or exchange.name=='FDD DEPOSIT'):
-            raise ValidationError('Cash Incentive against remittance received though SWIFT/FDD Deposit is not applicable before encashment in BDT')
+        if cash_incentive_status=='P' and (exchange.name=='SWIFT' or exchange.name=='FDD/RTGS DEPOSIT'):
+            raise ValidationError('Cash Incentive against remittance received though SWIFT/FDD/RTGS DEPOSIT is not applicable before encashment in BDT')
         if (cash_incentive_status=='P' or cash_incentive_status == 'U') and exchange.name=='CASH DEPOSIT':
             raise ValidationError('Cash Incentive is not applicable in Cash deposit')
         # Always return a value to use as the new cleaned data, even if
