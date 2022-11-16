@@ -129,7 +129,7 @@ LOGIN_REDIRECT_URL='index'
 
 ######################### Rem app sepcific settings##############################
 
-MAXIMUM_USER_PER_BRANCH=10
+MAXIMUM_USER_PER_BRANCH=15
 MAXIMUM_USER_PER_BOOTH=5
 MAXIMUM_USER_HEAD_OFFICE=10
 
