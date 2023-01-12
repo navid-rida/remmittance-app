@@ -73,6 +73,7 @@ def make_ac_df(list,category,columns,payments):
     amount = []
     narrations = []
     flags = []
+    amount_type = []
     #country = []
     i = 1
     for pay in payments:
@@ -108,6 +109,7 @@ def make_ac_df(list,category,columns,payments):
         else:
             flag= 0 if pay.requestpay.remittance.exchange.ac_no[0]=='9' else 1
         flags.append(flag)
+        amount_type.append('000')
         #country.append(pay.requestpay.remittance.rem_country.name)
         dict ={
         #'Sl' : Sl,
@@ -120,6 +122,7 @@ def make_ac_df(list,category,columns,payments):
         'amount' : amount,
         'narrations' : narrations,
         'flags' : flags,
+        'amount_type': amount_type
         #'country' : country
         }
     df = pd.DataFrame(dict)
@@ -141,6 +144,7 @@ def make_cash_incentive_df(list,category,columns,cis):
     amount = []
     narrations = []
     flags = []
+    amount_type = []
     #country = []
     i = 1
     for ci in cis:
@@ -177,6 +181,7 @@ def make_cash_incentive_df(list,category,columns,cis):
         else:
             flag=0
         flags.append(flag)
+        amount_type.append('000')
         #country.append(ci.remittance.rem_country.name)
         dict ={
         #'Sl' : Sl,
@@ -189,6 +194,7 @@ def make_cash_incentive_df(list,category,columns,cis):
         'amount' : amount,
         'narrations' : narrations,
         'flags' : flags,
+        'amount_type': amount_type
         #'country' : country
         }
     df = pd.DataFrame(dict)
