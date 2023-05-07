@@ -62,7 +62,7 @@ def cash_incentive_bb_statement(qset):
         bank_name.append("NRB COMMERCIAL BANK LTD.")
         sender_name.append(r.remittance.sender.upper())
         sender_occupation.append(r.remittance.get_sender_occupation_display().upper() if r.remittance.sender_occupation else None)
-        exchange_house.append(r.remittance.exchange.name if r.remittance.is_thirdparty_remittance() else r.remittance.sender_bank.name)
+        exchange_house.append(r.remittance.get_exchange_name_for_bb_form_kha())#exchange.name if r.remittance.is_thirdparty_remittance() else r.remittance.sender_bank.name)
         date_sending_remittance.append(r.remittance.date_sending)
         fc_amount.append(float(r.get_fc_amount())) #to be changed mandatory status
         exchange_rate.append(r.get_exchange_rate()) #to be changed mandatory status

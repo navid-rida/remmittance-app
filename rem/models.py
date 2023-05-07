@@ -476,6 +476,16 @@ class Remmit(models.Model):
             return ci.get_entry_category_display()
         else:
             return "Remittance is not a third party exchange house remittance"
+        
+    def get_exchange_name_for_bb_form_kha(self):
+        if self.is_thirdparty_remittance():
+            return self.exchange.name
+        elif self.exchange.name=="SWIFT" or self.exchange.name == "CASH DEPOSIT":
+            return self.sender_bank.name
+        elif self.exchange.name =="FDD/RTGS DEPOSIT":
+            return "Others"
+        else:
+            return "Error: Exchange House not found"
             
 
 
