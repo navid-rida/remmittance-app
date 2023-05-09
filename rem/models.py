@@ -638,6 +638,10 @@ class Remmit(models.Model):
             return "SUBAGENT_CASHPICKUP"
         elif self.exchange.name=='SWIFT':
             return "OWN BANK ACC CREDIT"
+        elif self.exchange.name=='FDD/RTGS DEPOSIT':
+            return "RTGS"
+        else:
+            return "TRANSACTION TYPE COULD NOT BE DETERMINED"
         return None
 
     """def get_exchange_rate(self, type = 'TTC'):

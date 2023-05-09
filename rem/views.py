@@ -1091,7 +1091,7 @@ def monthly_cash_incentive_bb_statement(request):
             date_to = form.cleaned_data['date_to']
             query_set = CashIncentive.objects.all()
             #q = filter_remittance(query_set, start_date=date_from, end_date= date_to, cash_incentive_status='P', cash_incentive_settlement_done=True)
-            q = query_set.filter(date_cash_incentive_settlement__range=(date_from,date_to),entry_category='P',date_cash_incentive_settlement__isnull=False)
+            q = query_set.filter(date_cash_incentive_settlement__range=(date_from,date_to),entry_category='P',date_cash_incentive_settlement__isnull=False).prefetch_related('remittance','remittance__receiver')
             statement = cash_incentive_bb_statement(qset=q)
             if '_show' in request.POST:
                 context = {'form':form, 'df': statement, }
