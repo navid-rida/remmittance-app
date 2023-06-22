@@ -134,22 +134,30 @@ def show_rem(request):
                 else:
                     return render(request, 'rem/report/payments/payment_list_branch.html', context)
             if '_download' in request.POST:
-                #df = pd.DataFrame(summary_list, columns=['code','name','count','sum'])
-                df = pd.DataFrame(list(req_list.values('branch__name','branch__code','booth__name', \
-                 'booth__code','exchange__name','currency__name','rem_country__name', \
-                 'sender','sender_occupation','relationship','purpose','cash_incentive_status', \
-                 'unpaid_cash_incentive_reason','receiver__name','receiver__idno', \
-                 'amount','cash_incentive_amount','date_sending','date_cash_incentive_paid', \
-                 'date_cash_incentive_settlement','date_create','reference','mariner_status','created_by')))
-                df['date_create'] = df['date_create'].dt.tz_convert('Asia/Dhaka').dt.tz_localize(None)
-                df['date_cash_incentive_paid'] = df['date_cash_incentive_paid'].dt.tz_convert('Asia/Dhaka').dt.tz_localize(None)
-                xlsx_data = excel_output(df)
-                response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                time = str(timezone.now().date())
-                filename = "Remittance List "+time+".xlsx"
-                response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
-                #writer.save(re)
-                return response
+                if req_list:
+                    #df = pd.DataFrame(summary_list, columns=['code','name','count','sum'])
+                    df = pd.DataFrame(list(req_list.values('branch__name','branch__code','booth__name', \
+                                                        'booth__code','exchange__name','currency__name','rem_country__name', \
+                                                        'sender','sender_occupation','relationship','purpose','cash_incentive_status', \
+                                                        'unpaid_cash_incentive_reason','receiver__name','receiver__idno', \
+                                                        'amount','cash_incentive_amount','date_sending','date_cash_incentive_paid', \
+                                                        'date_cash_incentive_settlement','date_create','reference','mariner_status','created_by')))
+                    df['date_create'] = df['date_create'].dt.tz_convert('Asia/Dhaka').dt.tz_localize(None)
+                    #df['date_cash_incentive_paid'] = df['date_cash_incentive_paid'].dt.tz_convert('Asia/Dhaka').dt.tz_localize(None)
+                    xlsx_data = excel_output(df)
+                    response = HttpResponse(xlsx_data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                    time = str(timezone.now().date())
+                    filename = "Remittance List "+time+".xlsx"
+                    response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+                    #writer.save(re)
+                    return response
+                else:
+                    messages.info(request, 'No records found')
+                    context = {'form':form }
+                    if request.user.has_perm('rem.view_ho_br_booth_reports'):
+                        return render(request, 'rem/report/payments/payment_list_ho.html', context)
+                    else:
+                        return render(request, 'rem/report/payments/payment_list_branch.html', context)
         else:
             context = {'form':form }
             if check_headoffice(request.user):
